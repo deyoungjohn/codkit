@@ -1,0 +1,12 @@
+{
+  "network": "sui:testnet",
+  "deployer": "0x641c81bfa8472367da432b112890e175b14bbbea7705fc451b5a1a6fd20d5066",
+  "deployedAt": "2026-10-15T16:19:32.789Z",
+  "commit": "1ce8ed7",
+  "packageId": "0x75baff73f8d31eada1976b4af87e81d1bf4ffe1d261d91006e643c5085a0c844",
+  "reputationId": "0xf10930ebc40c2dac7308a3cf442b6b99db5a8df631b7e6b2d3a7142d6387656b",
+  "upgradeCap": "0x00edbf29944d038a2083ad3ab68275439177fde796d73fdf2219af0527ca37f3",
+  "digest": "7bVtdrrdhKDx1PACYsAzFKKULkV8aid1Yjc9vCkatSsp",
+  "url": "https://suiscan.xyz/testnet/object/0x75baff73f8d31eada1976b4af87e81d1bf4ffe1d261d91006e643c5085a0c844",
+  "tx": "https://suiscan.xyz/testnet/tx/7bVtdrrdhKDx1PACYsAzFKKULkV8aid1Yjc9vCkatSsp"
+}

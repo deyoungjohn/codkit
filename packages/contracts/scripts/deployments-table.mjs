@@ -4,6 +4,7 @@
 //   forge script script/Deploy.s.sol --rpc-url base_sepolia --account dev --broadcast
 //   node scripts/deployments-table.mjs                 # every chain found in evm/broadcast
 //   node scripts/deployments-table.mjs --chain 84532   # one chain
+// Sui publications recorded in deployments/sui-*.json (non-local) are appended when no --chain is given.
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -47,9 +48,30 @@ export function deploymentsTable(broadcastDir, only) {
   return { rows, markdown: rows.length ? [head, ...body].join("\n") : "_No deployments found._" };
 }
 
+/** Rows for Sui publications (deployments/sui-<network>.json written by deploy-sui.mjs). */
+export function suiRows(deploymentsDir) {
+  if (!existsSync(deploymentsDir)) return [];
+  return readdirSync(deploymentsDir)
+    .filter((f) => /^sui-.+\.json$/.test(f) && !/local/.test(f))
+    .sort()
+    .flatMap((f) => {
+      const d = JSON.parse(readFileSync(join(deploymentsDir, f), "utf8"));
+      const net = f.replace(/^sui-|\.json$/g, "");
+      const name = `Sui ${net}`;
+      const obj = (id) => `[\`${id}\`](https://suiscan.xyz/${net}/object/${id})`;
+      const tx = d.digest ? `[${d.digest.slice(0, 10)}…](https://suiscan.xyz/${net}/tx/${d.digest})` : "";
+      return [
+        `| kit_escrow package | ${name} | ${obj(d.packageId)} | ${tx} |`,
+        ...(d.reputationId ? [`| Reputation (shared object) | ${name} | ${obj(d.reputationId)} | ${tx} |`] : []),
+      ];
+    });
+}
+
 if (import.meta.url === `file://${process.argv[1]}`) {
   const root = join(dirname(fileURLToPath(import.meta.url)), "..");
   const i = process.argv.indexOf("--chain");
-  const { markdown } = deploymentsTable(join(root, "evm", "broadcast"), i > 0 ? process.argv[i + 1] : undefined);
-  console.log(markdown);
+  const { rows, markdown } = deploymentsTable(join(root, "evm", "broadcast"), i > 0 ? process.argv[i + 1] : undefined);
+  const sui = i > 0 ? [] : suiRows(join(root, "deployments"));
+  if (!sui.length) console.log(markdown);
+  else console.log([rows.length ? markdown : "| Contract | Network | Address | Deploy tx |\n| --- | --- | --- | --- |", ...sui].join("\n"));
 }

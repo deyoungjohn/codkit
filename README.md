@@ -25,13 +25,19 @@ Each package works on its own, and the core of each package imports no chain SDK
 
 ## Testnet deployments
 
-Base Sepolia, deployed 2026-10-15 and source-verified. The `Reputation` owner is the deployer `0xefa0913b8a51359ebdf897a434e2783b1c86001a`. The end-to-end check passes 12/12 on Base Sepolia ([report](apps/testnet-e2e/reports/base-sepolia-2026-10-15T15-29-44-296Z.md)): escrow create, fund, deliver and release, reputation, three guardrail refusals, an x402 payment settled through the public facilitator, and a receipt log anchored onchain. Sui testnet is pending: see [docs/TESTNET.md](docs/TESTNET.md). The addresses are also exported as `deployments` from `@codkit/contracts`.
+Deployed 2026-10-15 to Base Sepolia (source-verified) and Sui testnet. The EVM `Reputation` owner is the deployer `0xefa0913b8a51359ebdf897a434e2783b1c86001a`. The Sui package was published by `0x641c81bfa8472367da432b112890e175b14bbbea7705fc451b5a1a6fd20d5066`, which holds the `UpgradeCap`. The addresses are also exported as `deployments` from `@codkit/contracts`.
+
+End-to-end checks against these deployments:
+- **Base Sepolia, 12/12** ([report](apps/testnet-e2e/reports/base-sepolia-2026-10-15T15-29-44-296Z.md)): escrow create, fund, deliver and release; reputation; three guardrail refusals; an x402 payment settled through the public facilitator; and a receipt log anchored onchain.
+- **Sui testnet** ([report](apps/testnet-e2e/reports/sui-testnet-2026-10-15T16-20-21-261Z.md)): a policy check, then escrow create, fund, deliver and release, then a receipt log anchored via `kit_escrow::anchor` and verified.
 
 | Contract | Network | Address | Deploy tx |
 | --- | --- | --- | --- |
 | Reputation | Base Sepolia (84532) | [`0x51ac7b594345dfec761f3e9c48b79f80bfab3061`](https://sepolia.basescan.org/address/0x51ac7b594345dfec761f3e9c48b79f80bfab3061) | [0x49934871…](https://sepolia.basescan.org/tx/0x49934871339103a2632b95c99508eeeafbbec7798d680769f4a1f7bea4dee9ad) |
 | Escrow | Base Sepolia (84532) | [`0x7934bd7b6e7a3732ac866c6d784244f5ebd79109`](https://sepolia.basescan.org/address/0x7934bd7b6e7a3732ac866c6d784244f5ebd79109) | [0xe79f0939…](https://sepolia.basescan.org/tx/0xe79f0939059ab42fe4261e6f1a706525eaa07128d88dd9f41484302671bb83d7) |
 | ReceiptAnchor | Base Sepolia (84532) | [`0xd2c2c972d883f7fe9c61e2624bc87e1e6621f326`](https://sepolia.basescan.org/address/0xd2c2c972d883f7fe9c61e2624bc87e1e6621f326) | [0x88aeead7…](https://sepolia.basescan.org/tx/0x88aeead79cefbb6c51114c20df3fac987991ee7cce497225e93b0e1a1602fca2) |
+| kit_escrow package | Sui testnet | [`0x75baff73f8d31eada1976b4af87e81d1bf4ffe1d261d91006e643c5085a0c844`](https://suiscan.xyz/testnet/object/0x75baff73f8d31eada1976b4af87e81d1bf4ffe1d261d91006e643c5085a0c844) | [7bVtdrrdhK…](https://suiscan.xyz/testnet/tx/7bVtdrrdhKDx1PACYsAzFKKULkV8aid1Yjc9vCkatSsp) |
+| Reputation (shared object) | Sui testnet | [`0xf10930ebc40c2dac7308a3cf442b6b99db5a8df631b7e6b2d3a7142d6387656b`](https://suiscan.xyz/testnet/object/0xf10930ebc40c2dac7308a3cf442b6b99db5a8df631b7e6b2d3a7142d6387656b) | [7bVtdrrdhK…](https://suiscan.xyz/testnet/tx/7bVtdrrdhKDx1PACYsAzFKKULkV8aid1Yjc9vCkatSsp) |
 
 Ran it yourself? File a [Testnet feedback](https://github.com/deyoungjohn/codkit/issues/new?template=testnet-feedback.yml) issue.
 

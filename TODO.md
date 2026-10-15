@@ -30,7 +30,7 @@ Check that the model calls `policy_status` before buying, asks for approval on t
 
 ### Testnet funds and deployments
 
-**Base Sepolia contracts are deployed and verified (2026-10-15).** The addresses are in the root README. `pnpm e2e:evm --network base-sepolia` passes 12/12 (2026-10-15; reports committed). Still to do: the Sui publish and `pnpm e2e:sui`. The full runbook is in [docs/TESTNET.md](docs/TESTNET.md). In short: `pnpm deploy:evm --network base-sepolia --account deployer --verify`, then `pnpm deploy:sui --network testnet`, then `pnpm e2e:evm --network base-sepolia` and `pnpm e2e:sui --network testnet`, and commit the deployments and reports. The steps below are the older manual equivalents.
+**Base Sepolia contracts are deployed and verified (2026-10-15).** The addresses are in the root README. `pnpm e2e:evm --network base-sepolia` passes 12/12 (2026-10-15; reports committed). The Sui package is published to testnet and `pnpm e2e:sui --network testnet` passes (2026-10-15). Testnet deployment is complete. The full runbook is in [docs/TESTNET.md](docs/TESTNET.md). In short: `pnpm deploy:evm --network base-sepolia --account deployer --verify`, then `pnpm deploy:sui --network testnet`, then `pnpm e2e:evm --network base-sepolia` and `pnpm e2e:sui --network testnet`, and commit the deployments and reports. The steps below are the older manual equivalents.
 
 
 - **Base Sepolia:** get ETH for gas and USDC from https://faucet.circle.com, using a throwaway key.
