@@ -1,0 +1,84 @@
+{
+  "name": "@iamyoungjohn-kit/pay",
+  "version": "0.1.0",
+  "description": "x402 payments for agents: one-call paywall middleware (Hono / Express) and a budget-aware client bounded by @iamyoungjohn-kit/policy.",
+  "license": "MIT",
+  "author": "Young John",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deyoungjohn/kit.git",
+    "directory": "packages/pay"
+  },
+  "homepage": "https://github.com/deyoungjohn/kit/tree/main/packages/pay#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server/core.d.ts",
+      "import": "./dist/server/core.js"
+    },
+    "./hono": {
+      "types": "./dist/server/hono.d.ts",
+      "import": "./dist/server/hono.js"
+    },
+    "./express": {
+      "types": "./dist/server/express.d.ts",
+      "import": "./dist/server/express.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "clean": "rm -rf dist .turbo",
+    "example:server": "tsx examples/server.ts",
+    "example:client": "tsx examples/client.ts",
+    "example:local": "tsx examples/local.ts"
+  },
+  "dependencies": {
+    "@iamyoungjohn-kit/policy": "workspace:*",
+    "@x402/core": "~2.28.0",
+    "@x402/evm": "~2.28.0",
+    "@x402/fetch": "~2.28.0"
+  },
+  "peerDependencies": {
+    "@x402/express": "~2.28.0",
+    "@x402/hono": "~2.28.0",
+    "express": "^4.21.0 || ^5.0.0",
+    "hono": "^4.6.0"
+  },
+  "peerDependenciesMeta": {
+    "@x402/express": {
+      "optional": true
+    },
+    "@x402/hono": {
+      "optional": true
+    },
+    "express": {
+      "optional": true
+    },
+    "hono": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@hono/node-server": "^1.19.0",
+    "@types/express": "^5.0.0",
+    "@x402/express": "~2.28.0",
+    "@x402/hono": "~2.28.0",
+    "express": "^5.1.0",
+    "hono": "^4.10.0",
+    "viem": "^2.48.0"
+  }
+}

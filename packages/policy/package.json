@@ -1,0 +1,54 @@
+{
+  "name": "@iamyoungjohn-kit/policy",
+  "version": "0.1.0",
+  "description": "Chain-agnostic guardrails for AI agents that move money: spend caps, allow/deny lists, human approval, mandatory simulation, kill switch.",
+  "license": "MIT",
+  "author": "Young John",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deyoungjohn/kit.git",
+    "directory": "packages/policy"
+  },
+  "homepage": "https://github.com/deyoungjohn/kit/tree/main/packages/policy#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./evm": {
+      "types": "./dist/adapters/evm.d.ts",
+      "import": "./dist/adapters/evm.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "clean": "rm -rf dist .turbo",
+    "example": "tsx examples/basic.ts",
+    "example:evm": "tsx examples/evm.ts"
+  },
+  "dependencies": {
+    "zod": "^4.1.0"
+  },
+  "peerDependencies": {
+    "viem": "^2.48.0"
+  },
+  "peerDependenciesMeta": {
+    "viem": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "viem": "^2.48.0"
+  }
+}
