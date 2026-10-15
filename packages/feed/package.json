@@ -6,10 +6,10 @@
   "author": "Young John",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/deyoungjohn/kit.git",
+    "url": "git+https://github.com/deyoungjohn/codkit.git",
     "directory": "packages/feed"
   },
-  "homepage": "https://github.com/deyoungjohn/kit/tree/main/packages/feed#readme",
+  "homepage": "https://github.com/deyoungjohn/codkit/tree/main/packages/feed#readme",
   "publishConfig": {
     "access": "public"
   },

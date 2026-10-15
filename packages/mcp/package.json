@@ -6,10 +6,10 @@
   "author": "Young John",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/deyoungjohn/kit.git",
+    "url": "git+https://github.com/deyoungjohn/codkit.git",
     "directory": "packages/mcp"
   },
-  "homepage": "https://github.com/deyoungjohn/kit/tree/main/packages/mcp#readme",
+  "homepage": "https://github.com/deyoungjohn/codkit/tree/main/packages/mcp#readme",
   "publishConfig": {
     "access": "public"
   },

@@ -64,7 +64,7 @@ pnpm dev
 
 ## Prior work and dependencies (disclosure)
 
-This project uses **[Hackathon Kit](https://github.com/deyoungjohn/kit)**, a public MIT-licensed toolkit written before this event, for its generic plumbing:
+This project uses **[codkit](https://github.com/deyoungjohn/codkit)**, a public MIT-licensed toolkit written before this event, for its generic plumbing:
 
 - `@codkit/policy`: spend caps, allow-lists, approvals, kill switch
 - `@codkit/pay`: x402 middleware and budgeted client

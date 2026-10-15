@@ -6,10 +6,10 @@
   "author": "Young John",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/deyoungjohn/kit.git",
+    "url": "git+https://github.com/deyoungjohn/codkit.git",
     "directory": "packages/contracts"
   },
-  "homepage": "https://github.com/deyoungjohn/kit/tree/main/packages/contracts#readme",
+  "homepage": "https://github.com/deyoungjohn/codkit/tree/main/packages/contracts#readme",
   "publishConfig": {
     "access": "public"
   },

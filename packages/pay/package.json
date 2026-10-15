@@ -6,10 +6,10 @@
   "author": "Young John",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/deyoungjohn/kit.git",
+    "url": "git+https://github.com/deyoungjohn/codkit.git",
     "directory": "packages/pay"
   },
-  "homepage": "https://github.com/deyoungjohn/kit/tree/main/packages/pay#readme",
+  "homepage": "https://github.com/deyoungjohn/codkit/tree/main/packages/pay#readme",
   "publishConfig": {
     "access": "public"
   },

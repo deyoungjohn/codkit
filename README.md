@@ -1,4 +1,4 @@
-# Hackathon Kit
+# codkit
 
 Open-source plumbing for Web3 / AI-agent hackathon projects. The kit covers the common pieces so you can spend the weekend on the idea, the sponsor integration, and the demo.
 
