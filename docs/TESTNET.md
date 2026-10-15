@@ -60,6 +60,8 @@ pnpm e2e:sui --network testnet
 - the receipt log is anchored via `kit_escrow::anchor` and verified;
 - the provider refunds the agent.
 
+**RPC:** `sepolia.base.org` is load-balanced and rate-limited. A read right after a confirmed transaction can hit a node that hasn't seen it yet, and `eth_getLogs` is capped at 200 blocks. The e2e polls until the expected state appears, but a dedicated endpoint (Alchemy, Infura, QuickNode, all with free tiers) in `BASE_SEPOLIA_RPC_URL` is faster and more reliable. Use one for agent dApps too: a stale read makes the policy guard's simulation fail closed, which blocks a valid transaction.
+
 Each run writes `apps/testnet-e2e/reports/<network>-<time>.md` and `.json`, with explorer links. **Commit the reports**: they're your public evidence, and they're what testers compare their own runs against.
 
 ## 4. Publish the results and collect feedback

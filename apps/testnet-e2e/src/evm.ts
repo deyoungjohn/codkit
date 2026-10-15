@@ -72,6 +72,26 @@ const wait = async (hash: Hex) => {
   if (r.status !== "success") throw new Error(`tx reverted: ${hash}`);
   return r;
 };
+/**
+ * Public RPCs (sepolia.base.org) are load-balanced: a read right after a confirmed tx can hit a
+ * node that hasn't seen it yet. Poll until the expected state shows up instead of trusting one read.
+ */
+async function eventually<T>(read: () => Promise<T>, ok: (v: T) => boolean, timeoutMs = chainId === 31337 ? 2_000 : 30_000): Promise<T> {
+  const until = Date.now() + timeoutMs;
+  for (;;) {
+    const v = await read().catch((e: unknown) => {
+      if (Date.now() >= until) throw e;
+      return undefined;
+    });
+    if (v !== undefined && ok(v)) return v;
+    if (Date.now() >= until) {
+      if (v === undefined) throw new Error("read kept failing");
+      return v;
+    }
+    await new Promise((r) => setTimeout(r, chainId === 31337 ? 50 : 1_500));
+  }
+}
+const json = (v: unknown) => JSON.stringify(v, (_k, x) => (typeof x === "bigint" ? x.toString() : x));
 const usdcBalance = (who: Address) => pc.readContract({ address: USDC, abi: erc20Abi, functionName: "balanceOf", args: [who] });
 
 const report = new Report(network, { agent: agent.address, provider: provider.address, escrow: ESCROW, reputation: REPUTATION, anchor: ANCHOR, usdc: USDC });
@@ -92,6 +112,8 @@ recordPolicyEvents(engine, receipts);
 const guard = createEvmGuard({ engine, chainId, account: agent.address, reader: pc, sender: agentWallet, abis: [escrowAbi] });
 const tx = escrowTxs(ESCROW);
 const AMOUNT = usdc("0.10");
+/** Set once USDC may have reached the provider, so cleanup waits for it rather than trusting a stale zero. */
+let providerPaid = false;
 
 try {
   await report.step(
@@ -121,6 +143,11 @@ try {
     async () => {
       const a = await guard.send(tx.approve(USDC, AMOUNT));
       await wait(a.result);
+      // the guard simulates createAndFund next; make sure the RPC sees the allowance first
+      await eventually(
+        () => pc.readContract({ address: USDC, abi: erc20Abi, functionName: "allowance", args: [agent.address, ESCROW] }),
+        (v) => v >= AMOUNT,
+      );
       const c = await guard.send(
         tx.createAndFund({ provider: provider.address, token: USDC, amount: AMOUNT, deadline: new Date(Date.now() + 3_600_000), termsHash: hashText("codkit e2e: deliver a hash") }),
       );
@@ -135,23 +162,24 @@ try {
   await report.step("escrow: provider delivers", async () => {
     const h = await providerWallet.sendTransaction(tx.deliver(dealId!, hashText("ipfs://codkit-e2e-result")));
     await wait(h);
-    const d = await readDeal(pc, ESCROW, dealId!);
+    const d = await eventually(() => readDeal(pc, ESCROW, dealId!), (d) => d.status === "Delivered");
     if (d.status !== "Delivered") throw new Error(`status ${d.status}`);
     return { links: [link(h)] };
   });
 
   await report.step("escrow: agent releases (guarded)", async () => {
     const r = await guard.send(tx.release(dealId!));
+    providerPaid = true;
     await wait(r.result);
-    const d = await readDeal(pc, ESCROW, dealId!);
-    const gained = (await usdcBalance(provider.address)) - before;
+    const d = await eventually(() => readDeal(pc, ESCROW, dealId!), (d) => d.status === "Released");
+    const gained = (await eventually(() => usdcBalance(provider.address), (b) => b - before >= AMOUNT)) - before;
     if (d.status !== "Released" || gained !== AMOUNT) throw new Error(`status ${d.status}, provider +${gained}`);
     return { detail: "provider received 0.10 USDC", links: [link(r.result)] };
   });
 
   await report.step("reputation recorded", async () => {
-    const rep = await readReputation(pc, REPUTATION, provider.address);
-    if (rep.completed < 1) throw new Error(JSON.stringify(rep));
+    const rep = await eventually(() => readReputation(pc, REPUTATION, provider.address), (r) => r.completed >= 1);
+    if (rep.completed < 1) throw new Error(json(rep));
     return { detail: `completed ${rep.completed}, score ${rep.score}` };
   });
 
@@ -189,7 +217,10 @@ try {
           engine,
           client,
           onPayment: (o) => {
-            if (o.status === "settled") settledTx = o.transaction;
+            if (o.status === "settled") {
+              settledTx = o.transaction;
+              providerPaid = true;
+            }
           },
         });
         const res = await fetchPaid(`http://127.0.0.1:${port}/data`);
@@ -203,12 +234,16 @@ try {
   }
 
   await report.step("receipts: anchor head on ReceiptAnchor" + (flag("walrus") ? " + upload to Walrus" : ""), async () => {
+    const fromBlock = await pc.getBlockNumber();
     const pub = await receipts.publish({
       anchorer: evmAnchorer({ chainId, wallet: agentWallet, contract: ANCHOR, waitFor: pc }),
       ...(flag("walrus") && { uploader: walrusUploader() }),
     });
-    const latest = await pc.getBlockNumber();
-    const anchors = await readEvmAnchors(pc, { contract: ANCHOR, logger: agent.address, fromBlock: latest > 50n ? latest - 50n : 0n });
+    // public RPCs cap eth_getLogs ranges (200 blocks on sepolia.base.org), so search from just before publishing
+    const anchors = await eventually(
+      () => readEvmAnchors(pc, { contract: ANCHOR, logger: agent.address, fromBlock: fromBlock > 5n ? fromBlock - 5n : 0n }),
+      (list) => list.some((a) => a.head === pub.checkpoint.head),
+    );
     const found = anchors.find((a) => a.head === pub.checkpoint.head);
     if (!found) throw new Error("anchor event not found");
     const log = pub.upload ? parseJsonl(await readWalrusUri(pub.upload.uri)) : await receipts.list();
@@ -220,8 +255,8 @@ try {
   // critical step failed; fall through to cleanup + report
 } finally {
   await report.step("cleanup: provider returns USDC to agent", async () => {
-    const bal = await usdcBalance(provider.address);
-    if (bal === 0n) return { detail: "nothing to return" };
+    const bal = providerPaid ? await eventually(() => usdcBalance(provider.address), (b) => b > 0n) : await usdcBalance(provider.address);
+    if (bal === 0n) return { detail: providerPaid ? "provider balance still reads 0 — check the explorer" : "nothing to return" };
     const h = await providerWallet.sendTransaction({
       to: USDC,
       data: encodeFunctionData({ abi: erc20Abi, functionName: "transfer", args: [agent.address, bal] }),
