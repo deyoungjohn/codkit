@@ -3,7 +3,17 @@
 x402 payments for agents. This package is a thin layer over the official [`@x402/*` v2 SDK](https://github.com/x402-foundation/x402) and adds two things:
 
 1. **`paywall()`**: one-call Hono / Express middleware. It defaults to Base Sepolia and the public testnet facilitator, accepts a `"$0.01"` route shorthand, and has an `onSettled` hook for receipts and live feeds.
-2. **`createBudgetedFetch()` / `withPolicy()`**: an x402 client that won't sign a payment unless [`@codkit/policy`](../policy) authorizes it. Spend is reserved first, then committed with the settlement tx hash, or released if the payment fails.
+2. **`createBudgetedFetch()` / `withPolicy()`**: an x402 client that won't sign a payment unless [`@codkit/policy`](https://github.com/deyoungjohn/codkit/tree/main/packages/policy) authorizes it. Spend is reserved first, then committed with the settlement tx hash, or released if the payment fails.
+
+## Install
+
+```bash
+npm install @codkit/pay @codkit/policy
+npm install hono @x402/hono                                 # for @codkit/pay/hono
+npm install express @x402/express && npm i -D @types/express # for @codkit/pay/express
+```
+
+The server frameworks are optional peer dependencies, so install only the one you use.
 
 ## Server
 

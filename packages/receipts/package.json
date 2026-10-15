@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "Verifiable receipts for agent actions: hash-chained, signed action log anchored onchain (EVM / Solana memo / Sui) with the full log on Walrus.",
   "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
   "author": "Young John",
   "repository": {
     "type": "git",
@@ -16,20 +19,43 @@
   "type": "module",
   "sideEffects": false,
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
-    "./node": { "types": "./dist/node.d.ts", "import": "./dist/node.js" },
-    "./evm": { "types": "./dist/anchors/evm.d.ts", "import": "./dist/anchors/evm.js" },
-    "./solana": { "types": "./dist/anchors/solana.d.ts", "import": "./dist/anchors/solana.js" },
-    "./sui": { "types": "./dist/anchors/sui.d.ts", "import": "./dist/anchors/sui.js" },
-    "./walrus": { "types": "./dist/anchors/walrus.d.ts", "import": "./dist/anchors/walrus.js" }
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "import": "./dist/node.js"
+    },
+    "./evm": {
+      "types": "./dist/anchors/evm.d.ts",
+      "import": "./dist/anchors/evm.js"
+    },
+    "./solana": {
+      "types": "./dist/anchors/solana.d.ts",
+      "import": "./dist/anchors/solana.js"
+    },
+    "./sui": {
+      "types": "./dist/anchors/sui.d.ts",
+      "import": "./dist/anchors/sui.js"
+    },
+    "./walrus": {
+      "types": "./dist/anchors/walrus.d.ts",
+      "import": "./dist/anchors/walrus.js"
+    }
   },
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "clean": "rm -rf dist .turbo",
-    "example": "tsx --env-file-if-exists=../../.env examples/agent-log.ts"
+    "example": "tsx --env-file-if-exists=../../.env examples/agent-log.ts",
+    "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
     "@noble/curves": "^2.0.0",
@@ -41,9 +67,15 @@
     "viem": "^2.48.0"
   },
   "peerDependenciesMeta": {
-    "@codkit/policy": { "optional": true },
-    "@mysten/sui": { "optional": true },
-    "viem": { "optional": true }
+    "@codkit/policy": {
+      "optional": true
+    },
+    "@mysten/sui": {
+      "optional": true
+    },
+    "viem": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@codkit/contracts": "workspace:*",

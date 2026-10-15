@@ -1,8 +1,11 @@
 {
   "name": "@codkit/contracts",
   "version": "0.1.0",
-  "description": "Escrow (create → fund → deliver → release/refund) + reputation counter. Solidity (Foundry) with typed viem bindings that plug into @codkit/policy.",
+  "description": "Escrow (create \u2192 fund \u2192 deliver \u2192 release/refund) + reputation counter. Solidity (Foundry) with typed viem bindings that plug into @codkit/policy.",
   "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
   "author": "Young John",
   "repository": {
     "type": "git",
@@ -31,6 +34,7 @@
   },
   "files": [
     "dist",
+    "src",
     "evm/src",
     "evm/script",
     "evm/foundry.toml",
@@ -38,7 +42,11 @@
     "sui/Move.toml",
     "sui/Move.lock",
     "README.md",
-    "deployments"
+    "deployments/*.json",
+    "!deployments/*local*.json",
+    "!deployments/anvil*.json",
+    "deployments/README.md",
+    "sui/Published.toml"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
@@ -52,7 +60,8 @@
     "test:move": "sh -c \"command -v sui >/dev/null && cd sui && sui move test < /dev/null || echo \\\"sui CLI not found; skipping Move tests\\\"\"",
     "deployments": "node scripts/deployments-table.mjs",
     "deploy:evm": "node --env-file-if-exists=../../.env scripts/deploy-evm.mjs",
-    "deploy:sui": "node --env-file-if-exists=../../.env scripts/deploy-sui.mjs"
+    "deploy:sui": "node --env-file-if-exists=../../.env scripts/deploy-sui.mjs",
+    "prepublishOnly": "pnpm run build"
   },
   "peerDependencies": {
     "viem": "^2.48.0",

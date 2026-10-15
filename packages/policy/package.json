@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "Chain-agnostic guardrails for AI agents that move money: spend caps, allow/deny lists, human approval, mandatory simulation, kill switch.",
   "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
   "author": "Young John",
   "repository": {
     "type": "git",
@@ -27,6 +30,7 @@
   },
   "files": [
     "dist",
+    "src",
     "README.md"
   ],
   "scripts": {
@@ -35,7 +39,8 @@
     "test": "vitest run",
     "clean": "rm -rf dist .turbo",
     "example": "tsx --env-file-if-exists=../../.env examples/basic.ts",
-    "example:evm": "tsx --env-file-if-exists=../../.env examples/evm.ts"
+    "example:evm": "tsx --env-file-if-exists=../../.env examples/evm.ts",
+    "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
     "zod": "^4.1.0"

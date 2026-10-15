@@ -20,4 +20,4 @@ export const GET = (req: Request) => sseHandler(feed)(req);  // Next.js route / 
 - **Approvals:** `createApprovalBroker` pushes `approval_request` events and denies a request automatically after `timeoutMs` (default 2 minutes).
 - **Reading in Node:** `readSse(body)` parses a stream into events, for tests and CLIs.
 
-See [`apps/demo-shell`](../../apps/demo-shell) for a complete dashboard built on it.
+See [`apps/demo-shell`](https://github.com/deyoungjohn/codkit/tree/main/apps/demo-shell) for a complete dashboard built on it.

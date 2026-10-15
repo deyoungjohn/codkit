@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "x402 payments for agents: one-call paywall middleware (Hono / Express) and a budget-aware client bounded by @codkit/policy.",
   "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
   "author": "Young John",
   "repository": {
     "type": "git",
@@ -35,6 +38,7 @@
   },
   "files": [
     "dist",
+    "src",
     "README.md"
   ],
   "scripts": {
@@ -44,10 +48,11 @@
     "clean": "rm -rf dist .turbo",
     "example:server": "tsx --env-file-if-exists=../../.env examples/server.ts",
     "example:client": "tsx --env-file-if-exists=../../.env examples/client.ts",
-    "example:local": "tsx --env-file-if-exists=../../.env examples/local.ts"
+    "example:local": "tsx --env-file-if-exists=../../.env examples/local.ts",
+    "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "@codkit/policy": "workspace:*",
+    "@codkit/policy": "workspace:^",
     "@x402/core": "~2.28.0",
     "@x402/evm": "~2.28.0",
     "@x402/fetch": "~2.28.0"

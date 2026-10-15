@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "One live event stream for agent demos: policy decisions, tool calls, reasoning, transactions and receipts, served over Server-Sent Events.",
   "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
   "author": "Young John",
   "repository": {
     "type": "git",
@@ -16,14 +19,22 @@
   "type": "module",
   "sideEffects": false,
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" }
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   },
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "clean": "rm -rf dist .turbo"
+    "clean": "rm -rf dist .turbo",
+    "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
     "@codkit/receipts": "workspace:^"
@@ -32,7 +43,9 @@
     "@codkit/policy": "workspace:^"
   },
   "peerDependenciesMeta": {
-    "@codkit/policy": { "optional": true }
+    "@codkit/policy": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@codkit/policy": "workspace:*"

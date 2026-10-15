@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "Define agent tools once with Zod; expose them as an MCP server (stdio / HTTP), an agent loop on any OpenAI-compatible LLM (Gemini, Groq, NVIDIA NIM, OpenRouter, \u2026), and WebMCP browser tools. Ships kit tools for policy, x402 pay, escrow and receipts.",
   "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
   "author": "Young John",
   "repository": {
     "type": "git",
@@ -55,6 +58,7 @@
   },
   "files": [
     "dist",
+    "src",
     "README.md"
   ],
   "scripts": {
@@ -64,7 +68,8 @@
     "clean": "rm -rf dist .turbo",
     "example:server": "tsx --env-file-if-exists=../../.env examples/mcp-server.ts",
     "example:agent": "tsx --env-file-if-exists=../../.env examples/agent.ts",
-    "example:models": "tsx --env-file-if-exists=../../.env examples/models.ts"
+    "example:models": "tsx --env-file-if-exists=../../.env examples/models.ts",
+    "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
     "zod": "^4.1.0"
