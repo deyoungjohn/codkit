@@ -56,7 +56,7 @@ Install Rust, the Solana CLI and Anchor (`avm`). Then the Solana items in sectio
 - [x] TypeScript client (`@codkit/contracts/solana`) and `pnpm e2e:solana`: passes 10/10 on devnet (2026-10-16). The agent is `~/.config/solana/codkit-agent.json`, separate from the deployer.
 - [x] EVM redeployed with the security-review fixes (Base Sepolia, 2026-10-15). `e2e:evm` passes 12/12.
 - [x] Sui republished with the fixes (package `0x9bc0…3944`, 2026-10-15). `e2e:sui` passes.
-- [ ] Release `@codkit/contracts` 0.2.0 with the new ABI and deployment addresses (after the Sui redeploy).
+- [x] `@codkit/contracts` 0.1.1 published (2026-10-16): the review fixes, the Solana client and the current deployments. Verified by installing it from npm.
 - [ ] Sui policy adapter (`@codkit/policy/sui`): Sui tx → `Action`, plus a dry-run via `simulateTransaction`. Today only the `suiEscrowCreateAction` helper exists.
 - [x] Security review of the EVM, Sui and Solana escrows: [docs/security/escrow-review.md](docs/security/escrow-review.md) (2026-10-15). All fixes applied. An independent audit is still needed before mainnet.
 
