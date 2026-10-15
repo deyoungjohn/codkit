@@ -1,6 +1,6 @@
 {
   "name": "@codkit/contracts",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Escrow (create → fund → deliver → release/refund) + reputation counter in Solidity (Foundry), Sui Move and Solana (Anchor), with typed viem, Sui and @solana/kit bindings that plug into @codkit/policy.",
   "license": "MIT",
   "engines": {
@@ -56,7 +56,8 @@
     "solana/Anchor.toml",
     "solana/Cargo.toml",
     "solana/rust-toolchain.toml",
-    "solana/idl"
+    "solana/idl",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
@@ -77,7 +78,7 @@
     "viem": "^2.48.0",
     "@mysten/sui": "^2.0.0",
     "@codkit/policy": "workspace:^",
-    "@solana/kit": ">=6.0.0"
+    "@solana/kit": "^8.3.0"
   },
   "devDependencies": {
     "@codkit/policy": "workspace:*",
