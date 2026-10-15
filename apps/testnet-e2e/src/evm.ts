@@ -23,7 +23,7 @@ import { evmAnchorer, readEvmAnchors } from "@codkit/receipts/evm";
 import { readWalrusUri, walrusUploader } from "@codkit/receipts/walrus";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
-import { createPublicClient, createWalletClient, encodeFunctionData, erc20Abi, http, parseEther, type Address, type Chain, type Hex } from "viem";
+import { createPublicClient, createWalletClient, encodeFunctionData, erc20Abi, http, nonceManager, parseEther, type Address, type Chain, type Hex } from "viem";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { baseSepolia, foundry } from "viem/chains";
 import { arg, flag, Report } from "./report.js";
@@ -62,10 +62,12 @@ const link = (h: Hex | string) => evmExplorerTxUrl(chainId, h as Hex);
 
 const transport = http(net.rpc);
 const pc = createPublicClient({ chain: net.chain, transport, pollingInterval: chainId === 31337 ? 50 : 1500 });
-const agent = privateKeyToAccount(agentKey);
+// Local nonce tracking: a load-balanced RPC can report a stale pending nonce right after a mined tx,
+// so the next tx would reuse it ("replacement transaction underpriced").
+const agent = privateKeyToAccount(agentKey, { nonceManager });
 const agentWallet = createWalletClient({ account: agent, chain: net.chain, transport });
 const providerKey = (process.env.PROVIDER_PRIVATE_KEY as Hex | undefined) ?? generatePrivateKey();
-const provider = privateKeyToAccount(providerKey);
+const provider = privateKeyToAccount(providerKey, { nonceManager });
 const providerWallet = createWalletClient({ account: provider, chain: net.chain, transport });
 const wait = async (hash: Hex) => {
   const r = await pc.waitForTransactionReceipt({ hash });

@@ -2,6 +2,20 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+/**
+ * Strip credentials from error text before it reaches the console or a committed report:
+ * RPC URLs from the environment, and API keys embedded in URLs (Alchemy /v2/<key>, Infura /v3/<key>, ?apikey=…).
+ */
+export function redact(text: string): string {
+  let out = text;
+  for (const [k, v] of Object.entries(process.env)) {
+    if (v && /_RPC_URL$|_URL$/.test(k) && /^https?:\/\//.test(v) && v.length > 12) out = out.split(v).join(`<${k}>`);
+  }
+  return out
+    .replace(/(\/v\d+\/)[A-Za-z0-9_-]{16,}/g, "$1<redacted>")
+    .replace(/([?&](?:api[-_]?key|key|token)=)[^&\s"]+/gi, "$1<redacted>");
+}
+
 export interface Step {
   name: string;
   ok: boolean;
@@ -29,7 +43,7 @@ export class Report {
       for (const l of links) console.log(`    ${l}`);
       return r?.value as T;
     } catch (e) {
-      const detail = e instanceof Error ? e.message : String(e);
+      const detail = redact(e instanceof Error ? e.message : String(e));
       this.steps.push({ name, ok: false, detail, ms: Date.now() - t0 });
       console.log(`FAILED — ${detail}`);
       if (opts.critical) throw e;
