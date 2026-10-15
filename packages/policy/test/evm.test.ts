@@ -76,6 +76,17 @@ describe("simulateEvmTx", () => {
   });
 });
 
+it("decodes custom-error reverts with the guard's ABIs", async () => {
+  const abi = parseAbi(["error WrongStatus(uint8 current)"]);
+  const data = "0x359011cc0000000000000000000000000000000000000000000000000000000000000005";
+  const reader: EvmReader = {
+    call: async () => Promise.reject(Object.assign(new Error("reverted"), { shortMessage: "custom error 0x359011cc", cause: { data } })),
+    estimateGas: async () => 0n,
+  };
+  expect(await simulateEvmTx(reader, AGENT, { to: USDC }, [abi])).toEqual({ ok: false, error: "reverted: WrongStatus(5)" });
+  expect((await simulateEvmTx(reader, AGENT, { to: USDC })).error).toBe("custom error 0x359011cc");
+});
+
 describe("createEvmGuard", () => {
   const engine = () =>
     createPolicyEngine({

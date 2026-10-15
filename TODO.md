@@ -7,13 +7,14 @@ Status as of 2026-10-15. Modules 1 to 6 are built, tested and pushed. CI is gree
 ### npm publishing
 
 1. ~~Create the npm org~~ Done: `codkit` exists. All packages are named `@codkit/*`.
-2. Publish:
+2. Turn on 2FA on your npm user account (npmjs.com → Account → Two-Factor Authentication), and in the `codkit` org settings require 2FA for members. Prefer **Trusted Publishing** from GitHub Actions over long-lived npm tokens.
+3. Publish:
    ```bash
    npm login
    pnpm -r --filter "./packages/*" publish --access public
    ```
    `pnpm publish` rewrites `workspace:*` dependencies to real versions. `apps/demo-shell` is private and won't be published.
-3. Optional: add Changesets plus a CI publish job with npm provenance, so releases aren't manual.
+4. Optional: add Changesets plus a CI publish job with npm provenance, so releases aren't manual.
 
 ### Anthropic API key (nothing has called the real API yet)
 
@@ -30,6 +31,9 @@ pnpm --filter demo-shell dev                          # dashboard switches to "C
 Check that Claude calls `policy_status` before buying, asks for approval on the $0.25 summary, and is blocked on the $2 report.
 
 ### Testnet funds and deployments
+
+The full runbook is in [docs/TESTNET.md](docs/TESTNET.md). In short: `pnpm deploy:evm --network base-sepolia --account deployer --verify`, then `pnpm deploy:sui --network testnet`, then `pnpm e2e:evm --network base-sepolia` and `pnpm e2e:sui --network testnet`, and commit the deployments and reports. The steps below are the older manual equivalents.
+
 
 - **Base Sepolia:** get ETH for gas and USDC from https://faucet.circle.com, using a throwaway key.
   ```bash

@@ -23,6 +23,17 @@ The pattern that keeps winning is an **AI agent that takes a real onchain action
 
 Each package works on its own, and the core of each package imports no chain SDK. Chain and sponsor code lives in thin adapters, because sponsor SDKs change monthly.
 
+## Testnet deployments
+
+Not deployed yet. See [docs/TESTNET.md](docs/TESTNET.md): deploy with your own wallet, run `pnpm e2e:evm` / `pnpm e2e:sui`, and publish the reports here.
+
+| Contract | Network | Address |
+| --- | --- | --- |
+| _pending_ | Base Sepolia | |
+| _pending_ | Sui testnet | |
+
+Ran it yourself? File a [Testnet feedback](https://github.com/deyoungjohn/codkit/issues/new?template=testnet-feedback.yml) issue.
+
 ## Develop
 
 ```bash

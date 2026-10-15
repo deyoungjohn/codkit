@@ -1,0 +1,24 @@
+name: Bug report
+description: Something in a codkit package doesn't work as documented.
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: package
+    attributes:
+      label: Package
+      options: ["@codkit/policy", "@codkit/pay", "@codkit/contracts", "@codkit/receipts", "@codkit/mcp", "@codkit/feed", "demo-shell", "other"]
+    validations: { required: true }
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations: { required: true }
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal reproduction
+      render: ts
+  - type: input
+    id: version
+    attributes:
+      label: Version / commit

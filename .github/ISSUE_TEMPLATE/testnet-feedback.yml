@@ -1,0 +1,38 @@
+name: Testnet feedback
+description: You ran codkit on a public testnet. Tell us what happened.
+title: "[testnet] "
+labels: ["testnet", "feedback"]
+body:
+  - type: dropdown
+    id: network
+    attributes:
+      label: Network
+      options: [Base Sepolia, Sui testnet, Other EVM testnet, Solana devnet]
+    validations: { required: true }
+  - type: dropdown
+    id: what
+    attributes:
+      label: What did you run?
+      multiple: true
+      options: [pnpm e2e:evm, pnpm e2e:sui, demo-shell, MCP server, my own project, deploy scripts]
+  - type: dropdown
+    id: result
+    attributes:
+      label: Result
+      options: [All passed, Some steps failed, Could not run]
+    validations: { required: true }
+  - type: textarea
+    id: report
+    attributes:
+      label: Report
+      description: Paste the generated report (apps/testnet-e2e/reports/*.md) or the failing output. Never paste private keys.
+      render: markdown
+  - type: textarea
+    id: feedback
+    attributes:
+      label: What was confusing, missing, or great?
+  - type: input
+    id: commit
+    attributes:
+      label: codkit commit / version
+      placeholder: git rev-parse --short HEAD

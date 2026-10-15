@@ -17,3 +17,5 @@ packages/contracts/evm/broadcast/*/31337/
 packages/contracts/sui/build/
 apps/demo-shell/.next/
 apps/demo-shell/next-env.d.ts
+packages/contracts/deployments/*local*.json
+packages/contracts/deployments/anvil*.json

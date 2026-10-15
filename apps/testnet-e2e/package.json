@@ -1,0 +1,25 @@
+{
+  "name": "testnet-e2e",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Post-deploy end-to-end checks of codkit on public testnets: policy-guarded escrow, receipt anchoring, x402 payments. Writes a report per run.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "evm": "tsx --env-file-if-exists=../../.env src/evm.ts",
+    "sui": "tsx --env-file-if-exists=../../.env src/sui.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@codkit/contracts": "workspace:*",
+    "@codkit/pay": "workspace:*",
+    "@codkit/policy": "workspace:*",
+    "@codkit/receipts": "workspace:*",
+    "@mysten/sui": "^2.36.0",
+    "@x402/core": "~2.28.0",
+    "@x402/hono": "~2.28.0",
+    "@hono/node-server": "^1.19.0",
+    "hono": "^4.10.0",
+    "viem": "^2.48.0"
+  }
+}

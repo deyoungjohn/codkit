@@ -37,7 +37,8 @@
     "sui/sources",
     "sui/Move.toml",
     "sui/Move.lock",
-    "README.md"
+    "README.md",
+    "deployments"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
@@ -49,7 +50,9 @@
     "example": "tsx examples/escrow-flow.ts",
     "example:sui": "tsx examples/sui-localnet.ts",
     "test:move": "sh -c \"command -v sui >/dev/null && cd sui && sui move test < /dev/null || echo \\\"sui CLI not found; skipping Move tests\\\"\"",
-    "deployments": "node scripts/deployments-table.mjs"
+    "deployments": "node scripts/deployments-table.mjs",
+    "deploy:evm": "node --env-file-if-exists=../../.env scripts/deploy-evm.mjs",
+    "deploy:sui": "node --env-file-if-exists=../../.env scripts/deploy-sui.mjs"
   },
   "peerDependencies": {
     "viem": "^2.48.0",

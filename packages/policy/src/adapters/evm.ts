@@ -4,7 +4,7 @@
  *
  * Import from `@codkit/policy/evm`; the core entry point never loads viem.
  */
-import { decodeFunctionData, erc20Abi, type Abi, type Address, type Hex } from "viem";
+import { decodeErrorResult, decodeFunctionData, erc20Abi, type Abi, type Address, type Hex } from "viem";
 import type { ExecuteResult, PolicyEngine } from "../engine.js";
 import type { Action, SimulationResult, Spend } from "../types.js";
 
@@ -89,16 +89,42 @@ export function evmTxToAction(tx: EvmTx, opts: ToActionOptions): Action {
   return { chain, kind: "contract_call", to: tx.to, program: tx.to, method, spends, meta: { tx: serialise(tx) } };
 }
 
-/** Dry-run with `eth_call` + `eth_estimateGas` from the agent's address. Never throws. */
-export async function simulateEvmTx(reader: EvmReader, account: Address, tx: EvmTx): Promise<SimulationResult> {
+/**
+ * Dry-run with `eth_call` + `eth_estimateGas` from the agent's address. Never throws.
+ * Pass `abis` to turn custom-error reverts into readable names, e.g. `WrongStatus(5)`.
+ */
+export async function simulateEvmTx(reader: EvmReader, account: Address, tx: EvmTx, abis: Abi[] = []): Promise<SimulationResult> {
   const args = { account, to: tx.to, ...(tx.value !== undefined && { value: tx.value }), ...(tx.data && { data: tx.data }) };
   try {
     const res = await reader.call(args);
     const gas = await reader.estimateGas(args);
     return { ok: true, details: { returnData: res.data ?? "0x", gasEstimate: gas.toString() } };
   } catch (e) {
-    return { ok: false, error: revertMessage(e) };
+    return { ok: false, error: decodeRevert(e, abis) ?? revertMessage(e) };
   }
+}
+
+/** Find revert data anywhere in a viem error chain and decode it with the given ABIs. */
+function decodeRevert(e: unknown, abis: Abi[]): string | undefined {
+  let data: Hex | undefined;
+  for (let cur = e as { data?: unknown; cause?: unknown } | undefined, i = 0; cur && i < 10; cur = cur.cause as typeof cur, i++) {
+    const d = typeof cur.data === "string" ? cur.data : (cur.data as { data?: unknown } | undefined)?.data;
+    if (typeof d === "string" && d.startsWith("0x") && d.length >= 10) {
+      data = d as Hex;
+      break;
+    }
+  }
+  if (!data) return undefined;
+  for (const abi of abis) {
+    try {
+      const r = decodeErrorResult({ abi, data });
+      const args = (r.args ?? []).map((a) => (typeof a === "bigint" ? a.toString() : String(a))).join(", ");
+      return `reverted: ${r.errorName}(${args})`;
+    } catch {
+      // not in this ABI
+    }
+  }
+  return undefined;
 }
 
 export interface EvmGuardOptions extends ToActionOptions {
@@ -118,7 +144,7 @@ export interface EvmGuard {
 export function createEvmGuard(opts: EvmGuardOptions): EvmGuard {
   const { engine, account, reader, sender } = opts;
   const toAction = (tx: EvmTx) => evmTxToAction(tx, opts);
-  const simulate = (tx: EvmTx) => simulateEvmTx(reader, account, tx);
+  const simulate = (tx: EvmTx) => simulateEvmTx(reader, account, tx, opts.abis);
   return {
     toAction,
     simulate,
