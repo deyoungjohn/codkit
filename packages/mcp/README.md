@@ -30,11 +30,22 @@ const quote = defineTool({
 ```ts
 import { serveStdio, mcpHttpHandler } from "@codkit/mcp/server";
 
-await serveStdio(tools, { name: "my-agent" });            // local: claude mcp add my-agent -- node server.js
-app.all("/mcp", (c) => mcpHttpHandler(tools, { name: "my-agent" })(c.req.raw)); // remote: stateless HTTP
+await serveStdio(tools, { name: "my-agent" }); // local: claude mcp add my-agent -- node server.js
+
+// remote: stateless Streamable HTTP, authenticated
+const mcp = mcpHttpHandler(tools, { name: "my-agent", auth: { bearerTokens: [process.env.MCP_TOKEN!] } });
+app.all("/mcp", (c) => mcp(c.req.raw));
 ```
 
-Put auth in front of the HTTP endpoint, because these tools can move money.
+**The HTTP handler requires auth**, because these tools can move money. Pick one:
+
+| `auth` | Use it for |
+| --- | --- |
+| `{ bearerTokens: [token, …] }` | API tokens (at least 16 characters; `openssl rand -hex 32`). Clients send `Authorization: Bearer <token>`. Tokens are compared in constant time, and several can be active at once so you can rotate them. |
+| `{ verify: (token, req) => … }` | Your own check, such as an OAuth access token or JWT from your authorization server. Add `resourceMetadataUrl` to advertise it to MCP clients (RFC 9728) in the `WWW-Authenticate` header. |
+| `{ allowAnonymous: true }` | Local development only. |
+
+A missing or wrong token gets `401` with `WWW-Authenticate: Bearer`. Calling the handler with no auth decision at all throws at startup.
 
 ## Run an agent
 

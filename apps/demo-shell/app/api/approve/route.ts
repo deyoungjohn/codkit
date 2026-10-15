@@ -1,8 +1,11 @@
+import { requireSession } from "@/lib/auth";
 import { runtime } from "@/lib/runtime";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
+  const denied = requireSession(req);
+  if (denied) return denied;
   const { requestId, approved, by } = (await req.json().catch(() => ({}))) as { requestId?: string; approved?: boolean; by?: string };
   if (!requestId || typeof approved !== "boolean") return Response.json({ error: "requestId and approved required" }, { status: 400 });
   const ok = runtime().approvals.resolve(requestId, approved, by ?? "dashboard");

@@ -22,6 +22,7 @@ import { receiptTools } from "@codkit/mcp/tools/receipts";
 import { createBudgetedFetch, registerExactEvmScheme, x402Client } from "@codkit/pay";
 import { paywall } from "@codkit/pay/hono";
 import { createPolicyEngine, fromAtomic, usdc, type PolicyEngine } from "@codkit/policy";
+import { authMode } from "./auth";
 import { ed25519Signer, MemoryReceiptStore, ReceiptLog, recordPolicyEvents, verifyLog } from "@codkit/receipts";
 import type { FacilitatorClient } from "@x402/core/server";
 import { Hono } from "hono";
@@ -199,6 +200,7 @@ export async function snapshot() {
   const verified = await verifyLog(log);
   return {
     mode: rt.mode,
+    auth: authMode(),
     llm: rt.providers[0] ? `${rt.providers[0].name} · ${rt.providers[0].model}` : null,
     running: rt.running,
     killed: rt.engine.isKilled,

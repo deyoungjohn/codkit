@@ -63,7 +63,7 @@ describe("MCP server", () => {
 
 describe("MCP over HTTP (stateless, web-standard)", () => {
   it("answers initialize, tools/list and tools/call", async () => {
-    const handler = mcpHttpHandler([echo], { name: "http-agent" });
+    const handler = mcpHttpHandler([echo], { name: "http-agent", auth: { allowAnonymous: true } });
     const rpc = async (body: object) => {
       const res = await handler(
         new Request("http://localhost/mcp", {
@@ -84,5 +84,57 @@ describe("MCP over HTTP (stateless, web-standard)", () => {
     expect((list.result.tools as { name: string }[]).map((t) => t.name)).toEqual(["echo"]);
     const call = await rpc({ method: "tools/call", params: { name: "echo", arguments: { message: "over http" } } });
     expect(text(call.result)).toContain("over http");
+  });
+});
+
+describe("MCP over HTTP: auth", () => {
+  const TOKEN = "test-token-0123456789abcdef";
+  const req = (headers: Record<string, string> = {}) =>
+    new Request("http://localhost/mcp", {
+      method: "POST",
+      headers: { "content-type": "application/json", accept: "application/json, text/event-stream", "mcp-protocol-version": "2025-06-18", ...headers },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list", params: {} }),
+    });
+
+  it("refuses to start without an auth decision", () => {
+    // @ts-expect-error auth is required
+    expect(() => mcpHttpHandler([echo], { name: "x" })).toThrow(/configure auth/);
+    expect(() => mcpHttpHandler([echo], { name: "x", auth: {} })).toThrow(/configure auth/);
+    expect(() => mcpHttpHandler([echo], { name: "x", auth: { bearerTokens: ["short"] } })).toThrow(/16 characters/);
+  });
+
+  it("rejects missing and wrong tokens with 401 + WWW-Authenticate, accepts the right one", async () => {
+    const handler = mcpHttpHandler([echo], { name: "x", auth: { bearerTokens: ["another-token-abcdefghijkl", TOKEN] } });
+    const none = await handler(req());
+    expect(none.status).toBe(401);
+    expect(none.headers.get("www-authenticate")).toBe('Bearer realm="mcp"');
+    const wrong = await handler(req({ authorization: "Bearer not-the-token-zzzzzzzz" }));
+    expect(wrong.status).toBe(401);
+    expect(wrong.headers.get("www-authenticate")).toContain('error="invalid_token"');
+    expect(await wrong.json()).toMatchObject({ error: { message: "Unauthorized" } });
+    const basic = await handler(req({ authorization: `Basic ${TOKEN}` }));
+    expect(basic.status).toBe(401);
+    const ok = await handler(req({ authorization: `Bearer ${TOKEN}` }));
+    expect(ok.status).toBe(200);
+    expect(((await ok.json()) as { result: { tools: unknown[] } }).result.tools).toHaveLength(1);
+  });
+
+  it("supports a custom verifier (e.g. OAuth / JWT) and advertises resource metadata", async () => {
+    const seen: string[] = [];
+    const handler = mcpHttpHandler([echo], {
+      name: "x",
+      auth: {
+        verify: async (t, r) => {
+          seen.push(new URL(r.url).pathname);
+          return t === "jwt-issued-by-my-auth-server";
+        },
+        resourceMetadataUrl: "https://agent.example/.well-known/oauth-protected-resource",
+      },
+    });
+    const denied = await handler(req({ authorization: "Bearer forged" }));
+    expect(denied.status).toBe(401);
+    expect(denied.headers.get("www-authenticate")).toContain('resource_metadata="https://agent.example/.well-known/oauth-protected-resource"');
+    expect((await handler(req({ authorization: "Bearer jwt-issued-by-my-auth-server" }))).status).toBe(200);
+    expect(seen).toEqual(["/mcp", "/mcp"]);
   });
 });

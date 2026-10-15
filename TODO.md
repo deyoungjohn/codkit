@@ -76,11 +76,11 @@ Install Rust, the Solana CLI and Anchor (`avm`). Then the Solana items in sectio
 ### mcp
 
 - [ ] Test WebMCP in a real browser (Chrome flag or the `@mcp-b/global` polyfill). Today it's tested with a fake `modelContext` only.
-- [ ] Auth for `mcpHttpHandler` (bearer token or OAuth).
+- [x] Auth for `mcpHttpHandler` (2026-10-16): required; bearer tokens, or a `verify` hook for OAuth/JWT with RFC 9728 metadata. The dashboard exposes `/api/mcp` behind `MCP_TOKEN`.
 
 ### demo-shell
 
-- [ ] **Auth.** There's none today. Add it before pointing the dashboard at real funds.
+- [x] **Auth** (2026-10-16): operator password, signed session cookie, a check in `proxy.ts` plus a check in every route, a same-origin check, and login throttling. See `apps/demo-shell/README.md#auth`.
 - [ ] Persistence: use `JsonlFileStore` for receipts and a durable `SpendStore`, since state is in-memory today.
 - [ ] A hosting decision. The runtime is an in-memory singleton with SSE, so it needs one long-running Node process (Railway, Fly or Render), not serverless functions.
 - [ ] Wire a real vendor plus `evmTools` / `escrowTools` with a funded testnet key, so transactions show real explorer links instead of `sim`.

@@ -70,13 +70,13 @@ export function Dashboard() {
       <Sidebar mode={snap?.mode} txs={by.txs} killed={snap?.killed ?? false} onKill={toggleKill} tab={tab} onNav={goto} />
 
       <main className="min-w-0 flex-1">
-        <TopBar mode={snap?.mode} running={running} killed={snap?.killed ?? false} onRun={run} connected={connected} pending={by.pending.length} />
+        <TopBar mode={snap?.mode} auth={snap?.auth} running={running} killed={snap?.killed ?? false} onRun={run} connected={connected} pending={by.pending.length} />
 
         <div className="flex flex-col gap-6 px-5 pb-10 pt-6 sm:px-8">
           {by.pending.length > 0 && <Approvals items={by.pending} onDone={refresh} />}
 
           {/* ---------------------------------------------------- budget */}
-          <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(320px,400px)]">
+          <section className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_minmax(340px,400px)]">
             <div className="min-w-0">
               <div className="flex flex-wrap items-end justify-between gap-4">
                 <div>
@@ -374,6 +374,7 @@ function Sidebar({
 
 function TopBar({
   mode,
+  auth,
   running,
   killed,
   onRun,
@@ -381,6 +382,7 @@ function TopBar({
   pending,
 }: {
   mode?: "demo" | "live";
+  auth?: "password" | "open" | "locked";
   running: boolean;
   killed: boolean;
   onRun: () => void;
@@ -422,6 +424,22 @@ function TopBar({
           {connected ? "Live feed" : "Feed offline"}
         </span>
         <WalletButton />
+        {auth === "open" && (
+          <span className="rounded-xl border border-amber-300/30 px-3 py-2.5 text-[13px] text-amber-200" title="Set DASHBOARD_PASSWORD to require sign-in">
+            Auth off (dev)
+          </span>
+        )}
+        {auth === "password" && (
+          <button
+            onClick={async () => {
+              await fetch("/api/logout", { method: "POST" });
+              window.location.href = "/login";
+            }}
+            className="rounded-xl border border-white/10 px-3.5 py-2.5 text-[13px] text-white/70 transition hover:bg-white/5 hover:text-white"
+          >
+            Sign out
+          </button>
+        )}
       </div>
     </header>
   );
@@ -491,8 +509,8 @@ function MetricCard(p: {
       <div className="flex items-start gap-3 px-5">
         <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${p.tile}`}>{p.icon}</span>
         <div className="min-w-0 flex-1 leading-tight">
-          <p className="text-[13px] text-white/50">{p.kicker}</p>
-          <p className="text-[16px] text-white">{p.title}</p>
+          <p className="truncate text-[13px] text-white/50">{p.kicker}</p>
+          <p className="truncate text-[16px] text-white">{p.title}</p>
         </div>
         <button onClick={p.onOpen} aria-label={`Open ${p.title}`} className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-white/80 transition hover:bg-white/5">
           <Icon.ArrowUpRight className="h-4 w-4" />
@@ -598,15 +616,18 @@ function PolicyCard({ snap, killed, onKill }: { snap: ReturnType<typeof useSnaps
         <span className="text-[17px] text-white">codkit</span>
         <span className="ml-auto rounded-lg bg-violet-300 px-2.5 py-1 text-xs font-medium text-[#1b1530]">{killed ? "Halted" : "Active"}</span>
       </div>
+      <div className="relative md:grid md:grid-cols-[minmax(0,1fr)_minmax(260px,340px)] md:items-end md:gap-10 2xl:block">
+      <div>
       <h2 className="relative mt-7 text-[30px] font-medium leading-tight tracking-tight text-white">Spending Policy</h2>
-      <p className="relative mt-3 max-w-[290px] text-[15px] leading-snug text-white/55">
+      <p className="relative mt-3 max-w-[290px] text-[15px] leading-snug text-white/55 md:max-w-[460px] 2xl:max-w-[290px]">
         Every payment is checked before anything is signed: at most {snap?.budget.perTx ?? "–"} USDC each, {snap?.budget.perDay ?? "–"} USDC a day, and a human approves anything
         above {snap?.budget.approvalAbove ?? "–"}.
       </p>
-      <svg className="pointer-events-none absolute -right-2 top-[42%] h-20 w-20 text-white/20" viewBox="0 0 100 100" fill="none">
+      </div>
+      <svg className="pointer-events-none absolute -right-2 top-[42%] hidden h-20 w-20 text-white/20 2xl:block" viewBox="0 0 100 100" fill="none">
         <path d="M5 95 L95 5" stroke="currentColor" strokeWidth="1" />
       </svg>
-      <div className="relative mt-10 flex flex-col gap-3">
+      <div className="relative mt-10 flex flex-col gap-3 md:mt-0 2xl:mt-10">
         <WalletButton variant="solid" />
         <button
           onClick={onKill}
@@ -614,6 +635,7 @@ function PolicyCard({ snap, killed, onKill }: { snap: ReturnType<typeof useSnaps
         >
           {killed ? "Release kill switch" : "Engage kill switch"} <Icon.Lock className="h-[18px] w-[18px]" />
         </button>
+      </div>
       </div>
     </div>
   );

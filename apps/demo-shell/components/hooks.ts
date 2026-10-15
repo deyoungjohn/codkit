@@ -32,6 +32,10 @@ export function useSnapshot(trigger: unknown) {
   const [snap, setSnap] = useState<Snapshot | null>(null);
   const refresh = useCallback(async () => {
     const r = await fetch("/api/state", { cache: "no-store" });
+    if (r.status === 401 || r.status === 503) {
+      window.location.href = "/login"; // session expired or dashboard locked
+      return;
+    }
     if (r.ok) setSnap(await r.json());
   }, []);
   useEffect(() => {
@@ -88,5 +92,6 @@ export function useWallet() {
 
 export async function post(path: string, body: unknown = {}) {
   const r = await fetch(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  if (r.status === 401) window.location.href = "/login";
   return r.json().catch(() => ({}));
 }

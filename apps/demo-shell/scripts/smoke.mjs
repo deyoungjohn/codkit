@@ -1,6 +1,7 @@
 // End-to-end smoke test of the built dashboard (run `next build` first):
-// start the server, run the demo agent, approve the approval request,
-// and check that decisions, blocks, payments, receipts and the final answer arrive.
+// start the server with auth on, check that signed-out access is refused, sign in,
+// run the demo agent, approve the approval request, and check that decisions, blocks,
+// payments, receipts and the final answer arrive. Also checks the bearer-protected MCP endpoint.
 import { spawn } from "node:child_process";
 import { createServer } from "node:net";
 
@@ -11,9 +12,18 @@ const port = await new Promise((r) => {
   });
 });
 const base = `http://127.0.0.1:${port}`;
+const PASSWORD = "smoke-test-operator-password";
+const MCP_TOKEN = "smoke-test-mcp-token-0123456789";
 const server = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "--port", String(port)], {
   // blank every LLM key so the smoke test always runs the scripted demo agent
-  env: { ...process.env, LLM_PROVIDER: "", GROQ_API_KEY: "", GEMINI_API_KEY: "", NVIDIA_API_KEY: "", OPENROUTER_API_KEY: "", AGENTROUTER_API_KEY: "", DEMO_STEP_MS: "0" },
+  env: {
+    ...process.env,
+    LLM_PROVIDER: "", GROQ_API_KEY: "", GEMINI_API_KEY: "", NVIDIA_API_KEY: "", OPENROUTER_API_KEY: "", AGENTROUTER_API_KEY: "",
+    DEMO_STEP_MS: "0",
+    DASHBOARD_PASSWORD: PASSWORD,
+    SESSION_SECRET: "",
+    MCP_TOKEN,
+  },
   stdio: ["ignore", "ignore", "inherit"],
   detached: true, // own process group, so we can stop next and its workers together
 });
@@ -33,16 +43,44 @@ const timer = setTimeout(() => fail("timed out"), 90_000);
 try {
   for (let i = 0; ; i++) {
     try {
-      if ((await fetch(`${base}/api/state`)).ok) break;
+      if ((await fetch(`${base}/api/state`)).status === 401) break; // up, and refusing signed-out callers
     } catch {}
     if (i > 150) fail("server did not start");
     await new Promise((r) => setTimeout(r, 200));
   }
-  const html = await (await fetch(base)).text();
+  const authChecks = {};
+  const page = await fetch(base, { redirect: "manual" });
+  authChecks["signed-out page redirects to /login"] = page.status === 307 && new URL(page.headers.get("location"), base).pathname === "/login";
+  authChecks["signed-out API refused (401)"] = (await fetch(`${base}/api/run`, { method: "POST", body: "{}" })).status === 401;
+  const login = (password) =>
+    fetch(`${base}/api/login`, { method: "POST", headers: { "content-type": "application/json", origin: base }, body: JSON.stringify({ password }) });
+  authChecks["wrong password refused"] = (await login("nope")).status === 401;
+  const ok = await login(PASSWORD);
+  const cookie = (ok.headers.get("set-cookie") ?? "").split(";")[0];
+  authChecks["sign-in sets an HttpOnly, SameSite=Strict session"] = ok.ok && /HttpOnly/.test(ok.headers.get("set-cookie")) && /SameSite=Strict/.test(ok.headers.get("set-cookie"));
+  authChecks["forged session refused"] = (await fetch(`${base}/api/state`, { headers: { cookie: `${cookie.split(".").slice(0, -1).join(".")}.forged` } })).status === 401;
+  const H = { cookie, origin: base, "content-type": "application/json" };
+  authChecks["cross-origin POST refused (403)"] =
+    (await fetch(`${base}/api/kill`, { method: "POST", headers: { ...H, origin: "https://evil.example" }, body: "{}" })).status === 403;
+
+  const mcp = (headers) =>
+    fetch(`${base}/api/mcp`, {
+      method: "POST",
+      headers: { "content-type": "application/json", accept: "application/json, text/event-stream", "mcp-protocol-version": "2025-06-18", ...headers },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list", params: {} }),
+    });
+  const mcpDenied = await mcp({});
+  authChecks["MCP without token: 401 + WWW-Authenticate"] = mcpDenied.status === 401 && /^Bearer/.test(mcpDenied.headers.get("www-authenticate") ?? "");
+  const mcpOk = await mcp({ authorization: `Bearer ${MCP_TOKEN}` });
+  authChecks["MCP with token lists the agent's tools"] = mcpOk.ok && ((await mcpOk.json()).result?.tools ?? []).some((t) => t.name === "pay_fetch");
+  for (const [name, ok] of Object.entries(authChecks)) console.log(`${ok ? "✓" : "✗"} ${name}`);
+  if (Object.values(authChecks).some((v) => !v)) fail("auth checks failed");
+
+  const html = await (await fetch(base, { headers: { cookie } })).text();
   if (!html.includes("Agent Console")) fail("page did not render");
 
-  const feed = await fetch(`${base}/api/feed`);
-  const run = await fetch(`${base}/api/run`, { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
+  const feed = await fetch(`${base}/api/feed`, { headers: { cookie } });
+  const run = await fetch(`${base}/api/run`, { method: "POST", headers: H, body: "{}" });
   if (run.status !== 202) fail(`run returned ${run.status}`);
 
   const seen = [];
@@ -63,7 +101,7 @@ try {
       if (e.kind === "approval_request") {
         const r = await fetch(`${base}/api/approve`, {
           method: "POST",
-          headers: { "content-type": "application/json" },
+          headers: H,
           body: JSON.stringify({ requestId: e.requestId, approved: true, by: "smoke-test" }),
         });
         if (!r.ok) fail("approve failed");
@@ -85,11 +123,11 @@ try {
     receipts: count((e) => e.kind === "receipt") >= 8,
     "final answer": count((e) => e.kind === "message") === 1,
   };
-  const state = await (await fetch(`${base}/api/state`)).json();
+  const state = await (await fetch(`${base}/api/state`, { headers: { cookie } })).json();
   checks["state: 3 payments, 0.27 USDC spent, receipts verify"] = state.payments === 3 && state.budget.spent === "0.27" && state.receipts.ok;
 
-  const kill = await (await fetch(`${base}/api/kill`, { method: "POST", headers: { "content-type": "application/json" }, body: "{}" })).json();
-  checks["kill switch"] = kill.killed === true && (await (await fetch(`${base}/api/state`)).json()).killed === true;
+  const kill = await (await fetch(`${base}/api/kill`, { method: "POST", headers: H, body: "{}" })).json();
+  checks["kill switch"] = kill.killed === true && (await (await fetch(`${base}/api/state`, { headers: { cookie } })).json()).killed === true;
 
   const failed = Object.entries(checks).filter(([, ok]) => !ok);
   if (process.env.SMOKE_DEBUG) for (const e of seen.filter((e) => e.kind === "tool_result" && !e.ok)) console.log("tool error:", e.output);
