@@ -13,7 +13,7 @@ The pattern that keeps winning is an **AI agent that takes a real onchain action
 | [`@iamyoungjohn-kit/policy`](packages/policy) | ✅ v0.1 | Guardrail engine: spend caps, allow/deny lists, human approval, mandatory simulation, kill switch. Includes an EVM adapter (viem). |
 | [`@iamyoungjohn-kit/pay`](packages/pay) | ✅ v0.1 | x402 paywall middleware (Hono / Express) and a budget-aware x402 client bounded by `policy`. |
 | [`@iamyoungjohn-kit/contracts`](packages/contracts) | 🟡 EVM + Sui v0.1 | Escrow (create → fund → deliver → release/refund) and reputation in Solidity (Foundry) and Sui Move, with TS bindings. Anchor (Solana) is still to do. |
-| `receipts` | planned | Hash-chained, signed action log anchored onchain or on Walrus/IPFS. |
+| [`@iamyoungjohn-kit/receipts`](packages/receipts) | ✅ v0.1 | Hash-chained, signed action log. Records policy events automatically, anchors onchain (EVM event or calldata, Solana memo, Sui event), stores the full log on Walrus, and lets anyone verify it. |
 | `mcp` | planned | MCP server exposing kit tools, plus a Claude tool-calling loop. |
 | `demo-shell` | planned | Next.js dashboard (wallet, live tx feed, reasoning trace, policy decisions) and a submission kit. |
 

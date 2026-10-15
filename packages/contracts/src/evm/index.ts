@@ -16,9 +16,9 @@ import {
   type Hex,
   type Log,
 } from "viem";
-import { escrowAbi, escrowBytecode, reputationAbi, reputationBytecode } from "./abi.js";
+import { escrowAbi, escrowBytecode, receiptAnchorAbi, receiptAnchorBytecode, reputationAbi, reputationBytecode } from "./abi.js";
 
-export { escrowAbi, escrowBytecode, reputationAbi, reputationBytecode };
+export { escrowAbi, escrowBytecode, receiptAnchorAbi, receiptAnchorBytecode, reputationAbi, reputationBytecode };
 
 export interface EvmTx {
   to: Address;

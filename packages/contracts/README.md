@@ -69,7 +69,7 @@ cd packages/contracts/evm
 forge script script/Deploy.s.sol --rpc-url base_sepolia --account <cast-wallet-name> --broadcast
 ```
 
-The script deploys `Reputation` and `Escrow`, then authorises the escrow as a reputation writer. Record the addresses in your project's deployed-contracts table.
+The script deploys `Reputation`, `Escrow`, and `ReceiptAnchor` (used by `@iamyoungjohn-kit/receipts`), then authorises the escrow as a reputation writer. Record the addresses in your project's deployed-contracts table.
 
 ## Develop
 
