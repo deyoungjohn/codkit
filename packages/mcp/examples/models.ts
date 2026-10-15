@@ -2,7 +2,9 @@
  * List the models each configured provider offers (GET /models), so you can
  * pick a free one with tool calling and set LLM_MODEL / <NAME>_MODEL.
  *
- *   GROQ_API_KEY=… OPENROUTER_API_KEY=… pnpm --filter @codkit/mcp example:models [filter]
+ *   pnpm --filter @codkit/mcp example:models [filter]
+ *
+ * Keys come from the repo-root .env. OpenRouter lists only `:free` models unless a filter is given.
  */
 import { PROVIDERS, type ProviderName } from "../src/agent.js";
 
@@ -21,9 +23,9 @@ for (const name of configured) {
   const rows = data
     .filter((m) => !filter || m.id.toLowerCase().includes(filter))
     // OpenRouter reports tool support; elsewhere assume and let the call fail over
-    .filter((m) => name !== "openrouter" || m.supported_parameters?.includes("tools"))
+    .filter((m) => name !== "openrouter" || (m.supported_parameters?.includes("tools") && (filter || m.id.endsWith(":free"))))
     .map((m) => m.id.replace(/^models\//, ""))
     .sort();
-  console.log(`\n${name} (${rows.length})${"model" in p ? ` default: ${p.model}` : ""}`);
+  console.log(`\n${name} (${rows.length})${"model" in p ? ` default: ${p.model.replaceAll(",", ", ")}` : ""}`);
   for (const id of rows) console.log(`  ${id}`);
 }

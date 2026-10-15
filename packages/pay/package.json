@@ -42,9 +42,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "clean": "rm -rf dist .turbo",
-    "example:server": "tsx examples/server.ts",
-    "example:client": "tsx examples/client.ts",
-    "example:local": "tsx examples/local.ts"
+    "example:server": "tsx --env-file-if-exists=../../.env examples/server.ts",
+    "example:client": "tsx --env-file-if-exists=../../.env examples/client.ts",
+    "example:local": "tsx --env-file-if-exists=../../.env examples/local.ts"
   },
   "dependencies": {
     "@codkit/policy": "workspace:*",

@@ -20,7 +20,10 @@ export interface ProviderPreset {
   baseUrl: string;
   /** Env var holding the API key. */
   keyEnv: string;
-  /** Default model. Free-tier catalogues change often — override with `LLM_MODEL` / `<NAME>_MODEL`. */
+  /**
+   * Default model; a comma-separated list means "try these in order". Free-tier
+   * catalogues change often — override with `LLM_MODEL` / `<NAME>_MODEL`.
+   */
   model?: string;
   headers?: Record<string, string>;
 }
@@ -33,7 +36,13 @@ export const PROVIDERS = {
   openrouter: {
     baseUrl: "https://openrouter.ai/api/v1",
     keyEnv: "OPENROUTER_API_KEY",
-    model: "nvidia/nemotron-3-super-120b-a12b:free",
+    // free models with tool support, tried in order (free slugs churn — check `example:models`)
+    model: [
+      "dots-studio/dots-3-note-preview:free",
+      "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "google/gemma-4-31b-it:free",
+      "nvidia/nemotron-3-super-120b-a12b:free",
+    ].join(","),
     headers: { "X-Title": "codkit" },
   },
   // No default model: the catalogue is account-specific (`pnpm --filter @codkit/mcp example:models`).
@@ -47,26 +56,29 @@ export type ProviderName = keyof typeof PROVIDERS;
  * - `LLM_PROVIDER=groq,gemini` picks and orders presets; `custom` uses `LLM_BASE_URL` + `LLM_API_KEY`.
  * - Unset: every preset whose key env var is set, in `PROVIDERS` order.
  * - Model: `<NAME>_MODEL` (e.g. `GROQ_MODEL`), else `LLM_MODEL` for the first provider, else the preset default.
+ *   A comma-separated model list expands into one failover entry per model.
  */
 export function providersFromEnv(env: Record<string, string | undefined> = process.env): LlmProvider[] {
   const names = env.LLM_PROVIDER
     ? env.LLM_PROVIDER.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean)
     : (Object.keys(PROVIDERS) as ProviderName[]).filter((n) => env[PROVIDERS[n].keyEnv]);
-  return names.map((name, i) => {
+  return names.flatMap((name, i): LlmProvider[] => {
     const m = env[`${name.toUpperCase()}_MODEL`] || (i === 0 ? env.LLM_MODEL : undefined);
     if (name === "custom") {
-      if (!env.LLM_BASE_URL || !(m ?? env.LLM_MODEL)) throw new Error("LLM_PROVIDER=custom needs LLM_BASE_URL and LLM_MODEL");
-      return { name, baseUrl: env.LLM_BASE_URL, apiKey: env.LLM_API_KEY, model: (m ?? env.LLM_MODEL)! };
+      if (!env.LLM_BASE_URL || !m) throw new Error("LLM_PROVIDER=custom needs LLM_BASE_URL and CUSTOM_MODEL (or LLM_MODEL)");
+      return models(m).map((model) => ({ name, baseUrl: env.LLM_BASE_URL!, apiKey: env.LLM_API_KEY, model }));
     }
     const preset: ProviderPreset | undefined = PROVIDERS[name as ProviderName];
     if (!preset) throw new Error(`unknown LLM provider "${name}" (known: ${Object.keys(PROVIDERS).join(", ")}, custom)`);
     const apiKey = env[preset.keyEnv];
     if (!apiKey) throw new Error(`${name}: set ${preset.keyEnv}`);
-    const model = m || preset.model;
-    if (!model) throw new Error(`${name}: set ${name.toUpperCase()}_MODEL (or LLM_MODEL)`);
-    return { name, baseUrl: preset.baseUrl, apiKey, model, ...(preset.headers && { headers: preset.headers }) };
+    const list = models(m || preset.model);
+    if (!list.length) throw new Error(`${name}: set ${name.toUpperCase()}_MODEL (or LLM_MODEL)`);
+    return list.map((model) => ({ name, baseUrl: preset.baseUrl, apiKey, model, ...(preset.headers && { headers: preset.headers }) }));
   });
 }
+
+const models = (s: string | undefined) => (s ?? "").split(",").map((x) => x.trim()).filter(Boolean);
 
 // ------------------------------------------------------------ wire types
 
@@ -109,6 +121,7 @@ export type AgentEvent =
       provider: string;
       model: string;
     }
+  /** `from` / `to` are `provider/model`. */
   | { type: "failover"; from: string; to: string; error: string };
 
 export interface RunAgentOptions {
@@ -189,7 +202,7 @@ export async function runAgent(opts: RunAgentOptions): Promise<RunAgentResult> {
       }
       if (opts.signal?.aborted) break;
       const next = providers[p + 1];
-      if (next) opts.onEvent?.({ type: "failover", from: provider.name, to: next.name, error: msg(lastErr) });
+      if (next) opts.onEvent?.({ type: "failover", from: label(provider), to: label(next), error: msg(lastErr) });
     }
     throw lastErr;
   };
@@ -283,6 +296,7 @@ async function runCall(byName: Map<string, AnyKitTool>, c: ToolCall, signal?: Ab
   return (await callTool(tool, args, signal ? { signal } : {})).text;
 }
 
+const label = (p: LlmProvider) => `${p.name}/${p.model}`;
 const msg = (e: unknown) => (e instanceof Error ? e.message : String(e));
 
 function sleep(ms: number, signal?: AbortSignal): Promise<void> {

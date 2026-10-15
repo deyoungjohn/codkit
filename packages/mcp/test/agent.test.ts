@@ -90,7 +90,7 @@ describe("runAgent (OpenAI-compatible loop)", () => {
     const events: AgentEvent[] = [];
     const res = await runAgent({ fetch, providers: [groq, gemini], retries: 1, maxBackoffMs: 1, tools: policyTools(engine), prompt: "go", onEvent: (e) => events.push(e) });
     expect(requests.map((r) => new URL(r.url).host)).toEqual(["api.groq.test", "api.groq.test", "gemini.test", "gemini.test"]);
-    expect(events.find((e) => e.type === "failover")).toMatchObject({ from: "groq", to: "gemini", error: expect.stringContaining("429") });
+    expect(events.find((e) => e.type === "failover")).toMatchObject({ from: "groq/gpt-oss", to: "gemini/flash", error: expect.stringContaining("429") });
     expect(res.provider).toBe("gemini");
   });
 
@@ -124,7 +124,10 @@ describe("providersFromEnv", () => {
     const ps = providersFromEnv({ OPENROUTER_API_KEY: "o", GEMINI_API_KEY: "g", LLM_MODEL: "gemini-x" });
     expect(ps.map((p) => [p.name, p.model])).toEqual([
       ["gemini", "gemini-x"],
-      ["openrouter", expect.stringContaining(":free")],
+      ["openrouter", "dots-studio/dots-3-note-preview:free"],
+      ["openrouter", "nvidia/nemotron-3-ultra-550b-a55b:free"],
+      ["openrouter", "google/gemma-4-31b-it:free"],
+      ["openrouter", "nvidia/nemotron-3-super-120b-a12b:free"],
     ]);
     expect(providersFromEnv({})).toEqual([]);
   });
@@ -142,6 +145,9 @@ describe("providersFromEnv", () => {
       { name: "custom", baseUrl: "http://localhost:11434/v1", apiKey: undefined, model: "qwen3" },
     ]);
     expect(() => providersFromEnv({ LLM_PROVIDER: "agentrouter", AGENTROUTER_API_KEY: "a" })).toThrow(/AGENTROUTER_MODEL/);
+    // comma-separated models expand into failover entries
+    const g = providersFromEnv({ LLM_PROVIDER: "groq", GROQ_API_KEY: "k", LLM_MODEL: "a, b" });
+    expect(g.map((p) => p.model)).toEqual(["a", "b"]);
     expect(() => providersFromEnv({ LLM_PROVIDER: "groq" })).toThrow(/GROQ_API_KEY/);
     expect(() => providersFromEnv({ LLM_PROVIDER: "anthropic" })).toThrow(/unknown LLM provider/);
   });

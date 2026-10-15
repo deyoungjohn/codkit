@@ -51,11 +51,11 @@ The loop talks plain Chat Completions over `fetch` with no SDK, so any OpenAI-co
 | `groq` | `GROQ_API_KEY` | `openai/gpt-oss-120b` |
 | `gemini` | `GEMINI_API_KEY` | `gemini-2.5-flash` |
 | `nvidia` (NIM) | `NVIDIA_API_KEY` | `openai/gpt-oss-120b` |
-| `openrouter` | `OPENROUTER_API_KEY` | `nvidia/nemotron-3-super-120b-a12b:free` |
+| `openrouter` | `OPENROUTER_API_KEY` | four free tool-capable models, tried in order (see `PROVIDERS`) |
 | `agentrouter` | `AGENTROUTER_API_KEY` | none, so set `AGENTROUTER_MODEL` |
 | `custom` | `LLM_API_KEY` + `LLM_BASE_URL` | `LLM_MODEL` (Ollama, vLLM, LM Studio…) |
 
-- **Configuration:** `providersFromEnv()` picks every provider whose key is set, in the order above. Override the order with `LLM_PROVIDER=gemini,groq`. Set the model with `LLM_MODEL` (first provider) or `<NAME>_MODEL`. Free-tier catalogues change monthly, so run `pnpm --filter @codkit/mcp example:models [filter]` to see what your keys can use. You can also pass `providers: [{ name, baseUrl, apiKey, model }]` directly.
+- **Configuration:** keys are read from the repo-root `.env` (examples and the dashboard load it). `providersFromEnv()` picks every provider whose key is set, in the order above. Override the order with `LLM_PROVIDER=gemini,groq`. Set the model with `LLM_MODEL` (first provider) or `<NAME>_MODEL`. A comma-separated list (`GEMINI_MODEL=gemini-3.8-flash,gemini-3.5-flash`) tries each model in turn. Free-tier catalogues change monthly, so run `pnpm --filter @codkit/mcp example:models [filter]` to see what your keys can use. You can also pass `providers: [{ name, baseUrl, apiKey, model }]` directly.
 - **Failover:** `429` and `5xx` responses are retried with backoff (`retry-after` is honoured), then the run moves to the next provider. Other errors (bad key, unknown model) fail over at once. The history is plain OpenAI format, so a run can switch providers mid-task. A `failover` event reports each switch.
 - **Errors:** invalid arguments, malformed JSON and unknown tool names go back to the model as `Error: …` tool results so it can correct itself.
 - **Trace:** `onEvent` emits `thinking` (from `reasoning` / `reasoning_content`, when the provider returns it), `text`, `tool_use`, and `turn` (with usage, provider and model). It stops after `maxIterations` (default 20).

@@ -62,9 +62,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "clean": "rm -rf dist .turbo",
-    "example:server": "tsx examples/mcp-server.ts",
-    "example:agent": "tsx examples/agent.ts",
-    "example:models": "tsx examples/models.ts"
+    "example:server": "tsx --env-file-if-exists=../../.env examples/mcp-server.ts",
+    "example:agent": "tsx --env-file-if-exists=../../.env examples/agent.ts",
+    "example:models": "tsx --env-file-if-exists=../../.env examples/models.ts"
   },
   "dependencies": {
     "zod": "^4.1.0"

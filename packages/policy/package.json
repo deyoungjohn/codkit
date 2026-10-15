@@ -34,8 +34,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "clean": "rm -rf dist .turbo",
-    "example": "tsx examples/basic.ts",
-    "example:evm": "tsx examples/evm.ts"
+    "example": "tsx --env-file-if-exists=../../.env examples/basic.ts",
+    "example:evm": "tsx --env-file-if-exists=../../.env examples/evm.ts"
   },
   "dependencies": {
     "zod": "^4.1.0"
