@@ -33,6 +33,8 @@ pnpm typecheck
 pnpm --filter demo-shell dev   # dashboard at http://localhost:3000 (demo mode, no keys needed)
 ```
 
+See [TODO.md](TODO.md) for remaining work and tasks that need accounts/funds.
+
 Requirements: Node ≥ 22, pnpm, [Foundry](https://getfoundry.sh), and optionally the [Sui CLI](https://docs.sui.io/guides/developer/getting-started/sui-install) for `contracts`. Clone with `--recurse-submodules`.
 
 ## Rules of the repo
