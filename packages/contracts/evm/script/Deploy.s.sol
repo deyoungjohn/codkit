@@ -14,7 +14,9 @@ import {ReceiptAnchor} from "../src/ReceiptAnchor.sol";
 contract Deploy is Script {
     function run() external returns (Reputation rep, Escrow escrow, ReceiptAnchor anchor) {
         vm.startBroadcast();
-        address owner = msg.sender;
+        // The broadcasting wallet, whatever the signer (--account keystore, --private-key, --ledger).
+        // Not msg.sender: with --account and no --sender, msg.sender is Foundry's default script sender.
+        (, address owner,) = vm.readCallers();
         rep = new Reputation(owner);
         escrow = new Escrow(rep);
         rep.setWriter(address(escrow), true);
