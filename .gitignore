@@ -22,3 +22,7 @@ packages/contracts/deployments/anvil*.json
 packages/contracts/evm/broadcast/**/dry-run/
 packages/contracts/sui/.coverage_map.mvcov
 packages/contracts/sui/traces/
+
+# design reference (third-party artwork, not ours to redistribute) and Windows download metadata
+ui-inspira*.webp
+*:Zone.Identifier

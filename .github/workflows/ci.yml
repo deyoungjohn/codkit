@@ -70,3 +70,31 @@ jobs:
           cargo test
           cargo clippy --all-targets -- -D warnings
           cargo fmt --check
+  # Versioning and publishing (Changesets + npm Trusted Publishing). Runs on main only after
+  # every test job is green: pending changesets → opens/updates a "Version Packages" PR;
+  # merging that PR → publishes the new versions (OIDC, provenance), tags them, creates releases.
+  release:
+    needs: [test, move, solana]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    concurrency: release
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write # npm Trusted Publishing
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - uses: changesets/action@v2.1.2
+        with:
+          version-script: pnpm version-packages
+          publish-script: pnpm release
+          create-github-releases: true
+          commit-message: Version Packages
+          pr-title: Version Packages

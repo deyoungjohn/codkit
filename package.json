@@ -17,9 +17,13 @@
     "deploy:sui": "pnpm --filter @codkit/contracts run deploy:sui",
     "e2e:evm": "pnpm --filter testnet-e2e run evm",
     "e2e:sui": "pnpm --filter testnet-e2e run sui",
-    "e2e:solana": "pnpm --filter testnet-e2e run solana"
+    "e2e:solana": "pnpm --filter testnet-e2e run solana",
+    "changeset": "changeset",
+    "version-packages": "changeset version && pnpm install --lockfile-only",
+    "release": "node scripts/release.mjs"
   },
   "devDependencies": {
+    "@changesets/cli": "3.0.3",
     "@types/node": "^22.13.0",
     "tsx": "^4.21.0",
     "turbo": "^2.11.8",
