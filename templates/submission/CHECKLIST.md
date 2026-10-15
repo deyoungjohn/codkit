@@ -27,4 +27,4 @@
 
 - [ ] The testnet wallet is funded (gas, plus USDC from https://faucet.circle.com).
 - [ ] There's a backup recording in case the live demo fails.
-- [ ] The dashboard has been reset, and `ANTHROPIC_API_KEY` is set if you're demoing live Claude.
+- [ ] The dashboard has been reset, and an LLM key (`GROQ_API_KEY`, `GEMINI_API_KEY`, …) is set if you're demoing the live agent. Set two so a free-tier rate limit fails over instead of stalling the demo.

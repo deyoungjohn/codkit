@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-/** MCP-style hints; Claude and WebMCP ignore what they don't use. */
+/** MCP-style hints; the agent loop and WebMCP ignore what they don't use. */
 export interface ToolAnnotations {
   readOnlyHint?: boolean;
   destructiveHint?: boolean;
@@ -13,8 +13,8 @@ export interface ToolContext {
 }
 
 /**
- * One tool definition, exposed three ways: MCP server (`/server`), Claude tool
- * runner (`/claude`), browser WebMCP (`/webmcp`).
+ * One tool definition, exposed three ways: MCP server (`/server`), LLM agent
+ * loop (`/agent`), browser WebMCP (`/webmcp`).
  */
 export interface KitTool<S extends z.ZodObject = z.ZodObject> {
   /** `snake_case`, unique within a toolset. */
@@ -80,7 +80,7 @@ export interface InstrumentOptions {
 /**
  * Wrap tools so every call emits events (for a live dashboard / reasoning trace)
  * and, optionally, lands in the receipt log. Surface-agnostic: the wrapped tools
- * work with MCP, Claude and WebMCP alike.
+ * work with MCP, the agent loop and WebMCP alike.
  */
 export function instrument<T extends AnyKitTool[]>(tools: T, opts: InstrumentOptions): T {
   return tools.map((t) => ({

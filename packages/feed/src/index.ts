@@ -150,7 +150,7 @@ export function feedReceiptStore(inner: ReceiptStore, feed: Feed): ReceiptStore 
   };
 }
 
-/** Map agent-loop events (`runAgent` onEvent in `@codkit/mcp/claude`). */
+/** Map agent-loop events (`runAgent` onEvent in `@codkit/mcp/agent`). */
 export function agentEventToFeed(feed: Feed, e: { type: string; text?: string }): void {
   if (e.type === "thinking" && e.text) feed.push({ kind: "thinking", text: e.text });
   else if (e.type === "text" && e.text) feed.push({ kind: "message", text: e.text });

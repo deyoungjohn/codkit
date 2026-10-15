@@ -81,7 +81,7 @@ export function Dashboard() {
               </button>
               {snap && (
                 <span className="ml-auto text-xs text-white/40">
-                  {snap.mode === "demo" ? "Demo mode: scripted agent, real policy + x402 + receipts" : "Live: Claude drives the tools"}
+                  {snap.mode === "demo" ? "Demo mode: scripted agent, real policy + x402 + receipts" : `Live: ${snap.llm} drives the tools`}
                 </span>
               )}
             </div>
@@ -122,7 +122,7 @@ function Header({ mode, connected }: { mode?: "demo" | "live"; connected: boolea
         </div>
       </div>
       <div className="ml-auto flex items-center gap-2">
-        {mode && <Badge tone={mode === "live" ? "allow" : "neutral"}>{mode === "live" ? "Claude live" : "Demo mode"}</Badge>}
+        {mode && <Badge tone={mode === "live" ? "allow" : "neutral"}>{mode === "live" ? "LLM live" : "Demo mode"}</Badge>}
         <Badge tone={connected ? "allow" : "deny"}>{connected ? "● feed live" : "○ feed offline"}</Badge>
         <WalletButton />
       </div>

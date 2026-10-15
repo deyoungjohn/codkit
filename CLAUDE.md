@@ -16,7 +16,7 @@ A reusable, open-source toolkit of the "plumbing" modules that keep recurring am
 2. **pay** — x402 server middleware (Express/Hono, FastAPI, MCP tool calls) + budget-aware x402 client; USDC transfers; payment links / QR; webhooks.
 3. **contracts** — escrow (create → fund → deliver → release/refund) + simple reputation counter, in Solidity (Foundry), Anchor, Sui Move.
 4. **receipts** — hash-chained, signed action log; anchor root onchain (EVM event / Solana memo / Sui) or Walrus/IPFS; explorer links.
-5. **mcp** — MCP server scaffold exposing kit tools + Claude tool-calling loop with Zod schemas; WebMCP variant.
+5. **mcp** — MCP server scaffold exposing kit tools + LLM tool-calling loop (any OpenAI-compatible provider) with Zod schemas; WebMCP variant.
 6. **demo-shell** — Next.js dashboard: wallet connect, live tx feed with explorer links, agent reasoning trace, policy decisions (allowed/blocked). Plus submission kit: README template, architecture diagram, demo-video script, deployed-contracts table.
 
 Later / maybe: agent wallets & session keys (ERC-4337, Solana session keys), identity (ERC-8004, ENS/SNS), multi-agent orchestration. Skip: ZK/privacy, gaming, RWA (too sponsor-specific).
@@ -25,7 +25,7 @@ Later / maybe: agent wallets & session keys (ERC-4337, Solana session keys), ide
 - pnpm + Turborepo monorepo, TypeScript strict, Zod, Vitest.
 - Chains: viem (EVM), @solana/kit + Anchor (Solana), @mysten/sui (Sui) — adapters only.
 - Frontend: Next.js + Tailwind. Backend: Node (Hono/Express); optional Python FastAPI sidecar for AI-heavy work.
-- AI: Anthropic SDK, MCP TypeScript SDK.
+- AI: provider-neutral OpenAI-compatible Chat Completions (Groq, Gemini, NVIDIA NIM, OpenRouter, AgentRouter free tiers), MCP TypeScript SDK. Do NOT use the Anthropic API.
 - Licence: MIT. Publish to GitHub (public) early.
 
 ## Principles

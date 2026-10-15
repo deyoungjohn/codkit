@@ -14,7 +14,6 @@
     "clean": "rm -rf .next .turbo"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "~0.133.0",
     "@codkit/feed": "workspace:*",
     "@codkit/mcp": "workspace:*",
     "@codkit/pay": "workspace:*",

@@ -1,10 +1,12 @@
 /**
- * Claude as a shopping agent with a budget: it buys data from x402 paywalls,
+ * An LLM as a shopping agent with a budget: it buys data from x402 paywalls,
  * the policy engine bounds what it can spend, and every step lands in a signed
  * receipt log. Paywall + facilitator run in-process, so no wallet funds needed —
- * only Anthropic API access (ANTHROPIC_API_KEY or `ant auth login`).
+ * only a key for any OpenAI-compatible provider (free tiers work):
  *
- *   pnpm --filter @codkit/mcp example:agent
+ *   GROQ_API_KEY=… pnpm --filter @codkit/mcp example:agent
+ *   GEMINI_API_KEY=… NVIDIA_API_KEY=… pnpm --filter @codkit/mcp example:agent   # failover chain
+ *   LLM_PROVIDER=openrouter LLM_MODEL=<id>:free OPENROUTER_API_KEY=… pnpm --filter @codkit/mcp example:agent
  */
 import { createPolicyEngine, usdc } from "@codkit/policy";
 import { createBudgetedFetch, registerExactEvmScheme, x402Client } from "@codkit/pay";
@@ -14,7 +16,7 @@ import type { FacilitatorClient } from "@x402/core/server";
 import { Hono } from "hono";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { instrument } from "../src/index.js";
-import { runAgent } from "../src/claude.js";
+import { providersFromEnv, runAgent } from "../src/agent.js";
 import { payTools } from "../src/tools/pay.js";
 import { policyTools } from "../src/tools/policy.js";
 import { receiptTools } from "../src/tools/receipts.js";
@@ -56,7 +58,10 @@ const tools = instrument([...payTools({ fetch: fetchPaid, allowedHosts: ["vendor
 });
 
 // --- run -------------------------------------------------------------------
+const providers = providersFromEnv();
+console.log(`providers: ${providers.map((p) => `${p.name} (${p.model})`).join(" → ") || "none — set GROQ_API_KEY, GEMINI_API_KEY, NVIDIA_API_KEY, OPENROUTER_API_KEY or AGENTROUTER_API_KEY"}`);
 const res = await runAgent({
+  providers,
   tools,
   system:
     "You are a research agent with a small USDC budget, paying for data via x402. Check your budget before buying, never try to evade the spending policy, and note the rationale for purchasing decisions with receipts_note. Be concise.",
@@ -64,7 +69,8 @@ const res = await runAgent({
     "The data vendor is at http://vendor.local/. Get me current ETH and SOL prices. If the full market report fits the budget, buy it too; otherwise explain why not.",
   onEvent: (e) => {
     if (e.type === "thinking") console.log(`  💭 ${e.text.replace(/\s+/g, " ").slice(0, 200)}`);
-    if (e.type === "turn") console.log(`  [turn: ${e.stopReason}, ${e.usage.input_tokens} in / ${e.usage.output_tokens} out]`);
+    if (e.type === "turn") console.log(`  [${e.provider}/${e.model}: ${e.stopReason}, ${e.usage.input_tokens} in / ${e.usage.output_tokens} out]`);
+    if (e.type === "failover") console.log(`  ⚠ ${e.from} failed (${e.error}) → trying ${e.to}`);
   },
 });
 

@@ -16,19 +16,17 @@ Status as of 2026-10-15. Modules 1 to 6 are built, tested and pushed. CI is gree
    `pnpm publish` rewrites `workspace:*` dependencies to real versions. `apps/demo-shell` is private and won't be published.
 4. Optional: add Changesets plus a CI publish job with npm provenance, so releases aren't manual.
 
-### Anthropic API key (nothing has called the real API yet)
+### LLM keys (no Anthropic API: free tiers only)
 
-The API is billed separately from a Claude Pro subscription. In the Claude Console (platform.claude.com), buy prepaid credits, then create an API key.
-
-The Claude agent loop is tested against a scripted API only, so its first real run is still to do. With a key:
+The agent loop (`@codkit/mcp/agent`) works with any OpenAI-compatible provider. It's tested against a scripted API, so its first real run is still to do. Get one or more free keys: Groq (console.groq.com), Gemini (aistudio.google.com), NVIDIA NIM (build.nvidia.com), OpenRouter (`:free` models), or AgentRouter. Put them in `.env` (see `.env.example`). With two or more set, a rate-limited provider fails over to the next.
 
 ```bash
-export ANTHROPIC_API_KEY=...        # or: ant auth login
-pnpm --filter @codkit/mcp example:agent    # Claude buys data within budget
-pnpm --filter demo-shell dev                          # dashboard switches to "Claude live"
+pnpm --filter @codkit/mcp example:models          # which models your keys can use
+pnpm --filter @codkit/mcp example:agent           # the LLM buys data within budget
+pnpm --filter demo-shell dev                      # the dashboard switches to "LLM live"
 ```
 
-Check that Claude calls `policy_status` before buying, asks for approval on the $0.25 summary, and is blocked on the $2 report.
+Check that the model calls `policy_status` before buying, asks for approval on the $0.25 summary, and is blocked on the $2 report. If a default model ID has been retired, set `<PROVIDER>_MODEL` and update the preset in `packages/mcp/src/agent.ts`. Before relying on AgentRouter, confirm that it accepts generic API clients and not just Claude Code or Codex, and remember that it sees every prompt.
 
 ### Testnet funds and deployments
 
@@ -103,4 +101,4 @@ Install Rust, the Solana CLI and Anchor (`avm`). Then the Solana items in sectio
 - The policy engine, receipt log and feed keep state in memory by default. Plug in a store for anything long-running.
 - Policy reservations never expire unless `reservationTtlMs` is set. That's conservative for signed-but-unsettled x402 payments.
 - EVM contract calls other than ERC20 transfer/approve expose only their native `value` as spend. Restrict them with `allow.programs` and `allow.methods`.
-- `@anthropic-ai/sdk` is pinned to `~0.133.0`, because pnpm 12's minimum-release-age policy rejected a 1-day-old 0.134.0. Bump it when it's older.
+- The agent loop has no provider SDK. It uses plain Chat Completions over `fetch`. Default free-tier model IDs drift, so override them with env vars.

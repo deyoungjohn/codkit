@@ -15,6 +15,7 @@ import {
   type Feed,
 } from "@codkit/feed";
 import { instrument, type AnyKitTool } from "@codkit/mcp";
+import { providersFromEnv, type LlmProvider } from "@codkit/mcp/agent";
 import { payTools } from "@codkit/mcp/tools/pay";
 import { policyTools } from "@codkit/mcp/tools/policy";
 import { receiptTools } from "@codkit/mcp/tools/receipts";
@@ -46,6 +47,8 @@ export interface Runtime {
   approvals: ApprovalBroker;
   tools: AnyKitTool[];
   mode: "live" | "demo";
+  /** LLM failover chain in live mode (from env: GROQ_API_KEY, GEMINI_API_KEY, …). */
+  providers: LlmProvider[];
   running: boolean;
   settled: number;
 }
@@ -127,13 +130,15 @@ function createRuntime(): Runtime {
     { onEvent: (e) => toolEventToFeed(feed, e) },
   );
 
+  const providers = providersFromEnv();
   return Object.assign(rt, {
     feed,
     engine,
     receipts,
     approvals,
     tools,
-    mode: process.env.ANTHROPIC_API_KEY ? ("live" as const) : ("demo" as const),
+    providers,
+    mode: providers.length ? ("live" as const) : ("demo" as const),
     running: false,
   });
 }
@@ -155,13 +160,22 @@ export function startRun(prompt: string): { started: boolean; mode: Runtime["mod
   const rt = runtime();
   if (rt.running) return { started: false, mode: rt.mode, reason: "already running" };
   rt.running = true;
-  rt.feed.push({ kind: "status", state: "running", detail: rt.mode === "live" ? "Claude is working" : "scripted demo agent" });
+  rt.feed.push({ kind: "status", state: "running", detail: rt.mode === "live" ? `${rt.providers[0]!.name} (${rt.providers[0]!.model}) is working` : "scripted demo agent" });
   void (async () => {
     try {
       if (rt.mode === "live") {
-        const { runAgent } = await import("@codkit/mcp/claude");
-        const res = await runAgent({ tools: rt.tools, system: SYSTEM_PROMPT, prompt, onEvent: (e) => agentEventToFeed(rt.feed, e) });
-        rt.feed.push({ kind: "status", state: "done", detail: `${res.turns} turns, stop: ${res.stopReason}` });
+        const { runAgent } = await import("@codkit/mcp/agent");
+        const res = await runAgent({
+          providers: rt.providers,
+          tools: rt.tools,
+          system: SYSTEM_PROMPT,
+          prompt,
+          onEvent: (e) => {
+            if (e.type === "failover") rt.feed.push({ kind: "status", state: "running", detail: `${e.from} failed, switching to ${e.to}` });
+            else agentEventToFeed(rt.feed, e);
+          },
+        });
+        rt.feed.push({ kind: "status", state: "done", detail: `${res.provider}/${res.model}: ${res.turns} turns, stop: ${res.stopReason}` });
       } else {
         const { runScenario } = await import("./scenario");
         await runScenario(rt);
@@ -185,6 +199,7 @@ export async function snapshot() {
   const verified = await verifyLog(log);
   return {
     mode: rt.mode,
+    llm: rt.providers[0] ? `${rt.providers[0].name} · ${rt.providers[0].model}` : null,
     running: rt.running,
     killed: rt.engine.isKilled,
     budget: {

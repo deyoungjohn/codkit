@@ -1,7 +1,7 @@
 {
   "name": "@codkit/mcp",
   "version": "0.1.0",
-  "description": "Define agent tools once with Zod; expose them as an MCP server (stdio / HTTP), a Claude tool-runner agent loop, and WebMCP browser tools. Ships kit tools for policy, x402 pay, escrow and receipts.",
+  "description": "Define agent tools once with Zod; expose them as an MCP server (stdio / HTTP), an agent loop on any OpenAI-compatible LLM (Gemini, Groq, NVIDIA NIM, OpenRouter, \u2026), and WebMCP browser tools. Ships kit tools for policy, x402 pay, escrow and receipts.",
   "license": "MIT",
   "author": "Young John",
   "repository": {
@@ -24,9 +24,9 @@
       "types": "./dist/server.d.ts",
       "import": "./dist/server.js"
     },
-    "./claude": {
-      "types": "./dist/claude.d.ts",
-      "import": "./dist/claude.js"
+    "./agent": {
+      "types": "./dist/agent.d.ts",
+      "import": "./dist/agent.js"
     },
     "./webmcp": {
       "types": "./dist/webmcp.d.ts",
@@ -63,13 +63,13 @@
     "test": "vitest run",
     "clean": "rm -rf dist .turbo",
     "example:server": "tsx examples/mcp-server.ts",
-    "example:agent": "tsx examples/agent.ts"
+    "example:agent": "tsx examples/agent.ts",
+    "example:models": "tsx examples/models.ts"
   },
   "dependencies": {
     "zod": "^4.1.0"
   },
   "peerDependencies": {
-    "@anthropic-ai/sdk": ">=0.130.0",
     "@codkit/contracts": "workspace:^",
     "@codkit/policy": "workspace:^",
     "@codkit/receipts": "workspace:^",
@@ -77,9 +77,6 @@
     "viem": "^2.48.0"
   },
   "peerDependenciesMeta": {
-    "@anthropic-ai/sdk": {
-      "optional": true
-    },
     "@codkit/contracts": {
       "optional": true
     },
@@ -97,7 +94,6 @@
     }
   },
   "devDependencies": {
-    "@anthropic-ai/sdk": "~0.133.0",
     "@codkit/contracts": "workspace:*",
     "@codkit/pay": "workspace:*",
     "@codkit/policy": "workspace:*",

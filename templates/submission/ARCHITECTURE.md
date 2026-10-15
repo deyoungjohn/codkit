@@ -9,7 +9,7 @@ flowchart LR
   ui -->|run / approve / kill| agent
 
   subgraph backend[Agent backend]
-    agent[Claude agent loop<br/>tool runner] --> tools[Kit tools<br/>Zod schemas]
+    agent[LLM agent loop<br/>OpenAI-compatible] --> tools[Kit tools<br/>Zod schemas]
     tools --> policy{Policy engine<br/>caps · allow-lists<br/>simulate · approve<br/>kill switch}
     policy -->|allowed| pay[x402 client<br/>budgeted]
     policy -->|allowed| tx[EVM / Sui tx<br/>guarded send]

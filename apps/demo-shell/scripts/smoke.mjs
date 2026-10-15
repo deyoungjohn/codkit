@@ -12,7 +12,8 @@ const port = await new Promise((r) => {
 });
 const base = `http://127.0.0.1:${port}`;
 const server = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "--port", String(port)], {
-  env: { ...process.env, ANTHROPIC_API_KEY: "", DEMO_STEP_MS: "0" },
+  // blank every LLM key so the smoke test always runs the scripted demo agent
+  env: { ...process.env, LLM_PROVIDER: "", GROQ_API_KEY: "", GEMINI_API_KEY: "", NVIDIA_API_KEY: "", OPENROUTER_API_KEY: "", AGENTROUTER_API_KEY: "", DEMO_STEP_MS: "0" },
   stdio: ["ignore", "ignore", "inherit"],
   detached: true, // own process group, so we can stop next and its workers together
 });

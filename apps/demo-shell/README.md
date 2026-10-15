@@ -12,7 +12,7 @@ A hackathon demo dashboard for "AI agent that spends money under policy". It sho
 - **Receipt log:** signed and hash-chained, with live verification.
 - **Wallet connect:** EIP-6963 discovery, with no extra dependencies.
 
-It's built on the kit: `policy`, `pay` (x402), `receipts`, `mcp` (tools and the Claude loop) and `feed` (SSE event stream).
+It's built on the kit: `policy`, `pay` (x402), `receipts`, `mcp` (tools and the LLM agent loop) and `feed` (SSE event stream).
 
 ## Run
 
@@ -22,7 +22,7 @@ pnpm --filter demo-shell dev        # http://localhost:3000
 ```
 
 - **Demo mode** (default, no keys needed): a scripted agent calls the real tools. The policy engine, x402 signing against an in-process paywall, approvals and receipts are all real. Only the reasoning text is canned, and settlement is simulated (transactions are marked `sim`).
-- **Live mode:** set `ANTHROPIC_API_KEY` and Claude (`claude-opus-5-5`) drives the same tools.
+- **Live mode:** set any OpenAI-compatible LLM key (`GROQ_API_KEY`, `GEMINI_API_KEY`, `NVIDIA_API_KEY`, `OPENROUTER_API_KEY`, `AGENTROUTER_API_KEY`) and that model drives the same tools. Set several to get a failover chain. See [`@codkit/mcp` → Run an agent](../../packages/mcp/README.md#run-an-agent).
 
 `DEMO_STEP_MS=1200` slows the scripted run so you can narrate it while recording.
 

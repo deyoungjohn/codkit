@@ -5,7 +5,7 @@ Define an agent tool once (Zod schema + `run`), then expose it in three ways:
 | Surface | Import | Use it for |
 | --- | --- | --- |
 | **MCP server** (stdio or Streamable HTTP) | `/server` | Claude Code, Claude Desktop, Cursor, or any MCP client |
-| **Claude agent loop** (Anthropic SDK tool runner) | `/claude` | Your own agent backend |
+| **Agent loop** (any OpenAI-compatible LLM) | `/agent` | Your own agent backend |
 | **WebMCP** (`document.modelContext`) | `/webmcp` | In-browser agents using your dApp's tools |
 
 It also includes ready-made **kit tools** that connect policy, payments, contracts and receipts. Every money-moving tool goes through the policy engine (caps, allow-lists, simulation, approval, kill switch).
@@ -36,18 +36,30 @@ app.all("/mcp", (c) => mcpHttpHandler(tools, { name: "my-agent" })(c.req.raw)); 
 
 Put auth in front of the HTTP endpoint, because these tools can move money.
 
-## Run a Claude agent
+## Run an agent
 
 ```ts
-import { runAgent } from "@codkit/mcp/claude";
+import { runAgent } from "@codkit/mcp/agent";
 
 const { text } = await runAgent({ tools, system, prompt, onEvent: (e) => trace.push(e) });
 ```
 
-- **Defaults:** `claude-opus-5-5` with adaptive thinking (summarized, so the reasoning trace can be shown in a demo), `effort: "high"`, and a cap of 20 iterations.
-- **Refusal fallback:** server-side refusal fallback is on (`fallbacks: "default"`). Pass `fallbacks: false` to turn it off.
-- **Errors:** when a tool fails, its error goes back to the model as an `is_error` result so it can adjust and try again.
-- **Credentials:** read from `ANTHROPIC_API_KEY` or an `ant auth login` profile.
+The loop talks plain Chat Completions over `fetch` with no SDK, so any OpenAI-compatible provider works. Presets (key env var → default model):
+
+| Provider | Key | Default model |
+| --- | --- | --- |
+| `groq` | `GROQ_API_KEY` | `openai/gpt-oss-120b` |
+| `gemini` | `GEMINI_API_KEY` | `gemini-2.5-flash` |
+| `nvidia` (NIM) | `NVIDIA_API_KEY` | `openai/gpt-oss-120b` |
+| `openrouter` | `OPENROUTER_API_KEY` | `nvidia/nemotron-3-super-120b-a12b:free` |
+| `agentrouter` | `AGENTROUTER_API_KEY` | none, so set `AGENTROUTER_MODEL` |
+| `custom` | `LLM_API_KEY` + `LLM_BASE_URL` | `LLM_MODEL` (Ollama, vLLM, LM Studio…) |
+
+- **Configuration:** `providersFromEnv()` picks every provider whose key is set, in the order above. Override the order with `LLM_PROVIDER=gemini,groq`. Set the model with `LLM_MODEL` (first provider) or `<NAME>_MODEL`. Free-tier catalogues change monthly, so run `pnpm --filter @codkit/mcp example:models [filter]` to see what your keys can use. You can also pass `providers: [{ name, baseUrl, apiKey, model }]` directly.
+- **Failover:** `429` and `5xx` responses are retried with backoff (`retry-after` is honoured), then the run moves to the next provider. Other errors (bad key, unknown model) fail over at once. The history is plain OpenAI format, so a run can switch providers mid-task. A `failover` event reports each switch.
+- **Errors:** invalid arguments, malformed JSON and unknown tool names go back to the model as `Error: …` tool results so it can correct itself.
+- **Trace:** `onEvent` emits `thinking` (from `reasoning` / `reasoning_content`, when the provider returns it), `text`, `tool_use`, and `turn` (with usage, provider and model). It stops after `maxIterations` (default 20).
+- **Model choice:** small free models are weaker at multi-step tool use. Pick a model with native function calling, keep toolsets small, and rely on the policy engine, not the prompt, for safety.
 
 ## Expose in the browser (WebMCP)
 
@@ -74,6 +86,8 @@ const { unregister } = await registerWebMcpTools(tools); // no-op if the browser
 # MCP server for Claude Code (policy + receipts; add EVM_PRIVATE_KEY for wallet + x402 tools)
 claude mcp add kit -- pnpm --silent --dir packages/mcp example:server
 
-# Claude buys data from an x402 vendor within a budget (in-process paywall, no funds needed)
-ANTHROPIC_API_KEY=… pnpm --filter @codkit/mcp example:agent
+# An LLM buys data from an x402 vendor within a budget (in-process paywall, no funds needed)
+GROQ_API_KEY=… pnpm --filter @codkit/mcp example:agent
+# Which models can my keys use?
+GROQ_API_KEY=… OPENROUTER_API_KEY=… pnpm --filter @codkit/mcp example:models
 ```
