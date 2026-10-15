@@ -73,17 +73,31 @@ The contracts are deployed on **Base Sepolia** (source-verified) and **Sui testn
 
 The addresses are also exported as `deployments` from `@codkit/contracts`. Want to reproduce the run with your own wallet? [docs/TESTNET.md](docs/TESTNET.md) explains how, and you can report results with a [Testnet feedback](https://github.com/deyoungjohn/codkit/issues/new?template=testnet-feedback.yml) issue.
 
-## Try it
+## Install
 
-You need Node 22+ and pnpm. The npm packages aren't published yet, so for now run codkit from source:
+The packages are on npm under [`@codkit`](https://www.npmjs.com/org/codkit). They need Node 22+. Install only the ones you need:
+
+```bash
+npm install @codkit/policy                    # guardrails
+npm install @codkit/pay @codkit/policy        # x402 payments
+npm install @codkit/receipts                  # verifiable log
+npm install @codkit/mcp                       # agent tools and the LLM loop
+npm install @codkit/contracts @codkit/feed    # escrow bindings, live event stream
+```
+
+Chain SDKs (`viem`, `@mysten/sui`) and server frameworks (`hono`, `express`) are optional peer dependencies, so you only install what your project uses. Each package's README shows the setup.
+
+## See it run
+
+The dashboard lives in this repo:
 
 ```bash
 git clone --recurse-submodules https://github.com/deyoungjohn/codkit.git
 cd codkit && pnpm install && pnpm build
-pnpm --filter demo-shell dev        # dashboard at http://localhost:3000, no keys needed
+pnpm --filter demo-shell dev        # http://localhost:3000, no keys needed
 ```
 
-The dashboard starts with a scripted agent that goes through the real policy engine, x402 paywall and receipt log. Add a free LLM key (Groq, Gemini, NVIDIA NIM or OpenRouter) to `.env` and a real model drives it instead; `.env.example` lists the options. Each package has its own README and runnable examples.
+It starts with a scripted agent going through the real policy engine, x402 paywall and receipt log. Add a free LLM key (Groq, Gemini, NVIDIA NIM or OpenRouter) to `.env` and a real model drives it instead; `.env.example` lists the options.
 
 ## Using codkit in a hackathon
 
@@ -91,7 +105,7 @@ codkit is public, MIT-licensed and existed before your event. Many hackathons re
 
 ## Status
 
-v0.1, testnet only. The contracts are **unaudited**: don't use them with real funds. On the roadmap: Solana (Anchor) escrow, more payment rails, persistent storage for the policy engine and logs, and agent wallets with session keys.
+v0.1 ([npm](https://www.npmjs.com/org/codkit)), testnet only. The contracts are **unaudited**: don't use them with real funds. On the roadmap: Solana (Anchor) escrow, more payment rails, persistent storage for the policy engine and logs, and agent wallets with session keys.
 
 Contributions and issues are welcome.
 

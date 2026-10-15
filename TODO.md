@@ -8,12 +8,7 @@ Status as of 2026-10-15. Modules 1 to 6 are built, tested and pushed. CI is gree
 
 1. ~~Create the npm org~~ Done: `codkit` exists. All packages are named `@codkit/*`.
 2. Turn on 2FA on your npm user account (npmjs.com → Account → Two-Factor Authentication), and in the `codkit` org settings require 2FA for members. Prefer **Trusted Publishing** from GitHub Actions over long-lived npm tokens.
-3. Publish. The dry run is done (2026-10-15): all six tarballs pack cleanly, and in a fresh project every entry point imports and typechecks. Each package builds itself before publishing (`prepublishOnly`). npm asks for your 2FA code:
-   ```bash
-   npm login
-   pnpm -r --filter "./packages/*" publish --access public
-   ```
-   pnpm publishes in dependency order and rewrites `workspace:^` to `^0.1.0`. `apps/*` are private and won't be published. A published version can't be changed: fix forward with 0.1.1, or `npm deprecate` a bad version.
+3. ~~Publish~~ Done: all six packages are on npm at 0.1.0 (2026-10-15). I verified them by installing from the registry into a clean project: all 25 entry points import and typecheck. A published version can't be changed, so fix forward (0.1.1) or `npm deprecate`.
 4. After the first publish: set up npm Trusted Publishing (GitHub Actions OIDC, no tokens) for each package, plus Changesets, so later releases are automated and carry provenance.
 
 ### LLM keys (no Anthropic API: free tiers only)
