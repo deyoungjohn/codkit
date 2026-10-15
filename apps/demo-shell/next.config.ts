@@ -10,6 +10,7 @@ try {
 }
 
 const config: NextConfig = {
+  devIndicators: false,
   // the agent runtime is server-only and keeps in-memory state
   serverExternalPackages: ["@x402/core", "@x402/evm", "@x402/fetch", "@x402/hono"],
 };
