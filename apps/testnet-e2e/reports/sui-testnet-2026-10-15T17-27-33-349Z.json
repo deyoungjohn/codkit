@@ -1,0 +1,78 @@
+{
+  "network": "sui-testnet",
+  "startedAt": "2026-10-15T17:27:33.349Z",
+  "ok": true,
+  "passed": 8,
+  "total": 8,
+  "meta": {
+    "agent": "0x641c81bfa8472367da432b112890e175b14bbbea7705fc451b5a1a6fd20d5066",
+    "provider": "0xb34091ef8d3855b1a6720e6e2daa01905c73f62afd7d1556d973b6ce1c8ee25b",
+    "packageId": "0xb285fb9fe4181908efd684e62216c436d605c371d761c3db921cfea0bd5b7481"
+  },
+  "steps": [
+    {
+      "name": "preflight balance",
+      "ok": true,
+      "ms": 788,
+      "detail": "0.9529364 SUI"
+    },
+    {
+      "name": "policy: authorize escrow funding (0.01 SUI ≤ 0.1 cap)",
+      "ok": true,
+      "ms": 10,
+      "detail": "1 SUI denied: SUI: 1 exceeds per-tx cap 0.1"
+    },
+    {
+      "name": "fund provider gas (0.05 SUI)",
+      "ok": true,
+      "ms": 4217,
+      "links": [
+        "https://suiscan.xyz/testnet/tx/GA9PbYw2pob9V9mPV8F3uCLEuQJyrqjui9DDbhP4UofF"
+      ]
+    },
+    {
+      "name": "escrow: create + fund 0.01 SUI",
+      "ok": true,
+      "ms": 1703,
+      "detail": "0x1075b2d1ba1ee38cb29cd42fb8eb07dfa65038713bb8db37c8a7ee632a6c76a2",
+      "links": [
+        "https://suiscan.xyz/testnet/tx/G6C7CE3fQnRmdjLvkCmL4hLqLMr67Wc88Xi1JrHvea8j"
+      ]
+    },
+    {
+      "name": "escrow: provider delivers",
+      "ok": true,
+      "ms": 1357,
+      "links": [
+        "https://suiscan.xyz/testnet/tx/5Zq3nBBLf8AMdLPLaWam2WHSwnVdJsjoQqSuyjga6iHc"
+      ]
+    },
+    {
+      "name": "escrow: agent releases",
+      "ok": true,
+      "ms": 1964,
+      "detail": "provider received 0.01 SUI; Released event emitted",
+      "links": [
+        "https://suiscan.xyz/testnet/tx/EGcjLp6azmr8U5XakpY2ing6sG6jmcZYpSxjFxDGAVWy"
+      ]
+    },
+    {
+      "name": "receipts: anchor head via kit_escrow::anchor and verify",
+      "ok": true,
+      "ms": 1289,
+      "detail": "3 receipts, head 0xd9ae1436fe7e536d…",
+      "links": [
+        "https://suiscan.xyz/testnet/tx/DzUTfQFJm4F31ADCoqvwXrpMPMUWRe8spXtzEDEcoo17"
+      ]
+    },
+    {
+      "name": "cleanup: provider returns all SUI to agent",
+      "ok": true,
+      "ms": 1478,
+      "detail": "~0.058760448 SUI minus gas",
+      "links": [
+        "https://suiscan.xyz/testnet/tx/9J4fPE7Bu4pMS3eWeZ5UBrMYGr8USZ52wzJw6oKLmkUu"
+      ]
+    }
+  ]
+}

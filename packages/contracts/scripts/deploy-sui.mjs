@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 // Publish the Move package (escrow + reputation + anchor) from YOUR active Sui address and record it.
 //
-//   node scripts/deploy-sui.mjs --network testnet [--dry-run] [--gas-budget 300000000] [--client-config <path>]
+//   node scripts/deploy-sui.mjs --network testnet [--expect-address 0x…] [--dry-run] [--gas-budget 300000000] [--client-config <path>]
 //
 // Uses the Sui CLI's active address for that environment (`sui client active-address`).
+// --expect-address aborts unless that active address is the wallet you mean to publish from
+// (the publisher receives the UpgradeCap). Check it before every non-local publish.
 // Fund it first: `sui client faucet` (testnet/devnet) or https://faucet.sui.io.
 import { spawnSync } from "node:child_process";
 import { join } from "node:path";
@@ -28,6 +30,12 @@ const sui = (args) => {
 };
 
 const sender = sui(["active-address"]).trim();
+const expected = arg("expect-address");
+if (expected && expected.toLowerCase() !== sender.toLowerCase()) {
+  console.error(`active Sui address is ${sender}, not ${expected}; run \`sui client switch --address ${expected}\``);
+  process.exit(1);
+}
+if (!expected && !network.includes("local")) console.warn(`! publishing from ${sender}; pass --expect-address to check it's the intended wallet`);
 // testnet / mainnet are declared by the package (real publish, recorded in the package's lock).
 // Local networks use an ephemeral publication file outside the repo.
 const ephemeral = !["testnet", "mainnet"].includes(network);

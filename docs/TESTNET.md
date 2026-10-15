@@ -8,7 +8,8 @@ Deploy codkit's contracts with **your** wallet, run the end-to-end checks agains
 | --- | --- | --- |
 | **Deployer** (yours) | Foundry keystore: `cast wallet import deployer --interactive` | ~0.01 Base Sepolia ETH |
 | **Agent** | A separate testnet key in `.env` as `AGENT_PRIVATE_KEY` (it plays the AI agent) | ~0.002 ETH + 0.15 USDC from [faucet.circle.com](https://faucet.circle.com) |
-| **Sui** | Your Sui CLI address on testnet (`sui client switch --env testnet`) | ~1 SUI from `sui client faucet` |
+| **Sui deployer** (yours) | Your Sui CLI address on testnet (`sui client switch --env testnet`). It receives the `UpgradeCap` | ~1 SUI from `sui client faucet` |
+| **Sui agent** | A separate key: `SUI_PRIVATE_KEY` in `.env` (`sui keytool generate ed25519`, then `sui keytool export`). Without it, the e2e signs with the CLI's *active* address, which is usually your deployer | ~0.2 SUI |
 
 Base Sepolia ETH faucets: [Coinbase CDP](https://portal.cdp.coinbase.com/products/faucet), [Alchemy](https://www.alchemy.com/faucets/base-sepolia).
 
@@ -32,8 +33,8 @@ pnpm deploy:evm --network base-sepolia --account deployer --verify    # broadcas
 
 ```bash
 sui client switch --env testnet && sui client faucet
-pnpm deploy:sui --network testnet --dry-run
-pnpm deploy:sui --network testnet
+pnpm deploy:sui --network testnet --expect-address <your Sui address> --dry-run
+pnpm deploy:sui --network testnet --expect-address <your Sui address>
 ```
 
 This writes `packages/contracts/deployments/sui-testnet.json`, and the Sui CLI records the publication in `packages/contracts/sui/`. Commit both.
