@@ -25,7 +25,7 @@ Each package works on its own, and the core of each package imports no chain SDK
 
 ## Testnet deployments
 
-Base Sepolia, deployed 2026-10-15 and source-verified. The `Reputation` owner is the deployer `0xefa0913b8a51359ebdf897a434e2783b1c86001a`. Sui testnet and the e2e reports are pending: see [docs/TESTNET.md](docs/TESTNET.md). The addresses are also exported as `deployments` from `@codkit/contracts`.
+Base Sepolia, deployed 2026-10-15 and source-verified. The `Reputation` owner is the deployer `0xefa0913b8a51359ebdf897a434e2783b1c86001a`. The end-to-end check passes 12/12 on Base Sepolia ([report](apps/testnet-e2e/reports/base-sepolia-2026-10-15T15-29-44-296Z.md)): escrow create, fund, deliver and release, reputation, three guardrail refusals, an x402 payment settled through the public facilitator, and a receipt log anchored onchain. Sui testnet is pending: see [docs/TESTNET.md](docs/TESTNET.md). The addresses are also exported as `deployments` from `@codkit/contracts`.
 
 | Contract | Network | Address | Deploy tx |
 | --- | --- | --- | --- |

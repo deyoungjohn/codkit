@@ -1,0 +1,110 @@
+{
+  "network": "base-sepolia",
+  "startedAt": "2026-10-15T15:29:44.296Z",
+  "ok": true,
+  "passed": 12,
+  "total": 12,
+  "meta": {
+    "agent": "0x144509235A869cd391e644d46d19b6a4CB09b9C3",
+    "provider": "0x9F3646388acef82584c9Db250a51B0d84a2bACa4",
+    "escrow": "0x7934bd7b6e7a3732ac866c6d784244f5ebd79109",
+    "reputation": "0x51ac7b594345dfec761f3e9c48b79f80bfab3061",
+    "anchor": "0xd2c2c972d883f7fe9c61e2624bc87e1e6621f326",
+    "usdc": "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
+  },
+  "steps": [
+    {
+      "name": "preflight balances",
+      "ok": true,
+      "ms": 613,
+      "detail": "0.498793949227998685 ETH, 20 USDC"
+    },
+    {
+      "name": "fund provider gas (guarded native transfer)",
+      "ok": true,
+      "ms": 2911,
+      "detail": "0.0003 ETH",
+      "links": [
+        "https://sepolia.basescan.org/tx/0x79d358666ca7932781629790d25ab6f565656319165361cde5b0ab4e63560c39"
+      ]
+    },
+    {
+      "name": "escrow: approve + createAndFund 0.10 USDC (guarded)",
+      "ok": true,
+      "ms": 7054,
+      "detail": "deal #3",
+      "links": [
+        "https://sepolia.basescan.org/tx/0x66a9193792517354bf7a753e1c4f02cf55571bc034769923d996f21fcc9e94cd",
+        "https://sepolia.basescan.org/tx/0xe17d8903b03b4c1e5f233486bd26a482a54da5b9df83479a5221f8d3749bd982"
+      ]
+    },
+    {
+      "name": "escrow: provider delivers",
+      "ok": true,
+      "ms": 2885,
+      "links": [
+        "https://sepolia.basescan.org/tx/0x067d9816f77fdd386e87e1a8e5e4cec2c522416c4aec7ae61860fa91932b9283"
+      ]
+    },
+    {
+      "name": "escrow: agent releases (guarded)",
+      "ok": true,
+      "ms": 3198,
+      "detail": "provider received 0.10 USDC",
+      "links": [
+        "https://sepolia.basescan.org/tx/0x679d1ef95f451148fdaf6287adc0bae027d91e27c837aca426bdbc65074f73f8"
+      ]
+    },
+    {
+      "name": "reputation recorded",
+      "ok": true,
+      "ms": 322,
+      "detail": "completed 1, score 1"
+    },
+    {
+      "name": "guardrail: over-cap approval is refused before signing",
+      "ok": true,
+      "ms": 10,
+      "detail": "denied: USDC: 5 exceeds per-tx cap 0.5; USDC: 0.1 spent + 5 exceeds 1 per 86400s"
+    },
+    {
+      "name": "guardrail: non-allow-listed contract is refused",
+      "ok": true,
+      "ms": 13,
+      "detail": "denied: program 0x51ac7b594345dfec761f3e9c48b79f80bfab3061 not in allow list"
+    },
+    {
+      "name": "guardrail: simulation catches a revert (release twice)",
+      "ok": true,
+      "ms": 180,
+      "detail": "simulation failed: reverted: WrongStatus(5)"
+    },
+    {
+      "name": "x402: pay $0.001 via the public facilitator (budgeted)",
+      "ok": true,
+      "ms": 2854,
+      "detail": "settled onchain",
+      "links": [
+        "https://sepolia.basescan.org/tx/0xc8ccfbf2585add10f1125d64bbfa0a419534657bc2046b22a54465532d4ac186"
+      ]
+    },
+    {
+      "name": "receipts: anchor head on ReceiptAnchor",
+      "ok": true,
+      "ms": 2777,
+      "detail": "24 receipts verified against the onchain head",
+      "links": [
+        "https://sepolia.basescan.org/tx/0xe0c5b4713d0ce66da55b14c92255d8bc9b9588a5aa3853866125ed0d315ed8e6"
+      ]
+    },
+    {
+      "name": "cleanup: provider returns USDC to agent",
+      "ok": true,
+      "ms": 2664,
+      "detail": "0.101 USDC",
+      "links": [
+        "https://sepolia.basescan.org/tx/0x6770efc4b51cf530797c590284abcb5b0b67a550784d8947e0ecba8a44a2ec6c"
+      ]
+    }
+  ]
+}

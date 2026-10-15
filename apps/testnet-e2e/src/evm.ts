@@ -69,9 +69,15 @@ const agentWallet = createWalletClient({ account: agent, chain: net.chain, trans
 const providerKey = (process.env.PROVIDER_PRIVATE_KEY as Hex | undefined) ?? generatePrivateKey();
 const provider = privateKeyToAccount(providerKey, { nonceManager });
 const providerWallet = createWalletClient({ account: provider, chain: net.chain, transport });
+/**
+ * Receipt, then a state barrier. Base serves receipts from Flashblocks pre-confirmations (~200ms),
+ * but eth_call / eth_estimateGas at "latest" read the last sealed block — so a simulation right
+ * after a receipt can miss the tx. Wait until "latest" includes the receipt's block.
+ */
 const wait = async (hash: Hex) => {
   const r = await pc.waitForTransactionReceipt({ hash });
   if (r.status !== "success") throw new Error(`tx reverted: ${hash}`);
+  await eventually(() => pc.getBlockNumber({ cacheTime: 0 }), (n) => n >= r.blockNumber);
   return r;
 };
 /**
