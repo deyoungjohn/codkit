@@ -1,4 +1,4 @@
-import type { Action, PolicyEngine } from "@iamyoungjohn-kit/policy";
+import type { Action, PolicyEngine } from "@codkit/policy";
 import { z } from "zod";
 import { defineTool } from "../tool.js";
 

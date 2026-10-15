@@ -1,4 +1,4 @@
-import { usdc } from "@iamyoungjohn-kit/policy";
+import { usdc } from "@codkit/policy";
 import express from "express";
 import type { AddressInfo } from "node:net";
 import { afterAll, beforeAll, expect, it } from "vitest";

@@ -187,19 +187,19 @@ importers:
       '@anthropic-ai/sdk':
         specifier: ~0.133.0
         version: 0.133.0(zod@4.6.7)
-      '@iamyoungjohn-kit/feed':
+      '@codkit/feed':
         specifier: workspace:*
         version: link:../../packages/feed
-      '@iamyoungjohn-kit/mcp':
+      '@codkit/mcp':
         specifier: workspace:*
         version: link:../../packages/mcp
-      '@iamyoungjohn-kit/pay':
+      '@codkit/pay':
         specifier: workspace:*
         version: link:../../packages/pay
-      '@iamyoungjohn-kit/policy':
+      '@codkit/policy':
         specifier: workspace:*
         version: link:../../packages/policy
-      '@iamyoungjohn-kit/receipts':
+      '@codkit/receipts':
         specifier: workspace:*
         version: link:../../packages/receipts
       '@modelcontextprotocol/sdk':
@@ -251,7 +251,7 @@ importers:
 
   packages/contracts:
     devDependencies:
-      '@iamyoungjohn-kit/policy':
+      '@codkit/policy':
         specifier: workspace:*
         version: link:../policy
       '@mysten/sui':
@@ -263,11 +263,11 @@ importers:
 
   packages/feed:
     dependencies:
-      '@iamyoungjohn-kit/receipts':
+      '@codkit/receipts':
         specifier: workspace:^
         version: link:../receipts
     devDependencies:
-      '@iamyoungjohn-kit/policy':
+      '@codkit/policy':
         specifier: workspace:*
         version: link:../policy
 
@@ -280,16 +280,16 @@ importers:
       '@anthropic-ai/sdk':
         specifier: ~0.133.0
         version: 0.133.0(zod@4.6.7)
-      '@iamyoungjohn-kit/contracts':
+      '@codkit/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@iamyoungjohn-kit/pay':
+      '@codkit/pay':
         specifier: workspace:*
         version: link:../pay
-      '@iamyoungjohn-kit/policy':
+      '@codkit/policy':
         specifier: workspace:*
         version: link:../policy
-      '@iamyoungjohn-kit/receipts':
+      '@codkit/receipts':
         specifier: workspace:*
         version: link:../receipts
       '@modelcontextprotocol/sdk':
@@ -307,7 +307,7 @@ importers:
 
   packages/pay:
     dependencies:
-      '@iamyoungjohn-kit/policy':
+      '@codkit/policy':
         specifier: workspace:*
         version: link:../policy
       '@x402/core':
@@ -361,10 +361,10 @@ importers:
         specifier: ^2.0.0
         version: 2.4.0
     devDependencies:
-      '@iamyoungjohn-kit/contracts':
+      '@codkit/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@iamyoungjohn-kit/policy':
+      '@codkit/policy':
         specifier: workspace:*
         version: link:../policy
       '@mysten/sui':

@@ -16,7 +16,7 @@
 
 - [ ] The README follows `templates/submission/README.md`, with the demo link in the first screen.
 - [ ] The demo video is 3 minutes or less, with captions, and shows the product, not slides.
-- [ ] The deployed-contracts table is filled in with explorer links (`pnpm --filter @iamyoungjohn-kit/contracts deployments`).
+- [ ] The deployed-contracts table is filled in with explorer links (`pnpm --filter @codkit/contracts deployments`).
 - [ ] The architecture diagram is included.
 - [ ] The kit is disclosed as prior work, with what you built during the event listed separately.
 - [ ] The repo is public, and the license file is present.

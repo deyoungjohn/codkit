@@ -3,7 +3,7 @@
  * through the TS builders: create → deliver → release, then read reputation.
  *
  *   sui start --with-faucet --force-regenesis      # in another terminal
- *   pnpm --filter @iamyoungjohn-kit/contracts example:sui
+ *   pnpm --filter @codkit/contracts example:sui
  */
 import { execFileSync } from "node:child_process";
 import { dirname, join } from "node:path";

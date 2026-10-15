@@ -1,4 +1,4 @@
-import { usdc, type PolicyInput } from "@iamyoungjohn-kit/policy";
+import { usdc, type PolicyInput } from "@codkit/policy";
 import { Hono } from "hono";
 import { describe, expect, it, vi } from "vitest";
 import { createBudgetedFetch, type PaymentOutcome } from "../src/index.js";

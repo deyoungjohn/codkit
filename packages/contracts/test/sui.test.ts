@@ -1,4 +1,4 @@
-import { createPolicyEngine } from "@iamyoungjohn-kit/policy";
+import { createPolicyEngine } from "@codkit/policy";
 import { describe, expect, it } from "vitest";
 import { suiEscrow, suiEscrowCreateAction, Transaction } from "../src/sui/index.js";
 

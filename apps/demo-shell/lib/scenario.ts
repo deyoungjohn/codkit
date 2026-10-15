@@ -4,7 +4,7 @@
  * receipts — so every decision, block and approval on screen is genuine.
  * Only the "reasoning" text is canned.
  */
-import { callTool } from "@iamyoungjohn-kit/mcp";
+import { callTool } from "@codkit/mcp";
 import type { Runtime } from "./runtime";
 import { VENDOR_HOST } from "./runtime";
 

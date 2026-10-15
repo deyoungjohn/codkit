@@ -1,5 +1,5 @@
-import type { ApprovalRequest, ApprovalResponse, PolicyEvent } from "@iamyoungjohn-kit/policy";
-import { explorerTxUrl, normalize, type Json, type Receipt, type ReceiptStore } from "@iamyoungjohn-kit/receipts";
+import type { ApprovalRequest, ApprovalResponse, PolicyEvent } from "@codkit/policy";
+import { explorerTxUrl, normalize, type Json, type Receipt, type ReceiptStore } from "@codkit/receipts";
 
 /** Everything a demo dashboard shows, as one discriminated union. */
 export type FeedEventBody =
@@ -150,13 +150,13 @@ export function feedReceiptStore(inner: ReceiptStore, feed: Feed): ReceiptStore 
   };
 }
 
-/** Map agent-loop events (`runAgent` onEvent in `@iamyoungjohn-kit/mcp/claude`). */
+/** Map agent-loop events (`runAgent` onEvent in `@codkit/mcp/claude`). */
 export function agentEventToFeed(feed: Feed, e: { type: string; text?: string }): void {
   if (e.type === "thinking" && e.text) feed.push({ kind: "thinking", text: e.text });
   else if (e.type === "text" && e.text) feed.push({ kind: "message", text: e.text });
 }
 
-/** Map tool events (`instrument` onEvent in `@iamyoungjohn-kit/mcp`). */
+/** Map tool events (`instrument` onEvent in `@codkit/mcp`). */
 export function toolEventToFeed(
   feed: Feed,
   e: { type: "tool_call"; id: string; name: string; input: unknown } | { type: "tool_result"; id: string; name: string; ok: boolean; output: string; ms: number },

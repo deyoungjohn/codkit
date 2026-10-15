@@ -13,15 +13,15 @@ import {
   toolEventToFeed,
   type ApprovalBroker,
   type Feed,
-} from "@iamyoungjohn-kit/feed";
-import { instrument, type AnyKitTool } from "@iamyoungjohn-kit/mcp";
-import { payTools } from "@iamyoungjohn-kit/mcp/tools/pay";
-import { policyTools } from "@iamyoungjohn-kit/mcp/tools/policy";
-import { receiptTools } from "@iamyoungjohn-kit/mcp/tools/receipts";
-import { createBudgetedFetch, registerExactEvmScheme, x402Client } from "@iamyoungjohn-kit/pay";
-import { paywall } from "@iamyoungjohn-kit/pay/hono";
-import { createPolicyEngine, fromAtomic, usdc, type PolicyEngine } from "@iamyoungjohn-kit/policy";
-import { ed25519Signer, MemoryReceiptStore, ReceiptLog, recordPolicyEvents, verifyLog } from "@iamyoungjohn-kit/receipts";
+} from "@codkit/feed";
+import { instrument, type AnyKitTool } from "@codkit/mcp";
+import { payTools } from "@codkit/mcp/tools/pay";
+import { policyTools } from "@codkit/mcp/tools/policy";
+import { receiptTools } from "@codkit/mcp/tools/receipts";
+import { createBudgetedFetch, registerExactEvmScheme, x402Client } from "@codkit/pay";
+import { paywall } from "@codkit/pay/hono";
+import { createPolicyEngine, fromAtomic, usdc, type PolicyEngine } from "@codkit/policy";
+import { ed25519Signer, MemoryReceiptStore, ReceiptLog, recordPolicyEvents, verifyLog } from "@codkit/receipts";
 import type { FacilitatorClient } from "@x402/core/server";
 import { Hono } from "hono";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
@@ -159,7 +159,7 @@ export function startRun(prompt: string): { started: boolean; mode: Runtime["mod
   void (async () => {
     try {
       if (rt.mode === "live") {
-        const { runAgent } = await import("@iamyoungjohn-kit/mcp/claude");
+        const { runAgent } = await import("@codkit/mcp/claude");
         const res = await runAgent({ tools: rt.tools, system: SYSTEM_PROMPT, prompt, onEvent: (e) => agentEventToFeed(rt.feed, e) });
         rt.feed.push({ kind: "status", state: "done", detail: `${res.turns} turns, stop: ${res.stopReason}` });
       } else {

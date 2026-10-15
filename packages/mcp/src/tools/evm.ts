@@ -1,6 +1,6 @@
-import { fromAtomic, toAtomic } from "@iamyoungjohn-kit/policy";
-import type { EvmGuard } from "@iamyoungjohn-kit/policy/evm";
-import { evmExplorerTxUrl } from "@iamyoungjohn-kit/policy/evm";
+import { fromAtomic, toAtomic } from "@codkit/policy";
+import type { EvmGuard } from "@codkit/policy/evm";
+import { evmExplorerTxUrl } from "@codkit/policy/evm";
 import { encodeFunctionData, erc20Abi, isAddress, type Address } from "viem";
 import { z } from "zod";
 import { defineTool } from "../tool.js";

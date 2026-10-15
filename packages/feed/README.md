@@ -1,9 +1,9 @@
-# @iamyoungjohn-kit/feed
+# @codkit/feed
 
 A live event stream for agent demos. It merges policy decisions, approvals, tool calls, reasoning, transactions and receipts into one typed `FeedEvent` union, and serves it over Server-Sent Events.
 
 ```ts
-import { createFeed, connectPolicy, createApprovalBroker, feedReceiptStore, sseHandler, toolEventToFeed } from "@iamyoungjohn-kit/feed";
+import { createFeed, connectPolicy, createApprovalBroker, feedReceiptStore, sseHandler, toolEventToFeed } from "@codkit/feed";
 
 const feed = createFeed();
 const approvals = createApprovalBroker(feed);                 // human-in-the-loop via the dashboard

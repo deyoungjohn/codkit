@@ -1,6 +1,6 @@
 /**
  * Run kit tools in a Claude agent loop (Anthropic SDK tool runner).
- * Import from `@iamyoungjohn-kit/mcp/claude`.
+ * Import from `@codkit/mcp/claude`.
  */
 import Anthropic from "@anthropic-ai/sdk";
 import { betaZodTool } from "@anthropic-ai/sdk/helpers/beta/zod";

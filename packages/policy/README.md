@@ -1,4 +1,4 @@
-# @iamyoungjohn-kit/policy
+# @codkit/policy
 
 Guardrails for AI agents that move money. Chain-agnostic TypeScript core with thin chain adapters.
 
@@ -10,12 +10,12 @@ Guardrails for AI agents that move money. Chain-agnostic TypeScript core with th
 - **Reservations**: spend is reserved atomically on authorize, so concurrent agent calls can't overspend
 - **Events** for every decision, simulation, approval, execution. Feed them to receipts or the demo dashboard
 
-The core imports no chain SDK. The EVM adapter lives at `@iamyoungjohn-kit/policy/evm`, and `viem` is an optional peer.
+The core imports no chain SDK. The EVM adapter lives at `@codkit/policy/evm`, and `viem` is an optional peer.
 
 ## Quick start
 
 ```ts
-import { createPolicyEngine, usdc } from "@iamyoungjohn-kit/policy";
+import { createPolicyEngine, usdc } from "@codkit/policy";
 
 const engine = createPolicyEngine({
   policy: {
@@ -55,7 +55,7 @@ Amounts are always atomic units (`bigint`). Use `toAtomic("1.5", 6)`, `usdc("1.5
 ## EVM adapter (viem)
 
 ```ts
-import { createEvmGuard } from "@iamyoungjohn-kit/policy/evm";
+import { createEvmGuard } from "@codkit/policy/evm";
 
 const guard = createEvmGuard({ engine, chainId: 84532, account: account.address, reader: publicClient, sender: walletClient });
 await guard.send({ to: USDC, data: encodeFunctionData({ abi: erc20Abi, functionName: "transfer", args: [to, amount] }) });
@@ -74,6 +74,6 @@ await guard.send({ to: USDC, data: encodeFunctionData({ abi: erc20Abi, functionN
 ## Examples
 
 ```bash
-pnpm --filter @iamyoungjohn-kit/policy example        # no chain: decisions, approval, budget, kill switch
-pnpm --filter @iamyoungjohn-kit/policy example:evm    # Base Sepolia dry run (simulation catches the revert)
+pnpm --filter @codkit/policy example        # no chain: decisions, approval, budget, kill switch
+pnpm --filter @codkit/policy example:evm    # Base Sepolia dry run (simulation catches the revert)
 ```

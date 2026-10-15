@@ -2,7 +2,7 @@
  * No chain needed: shows how decisions, reservations, approval and the kill
  * switch behave for a toy "agent pays a vendor in USDC" flow.
  *
- *   pnpm --filter @iamyoungjohn-kit/policy example
+ *   pnpm --filter @codkit/policy example
  */
 import { createPolicyEngine, fromAtomic, isPolicyError, usdc, type Action } from "../src/index.js";
 

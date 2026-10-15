@@ -1,7 +1,7 @@
 {
-  "name": "@iamyoungjohn-kit/pay",
+  "name": "@codkit/pay",
   "version": "0.1.0",
-  "description": "x402 payments for agents: one-call paywall middleware (Hono / Express) and a budget-aware client bounded by @iamyoungjohn-kit/policy.",
+  "description": "x402 payments for agents: one-call paywall middleware (Hono / Express) and a budget-aware client bounded by @codkit/policy.",
   "license": "MIT",
   "author": "Young John",
   "repository": {
@@ -47,7 +47,7 @@
     "example:local": "tsx examples/local.ts"
   },
   "dependencies": {
-    "@iamyoungjohn-kit/policy": "workspace:*",
+    "@codkit/policy": "workspace:*",
     "@x402/core": "~2.28.0",
     "@x402/evm": "~2.28.0",
     "@x402/fetch": "~2.28.0"

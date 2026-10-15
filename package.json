@@ -1,5 +1,5 @@
 {
-  "name": "hackathon-kit",
+  "name": "codkit",
   "private": true,
   "description": "Reusable plumbing for Web3 / AI agent hackathon projects: policy guardrails, x402 payments, escrow, receipts, MCP, demo shell.",
   "license": "MIT",

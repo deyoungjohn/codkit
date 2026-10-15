@@ -1,5 +1,5 @@
-import { createPolicyEngine, usdc } from "@iamyoungjohn-kit/policy";
-import { ed25519Signer, ReceiptLog } from "@iamyoungjohn-kit/receipts";
+import { createPolicyEngine, usdc } from "@codkit/policy";
+import { ed25519Signer, ReceiptLog } from "@codkit/receipts";
 import { z } from "zod";
 import { defineTool } from "../src/index.js";
 

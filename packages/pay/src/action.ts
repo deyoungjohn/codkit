@@ -1,4 +1,4 @@
-import type { Action } from "@iamyoungjohn-kit/policy";
+import type { Action } from "@codkit/policy";
 import type { PaymentRequirements } from "@x402/core/types";
 
 /**

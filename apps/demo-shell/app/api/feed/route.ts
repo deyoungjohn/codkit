@@ -1,4 +1,4 @@
-import { sseHandler } from "@iamyoungjohn-kit/feed";
+import { sseHandler } from "@codkit/feed";
 import { runtime } from "@/lib/runtime";
 
 export const dynamic = "force-dynamic";

@@ -6,7 +6,7 @@
  * any Sui client / wallet.
  */
 import { Transaction, type TransactionObjectArgument } from "@mysten/sui/transactions";
-import type { Action } from "@iamyoungjohn-kit/policy";
+import type { Action } from "@codkit/policy";
 
 export interface SuiEscrowIds {
   /** Published package id. */

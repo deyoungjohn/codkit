@@ -1,4 +1,4 @@
-# @iamyoungjohn-kit/mcp
+# @codkit/mcp
 
 Define an agent tool once (Zod schema + `run`), then expose it in three ways:
 
@@ -13,7 +13,7 @@ It also includes ready-made **kit tools** that connect policy, payments, contrac
 ## Define a tool
 
 ```ts
-import { defineTool } from "@iamyoungjohn-kit/mcp";
+import { defineTool } from "@codkit/mcp";
 import { z } from "zod";
 
 const quote = defineTool({
@@ -28,7 +28,7 @@ const quote = defineTool({
 ## Serve over MCP
 
 ```ts
-import { serveStdio, mcpHttpHandler } from "@iamyoungjohn-kit/mcp/server";
+import { serveStdio, mcpHttpHandler } from "@codkit/mcp/server";
 
 await serveStdio(tools, { name: "my-agent" });            // local: claude mcp add my-agent -- node server.js
 app.all("/mcp", (c) => mcpHttpHandler(tools, { name: "my-agent" })(c.req.raw)); // remote: stateless HTTP
@@ -39,7 +39,7 @@ Put auth in front of the HTTP endpoint, because these tools can move money.
 ## Run a Claude agent
 
 ```ts
-import { runAgent } from "@iamyoungjohn-kit/mcp/claude";
+import { runAgent } from "@codkit/mcp/claude";
 
 const { text } = await runAgent({ tools, system, prompt, onEvent: (e) => trace.push(e) });
 ```
@@ -52,7 +52,7 @@ const { text } = await runAgent({ tools, system, prompt, onEvent: (e) => trace.p
 ## Expose in the browser (WebMCP)
 
 ```ts
-import { registerWebMcpTools } from "@iamyoungjohn-kit/mcp/webmcp";
+import { registerWebMcpTools } from "@codkit/mcp/webmcp";
 const { unregister } = await registerWebMcpTools(tools); // no-op if the browser has no model context
 ```
 
@@ -75,5 +75,5 @@ const { unregister } = await registerWebMcpTools(tools); // no-op if the browser
 claude mcp add kit -- pnpm --silent --dir packages/mcp example:server
 
 # Claude buys data from an x402 vendor within a budget (in-process paywall, no funds needed)
-ANTHROPIC_API_KEY=… pnpm --filter @iamyoungjohn-kit/mcp example:agent
+ANTHROPIC_API_KEY=… pnpm --filter @codkit/mcp example:agent
 ```

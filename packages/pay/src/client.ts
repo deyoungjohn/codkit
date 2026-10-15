@@ -1,4 +1,4 @@
-import { isPolicyError, type Action, type PolicyEngine, type PolicyError } from "@iamyoungjohn-kit/policy";
+import { isPolicyError, type Action, type PolicyEngine, type PolicyError } from "@codkit/policy";
 import type { x402Client } from "@x402/core/client";
 import type { PaymentPayload, PaymentRequirements } from "@x402/core/types";
 import { wrapFetchWithPayment } from "@x402/fetch";

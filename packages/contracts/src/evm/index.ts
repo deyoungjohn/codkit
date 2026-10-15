@@ -2,7 +2,7 @@
  * Typed viem bindings for Escrow + Reputation.
  *
  * Write helpers return plain `{ to, data }` transactions on purpose: hand them to
- * `createEvmGuard(...).send(tx)` from `@iamyoungjohn-kit/policy/evm` so every
+ * `createEvmGuard(...).send(tx)` from `@codkit/policy/evm` so every
  * escrow action goes through policy + simulation, or send them with any wallet client.
  */
 import {

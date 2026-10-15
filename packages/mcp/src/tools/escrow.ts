@@ -1,7 +1,7 @@
-import { dealIdFromLogs, escrowTxs, hashText, readDeal, type ContractReader } from "@iamyoungjohn-kit/contracts";
-import { fromAtomic, toAtomic } from "@iamyoungjohn-kit/policy";
-import type { EvmGuard } from "@iamyoungjohn-kit/policy/evm";
-import { evmExplorerTxUrl } from "@iamyoungjohn-kit/policy/evm";
+import { dealIdFromLogs, escrowTxs, hashText, readDeal, type ContractReader } from "@codkit/contracts";
+import { fromAtomic, toAtomic } from "@codkit/policy";
+import type { EvmGuard } from "@codkit/policy/evm";
+import { evmExplorerTxUrl } from "@codkit/policy/evm";
 import type { Address, Hex, Log } from "viem";
 import { z } from "zod";
 import { defineTool } from "../tool.js";

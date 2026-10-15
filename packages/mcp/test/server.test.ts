@@ -1,4 +1,4 @@
-import { usdc } from "@iamyoungjohn-kit/policy";
+import { usdc } from "@codkit/policy";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { describe, expect, it } from "vitest";

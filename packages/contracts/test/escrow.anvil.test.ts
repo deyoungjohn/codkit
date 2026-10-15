@@ -1,5 +1,5 @@
-import { createPolicyEngine, usdc } from "@iamyoungjohn-kit/policy";
-import { createEvmGuard, type EvmGuard } from "@iamyoungjohn-kit/policy/evm";
+import { createPolicyEngine, usdc } from "@codkit/policy";
+import { createEvmGuard, type EvmGuard } from "@codkit/policy/evm";
 import type { Address, PublicClient } from "viem";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {

@@ -2,7 +2,7 @@
  * EVM adapter: viem transactions → policy `Action`s, simulation via `eth_call`,
  * and a guarded `send()` that runs the full policy pipeline.
  *
- * Import from `@iamyoungjohn-kit/policy/evm`; the core entry point never loads viem.
+ * Import from `@codkit/policy/evm`; the core entry point never loads viem.
  */
 import { decodeFunctionData, erc20Abi, type Abi, type Address, type Hex } from "viem";
 import type { ExecuteResult, PolicyEngine } from "../engine.js";

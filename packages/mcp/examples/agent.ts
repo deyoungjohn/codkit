@@ -4,12 +4,12 @@
  * receipt log. Paywall + facilitator run in-process, so no wallet funds needed —
  * only Anthropic API access (ANTHROPIC_API_KEY or `ant auth login`).
  *
- *   pnpm --filter @iamyoungjohn-kit/mcp example:agent
+ *   pnpm --filter @codkit/mcp example:agent
  */
-import { createPolicyEngine, usdc } from "@iamyoungjohn-kit/policy";
-import { createBudgetedFetch, registerExactEvmScheme, x402Client } from "@iamyoungjohn-kit/pay";
-import { paywall } from "@iamyoungjohn-kit/pay/hono";
-import { ed25519Signer, ReceiptLog, recordPolicyEvents, verifyLog } from "@iamyoungjohn-kit/receipts";
+import { createPolicyEngine, usdc } from "@codkit/policy";
+import { createBudgetedFetch, registerExactEvmScheme, x402Client } from "@codkit/pay";
+import { paywall } from "@codkit/pay/hono";
+import { ed25519Signer, ReceiptLog, recordPolicyEvents, verifyLog } from "@codkit/receipts";
 import type { FacilitatorClient } from "@x402/core/server";
 import { Hono } from "hono";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";

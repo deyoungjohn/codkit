@@ -9,11 +9,11 @@
  *
  * stdout is the MCP protocol — log to stderr only.
  */
-import { createPolicyEngine, usdc } from "@iamyoungjohn-kit/policy";
-import { createEvmGuard } from "@iamyoungjohn-kit/policy/evm";
-import { createBudgetedFetch, registerExactEvmScheme, x402Client } from "@iamyoungjohn-kit/pay";
-import { ed25519Signer, ReceiptLog, recordPolicyEvents } from "@iamyoungjohn-kit/receipts";
-import { JsonlFileStore } from "@iamyoungjohn-kit/receipts/node";
+import { createPolicyEngine, usdc } from "@codkit/policy";
+import { createEvmGuard } from "@codkit/policy/evm";
+import { createBudgetedFetch, registerExactEvmScheme, x402Client } from "@codkit/pay";
+import { ed25519Signer, ReceiptLog, recordPolicyEvents } from "@codkit/receipts";
+import { JsonlFileStore } from "@codkit/receipts/node";
 import { createPublicClient, createWalletClient, http, type Hex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { baseSepolia } from "viem/chains";

@@ -2,9 +2,9 @@
  * Agent-side: pay x402 endpoints with a testnet USDC wallet, bounded by policy.
  * Fund the key with Base Sepolia USDC from https://faucet.circle.com.
  *
- *   EVM_PRIVATE_KEY=0x... pnpm --filter @iamyoungjohn-kit/pay example:client -- http://localhost:4021/weather
+ *   EVM_PRIVATE_KEY=0x... pnpm --filter @codkit/pay example:client -- http://localhost:4021/weather
  */
-import { createPolicyEngine, usdc } from "@iamyoungjohn-kit/policy";
+import { createPolicyEngine, usdc } from "@codkit/policy";
 import { privateKeyToAccount } from "viem/accounts";
 import { createBudgetedFetch, registerExactEvmScheme, x402Client } from "../src/index.js";
 

@@ -6,7 +6,7 @@ Status as of 2026-10-15. Modules 1 to 6 are built, tested and pushed. CI is gree
 
 ### npm publishing
 
-1. On npmjs.com, logged in as `iamyoungjohn`: avatar menu → **Add Organization**, name it `iamyoungjohn-kit`, and pick the free plan.
+1. ~~Create the npm org~~ Done: `codkit` exists. All packages are named `@codkit/*`.
 2. Publish:
    ```bash
    npm login
@@ -17,11 +17,13 @@ Status as of 2026-10-15. Modules 1 to 6 are built, tested and pushed. CI is gree
 
 ### Anthropic API key (nothing has called the real API yet)
 
+The API is billed separately from a Claude Pro subscription. In the Claude Console (platform.claude.com), buy prepaid credits, then create an API key.
+
 The Claude agent loop is tested against a scripted API only, so its first real run is still to do. With a key:
 
 ```bash
 export ANTHROPIC_API_KEY=...        # or: ant auth login
-pnpm --filter @iamyoungjohn-kit/mcp example:agent    # Claude buys data within budget
+pnpm --filter @codkit/mcp example:agent    # Claude buys data within budget
 pnpm --filter demo-shell dev                          # dashboard switches to "Claude live"
 ```
 
@@ -33,16 +35,16 @@ Check that Claude calls `policy_status` before buying, asks for approval on the 
   ```bash
   cast wallet import dev --interactive
   cd packages/contracts/evm && forge script script/Deploy.s.sol --rpc-url base_sepolia --account dev --broadcast
-  pnpm --filter @iamyoungjohn-kit/contracts deployments   # markdown table for READMEs
+  pnpm --filter @codkit/contracts deployments   # markdown table for READMEs
   ```
 - **x402 on a real testnet** (only tested against an in-process facilitator so far):
   ```bash
-  PAY_TO=0x... pnpm --filter @iamyoungjohn-kit/pay example:server
-  EVM_PRIVATE_KEY=0x... pnpm --filter @iamyoungjohn-kit/pay example:client -- http://localhost:4021/weather
+  PAY_TO=0x... pnpm --filter @codkit/pay example:server
+  EVM_PRIVATE_KEY=0x... pnpm --filter @codkit/pay example:client -- http://localhost:4021/weather
   ```
 - **Sui testnet:** `cd packages/contracts/sui && sui client faucet && sui client publish`, then record the package id and the `Reputation` object id.
   - Note: the first `sui` run auto-created `~/.sui/sui_config` with a new testnet keypair. Its recovery phrase went to a scratch log, which I deleted. It holds no funds. Delete that config or replace it with your own key.
-- **Walrus testnet** (I didn't upload anything to a public service): `pnpm --filter @iamyoungjohn-kit/receipts example -- --walrus`
+- **Walrus testnet** (I didn't upload anything to a public service): `pnpm --filter @codkit/receipts example -- --walrus`
 
 ### Solana toolchain (you said later)
 
@@ -53,7 +55,7 @@ Install Rust, the Solana CLI and Anchor (`avm`). Then the Solana items in sectio
 ### contracts
 
 - [ ] **Anchor escrow + reputation** (Solana), with the same lifecycle as `Escrow.sol` and `escrow.move`. Needs the toolchain above.
-- [ ] Sui policy adapter (`@iamyoungjohn-kit/policy/sui`): Sui tx → `Action`, plus a dry-run via `simulateTransaction`. Today only the `suiEscrowCreateAction` helper exists.
+- [ ] Sui policy adapter (`@codkit/policy/sui`): Sui tx → `Action`, plus a dry-run via `simulateTransaction`. Today only the `suiEscrowCreateAction` helper exists.
 - [ ] An audit-style review pass on `Escrow.sol` and `escrow.move`. Both are unaudited and testnet-only.
 
 ### pay (rest of module 2)

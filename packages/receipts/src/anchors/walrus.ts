@@ -1,6 +1,6 @@
 /**
  * Store the full receipt log on Walrus via the HTTP publisher / aggregator API
- * (no SDK). Import from `@iamyoungjohn-kit/receipts/walrus`.
+ * (no SDK). Import from `@codkit/receipts/walrus`.
  *
  * Public testnet endpoints are the defaults. Mainnet has no public publisher:
  * run your own or use an upload relay, and pass its URL.

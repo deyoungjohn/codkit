@@ -1,4 +1,4 @@
-import type { PolicyEvent } from "@iamyoungjohn-kit/policy";
+import type { PolicyEvent } from "@codkit/policy";
 import type { ReceiptLog } from "./log.js";
 import type { Receipt } from "./types.js";
 

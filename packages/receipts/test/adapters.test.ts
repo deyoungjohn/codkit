@@ -1,4 +1,4 @@
-import { createPolicyEngine, usdc } from "@iamyoungjohn-kit/policy";
+import { createPolicyEngine, usdc } from "@codkit/policy";
 import { describe, expect, it, vi } from "vitest";
 import { ed25519Signer, explorerTxUrl, ReceiptLog, recordPolicyEvents, verifyLog, walrusBlobUrl } from "../src/index.js";
 import { anchorMemo, anchorMemoInstruction, MEMO_PROGRAM_ADDRESS, parseAnchorMemo } from "../src/anchors/solana.js";

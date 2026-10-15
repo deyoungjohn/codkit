@@ -1,6 +1,6 @@
 /**
  * Expose kit tools to in-browser agents via WebMCP. Import from
- * `@iamyoungjohn-kit/mcp/webmcp`.
+ * `@codkit/mcp/webmcp`.
  *
  * Targets the current draft (`document.modelContext.registerTool(tool, { signal })`)
  * and falls back to the earlier `navigator.modelContext` shape used by polyfills.

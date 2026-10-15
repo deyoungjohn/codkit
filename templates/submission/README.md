@@ -42,7 +42,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Deployed contracts
 
-<!-- generate with: pnpm --filter @iamyoungjohn-kit/contracts deployments -->
+<!-- generate with: pnpm --filter @codkit/contracts deployments -->
 
 | Contract | Network | Address | Deploy tx |
 | --- | --- | --- | --- |
@@ -66,9 +66,9 @@ pnpm dev
 
 This project uses **[Hackathon Kit](https://github.com/deyoungjohn/kit)**, a public MIT-licensed toolkit written before this event, for its generic plumbing:
 
-- `@iamyoungjohn-kit/policy`: spend caps, allow-lists, approvals, kill switch
-- `@iamyoungjohn-kit/pay`: x402 middleware and budgeted client
-- `@iamyoungjohn-kit/receipts`: signed action log and onchain anchoring
+- `@codkit/policy`: spend caps, allow-lists, approvals, kill switch
+- `@codkit/pay`: x402 middleware and budgeted client
+- `@codkit/receipts`: signed action log and onchain anchoring
 - <…only list the ones you use>
 
 The product idea, the <sponsor> integration, <…> and the UI were built during the hackathon (see above).

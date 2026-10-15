@@ -1,5 +1,5 @@
 {
-  "name": "@iamyoungjohn-kit/receipts",
+  "name": "@codkit/receipts",
   "version": "0.1.0",
   "description": "Verifiable receipts for agent actions: hash-chained, signed action log anchored onchain (EVM / Solana memo / Sui) with the full log on Walrus.",
   "license": "MIT",
@@ -36,18 +36,18 @@
     "@noble/hashes": "^2.0.0"
   },
   "peerDependencies": {
-    "@iamyoungjohn-kit/policy": "workspace:^",
+    "@codkit/policy": "workspace:^",
     "@mysten/sui": "^2.0.0",
     "viem": "^2.48.0"
   },
   "peerDependenciesMeta": {
-    "@iamyoungjohn-kit/policy": { "optional": true },
+    "@codkit/policy": { "optional": true },
     "@mysten/sui": { "optional": true },
     "viem": { "optional": true }
   },
   "devDependencies": {
-    "@iamyoungjohn-kit/contracts": "workspace:*",
-    "@iamyoungjohn-kit/policy": "workspace:*",
+    "@codkit/contracts": "workspace:*",
+    "@codkit/policy": "workspace:*",
     "@mysten/sui": "^2.36.0",
     "viem": "^2.48.0"
   }

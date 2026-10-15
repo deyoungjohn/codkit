@@ -1,6 +1,6 @@
 /**
  * Sui anchoring via `kit_escrow::anchor::anchor` (published with the contracts
- * package). Import from `@iamyoungjohn-kit/receipts/sui`.
+ * package). Import from `@codkit/receipts/sui`.
  */
 import { Transaction } from "@mysten/sui/transactions";
 import { explorerTxUrl } from "../explorer.js";

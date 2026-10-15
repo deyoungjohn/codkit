@@ -2,7 +2,7 @@ import { z } from "zod";
 import { defineTool } from "../tool.js";
 
 export interface PayToolOptions {
-  /** A budget-aware x402 fetch, e.g. from `createBudgetedFetch` in `@iamyoungjohn-kit/pay`. */
+  /** A budget-aware x402 fetch, e.g. from `createBudgetedFetch` in `@codkit/pay`. */
   fetch: typeof globalThis.fetch;
   /** Only these hosts may be fetched (recommended). */
   allowedHosts?: string[];

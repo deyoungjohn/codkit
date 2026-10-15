@@ -1,8 +1,8 @@
 /**
  * Guarded EVM sends on Base Sepolia with viem.
  *
- *   pnpm --filter @iamyoungjohn-kit/policy example:evm            # dry run: policy + simulation only
- *   EVM_PRIVATE_KEY=0x... pnpm --filter @iamyoungjohn-kit/policy example:evm -- --send
+ *   pnpm --filter @codkit/policy example:evm            # dry run: policy + simulation only
+ *   EVM_PRIVATE_KEY=0x... pnpm --filter @codkit/policy example:evm -- --send
  *
  * Without a key a throwaway account is used, so the simulation fails with
  * "insufficient funds" and the guard refuses to send — which is the point.

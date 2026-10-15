@@ -3,12 +3,12 @@
  * policy decisions are recorded as signed, hash-chained receipts, the head is
  * anchored onchain, and a third party verifies the log against the anchor.
  *
- *   pnpm --filter @iamyoungjohn-kit/receipts example             # local anvil (needs Foundry)
- *   pnpm --filter @iamyoungjohn-kit/receipts example -- --walrus # also upload the log to Walrus testnet
+ *   pnpm --filter @codkit/receipts example             # local anvil (needs Foundry)
+ *   pnpm --filter @codkit/receipts example -- --walrus # also upload the log to Walrus testnet
  */
 import { spawn } from "node:child_process";
-import { receiptAnchorBytecode } from "@iamyoungjohn-kit/contracts";
-import { createPolicyEngine, usdc } from "@iamyoungjohn-kit/policy";
+import { receiptAnchorBytecode } from "@codkit/contracts";
+import { createPolicyEngine, usdc } from "@codkit/policy";
 import { createPublicClient, createWalletClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { foundry } from "viem/chains";

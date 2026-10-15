@@ -1,4 +1,4 @@
-# @iamyoungjohn-kit/contracts
+# @codkit/contracts
 
 Escrow and reputation primitives for agent commerce: **create → fund → deliver → release / refund**, plus an onchain track record.
 
@@ -30,8 +30,8 @@ create ─▶ fund ─▶ deliver ─▶ release (client / arbiter)
 Write helpers return plain `{ to, data }` transactions, so an agent can send them through the policy guard:
 
 ```ts
-import { escrowAbi, escrowTxs, dealIdFromLogs, readDeal, hashText } from "@iamyoungjohn-kit/contracts";
-import { createEvmGuard } from "@iamyoungjohn-kit/policy/evm";
+import { escrowAbi, escrowTxs, dealIdFromLogs, readDeal, hashText } from "@codkit/contracts";
+import { createEvmGuard } from "@codkit/policy/evm";
 
 const agent = createEvmGuard({ engine, chainId, account, reader: publicClient, sender: walletClient, abis: [escrowAbi] });
 const tx = escrowTxs(ESCROW);
@@ -49,7 +49,7 @@ The package also provides `readDeal`, `readReputation`, `parseEscrowLogs`, `depl
 The Sui package has the same lifecycle. The only difference is that there is no unfunded state, because the coin is locked when the deal is created. Each deal is a shared `Escrow<T>` object, so it works with any coin type (SUI or USDC). `Reputation` is a singleton shared object created on publish, and only the package's `escrow` module can write to it.
 
 ```ts
-import { suiEscrow, suiEscrowCreateAction, Transaction } from "@iamyoungjohn-kit/contracts/sui";
+import { suiEscrow, suiEscrowCreateAction, Transaction } from "@codkit/contracts/sui";
 
 const escrow = suiEscrow({ packageId, reputationId });
 const tx = new Transaction();
@@ -69,14 +69,14 @@ cd packages/contracts/evm
 forge script script/Deploy.s.sol --rpc-url base_sepolia --account <cast-wallet-name> --broadcast
 ```
 
-The script deploys `Reputation`, `Escrow`, and `ReceiptAnchor` (used by `@iamyoungjohn-kit/receipts`), then authorises the escrow as a reputation writer. Record the addresses in your project's deployed-contracts table.
+The script deploys `Reputation`, `Escrow`, and `ReceiptAnchor` (used by `@codkit/receipts`), then authorises the escrow as a reputation writer. Record the addresses in your project's deployed-contracts table.
 
 ## Develop
 
 ```bash
-pnpm --filter @iamyoungjohn-kit/contracts test      # forge test + anvil integration (needs Foundry)
-pnpm --filter @iamyoungjohn-kit/contracts example   # narrated lifecycle on a local anvil
-pnpm --filter @iamyoungjohn-kit/contracts example:sui   # publish + lifecycle on a Sui localnet
+pnpm --filter @codkit/contracts test      # forge test + anvil integration (needs Foundry)
+pnpm --filter @codkit/contracts example   # narrated lifecycle on a local anvil
+pnpm --filter @codkit/contracts example:sui   # publish + lifecycle on a Sui localnet
 ```
 
 `test` also runs `sui move test` when the `sui` CLI is installed. To run the Sui example, first start a localnet in another terminal with `sui start --with-faucet --force-regenesis`.

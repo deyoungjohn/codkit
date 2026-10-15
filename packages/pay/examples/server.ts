@@ -1,7 +1,7 @@
 /**
  * Paid API on Base Sepolia via the public x402 facilitator.
  *
- *   PAY_TO=0xYourAddress pnpm --filter @iamyoungjohn-kit/pay example:server
+ *   PAY_TO=0xYourAddress pnpm --filter @codkit/pay example:server
  */
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";

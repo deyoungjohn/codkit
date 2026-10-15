@@ -1,6 +1,6 @@
-import { createPolicyEngine, usdc } from "@iamyoungjohn-kit/policy";
-import { createEvmGuard } from "@iamyoungjohn-kit/policy/evm";
-import { escrowAbi } from "@iamyoungjohn-kit/contracts";
+import { createPolicyEngine, usdc } from "@codkit/policy";
+import { createEvmGuard } from "@codkit/policy/evm";
+import { escrowAbi } from "@codkit/contracts";
 import { decodeFunctionData, encodeEventTopics, encodeAbiParameters, erc20Abi, type Address, type Hex } from "viem";
 import { describe, expect, it, vi } from "vitest";
 import { callTool } from "../src/index.js";

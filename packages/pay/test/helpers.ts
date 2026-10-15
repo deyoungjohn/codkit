@@ -1,4 +1,4 @@
-import { createPolicyEngine, type PolicyInput } from "@iamyoungjohn-kit/policy";
+import { createPolicyEngine, type PolicyInput } from "@codkit/policy";
 import type { FacilitatorClient } from "@x402/core/server";
 import type { PaymentPayload, PaymentRequirements, SettleResponse, VerifyResponse } from "@x402/core/types";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";

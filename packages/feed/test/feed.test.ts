@@ -1,5 +1,5 @@
-import { createPolicyEngine, usdc } from "@iamyoungjohn-kit/policy";
-import { ed25519Signer, MemoryReceiptStore, ReceiptLog } from "@iamyoungjohn-kit/receipts";
+import { createPolicyEngine, usdc } from "@codkit/policy";
+import { ed25519Signer, MemoryReceiptStore, ReceiptLog } from "@codkit/receipts";
 import { describe, expect, it } from "vitest";
 import {
   agentEventToFeed,

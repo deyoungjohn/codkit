@@ -1,5 +1,5 @@
 {
-  "name": "@iamyoungjohn-kit/feed",
+  "name": "@codkit/feed",
   "version": "0.1.0",
   "description": "One live event stream for agent demos: policy decisions, tool calls, reasoning, transactions and receipts, served over Server-Sent Events.",
   "license": "MIT",
@@ -26,15 +26,15 @@
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
-    "@iamyoungjohn-kit/receipts": "workspace:^"
+    "@codkit/receipts": "workspace:^"
   },
   "peerDependencies": {
-    "@iamyoungjohn-kit/policy": "workspace:^"
+    "@codkit/policy": "workspace:^"
   },
   "peerDependenciesMeta": {
-    "@iamyoungjohn-kit/policy": { "optional": true }
+    "@codkit/policy": { "optional": true }
   },
   "devDependencies": {
-    "@iamyoungjohn-kit/policy": "workspace:*"
+    "@codkit/policy": "workspace:*"
   }
 }

@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { usdc } from "@iamyoungjohn-kit/policy";
+import { usdc } from "@codkit/policy";
 import { describe, expect, it } from "vitest";
 import { runAgent, toClaudeTools, type AgentEvent } from "../src/claude.js";
 import { policyTools } from "../src/tools/policy.js";

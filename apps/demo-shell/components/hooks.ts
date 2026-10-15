@@ -1,6 +1,6 @@
 "use client";
 
-import type { FeedEvent } from "@iamyoungjohn-kit/feed";
+import type { FeedEvent } from "@codkit/feed";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Snapshot } from "@/lib/runtime";
 

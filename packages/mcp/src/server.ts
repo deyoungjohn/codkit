@@ -1,5 +1,5 @@
 /**
- * Serve kit tools over MCP. Import from `@iamyoungjohn-kit/mcp/server`.
+ * Serve kit tools over MCP. Import from `@codkit/mcp/server`.
  */
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";

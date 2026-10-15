@@ -32,7 +32,7 @@ Everything specific to the demo lives in [`lib/runtime.ts`](lib/runtime.ts):
 
 1. **`createVendor()`:** replace the in-process paywall with your sponsor's API, an x402 endpoint, or your own `paywall()` route.
 2. **Policy:** set your chain, assets, caps, approval threshold and allow-lists.
-3. **Tools:** add `evmTools` / `escrowTools` (from `@iamyoungjohn-kit/mcp/tools/*`) with a funded testnet key to move real funds through the guard.
+3. **Tools:** add `evmTools` / `escrowTools` (from `@codkit/mcp/tools/*`) with a funded testnet key to move real funds through the guard.
 4. **`SYSTEM_PROMPT` / `DEFAULT_PROMPT`:** describe your agent's job.
 5. **`lib/scenario.ts`:** script the demo-mode story so it matches your pitch.
 

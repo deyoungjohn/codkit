@@ -1,8 +1,8 @@
 /**
- * EVM anchoring + EIP-191 signing. Import from `@iamyoungjohn-kit/receipts/evm`.
+ * EVM anchoring + EIP-191 signing. Import from `@codkit/receipts/evm`.
  *
  * Two anchoring modes:
- * - `contract`: call `ReceiptAnchor.anchor(head, seq, uri)` (from `@iamyoungjohn-kit/contracts`),
+ * - `contract`: call `ReceiptAnchor.anchor(head, seq, uri)` (from `@codkit/contracts`),
  *   which emits an indexed `Anchored` event — easy to query with `readEvmAnchors`.
  * - no contract: a 0-value tx to yourself whose calldata is `KIT_RECEIPTS_TAG ‖ head ‖ seq`.
  *   Zero deployment; look it up by tx hash.

@@ -3,9 +3,9 @@
  * in-memory facilitator and an agent with a $0.03/hour budget hitting it until
  * the policy says stop. Good for the first 30 seconds of a demo video.
  *
- *   pnpm --filter @iamyoungjohn-kit/pay example:local
+ *   pnpm --filter @codkit/pay example:local
  */
-import { createPolicyEngine, fromAtomic, usdc } from "@iamyoungjohn-kit/policy";
+import { createPolicyEngine, fromAtomic, usdc } from "@codkit/policy";
 import type { FacilitatorClient } from "@x402/core/server";
 import { Hono } from "hono";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";

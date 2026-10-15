@@ -1,5 +1,5 @@
 {
-  "name": "@iamyoungjohn-kit/mcp",
+  "name": "@codkit/mcp",
   "version": "0.1.0",
   "description": "Define agent tools once with Zod; expose them as an MCP server (stdio / HTTP), a Claude tool-runner agent loop, and WebMCP browser tools. Ships kit tools for policy, x402 pay, escrow and receipts.",
   "license": "MIT",
@@ -70,9 +70,9 @@
   },
   "peerDependencies": {
     "@anthropic-ai/sdk": ">=0.130.0",
-    "@iamyoungjohn-kit/contracts": "workspace:^",
-    "@iamyoungjohn-kit/policy": "workspace:^",
-    "@iamyoungjohn-kit/receipts": "workspace:^",
+    "@codkit/contracts": "workspace:^",
+    "@codkit/policy": "workspace:^",
+    "@codkit/receipts": "workspace:^",
     "@modelcontextprotocol/sdk": "^1.30.0",
     "viem": "^2.48.0"
   },
@@ -80,13 +80,13 @@
     "@anthropic-ai/sdk": {
       "optional": true
     },
-    "@iamyoungjohn-kit/contracts": {
+    "@codkit/contracts": {
       "optional": true
     },
-    "@iamyoungjohn-kit/policy": {
+    "@codkit/policy": {
       "optional": true
     },
-    "@iamyoungjohn-kit/receipts": {
+    "@codkit/receipts": {
       "optional": true
     },
     "@modelcontextprotocol/sdk": {
@@ -98,10 +98,10 @@
   },
   "devDependencies": {
     "@anthropic-ai/sdk": "~0.133.0",
-    "@iamyoungjohn-kit/contracts": "workspace:*",
-    "@iamyoungjohn-kit/pay": "workspace:*",
-    "@iamyoungjohn-kit/policy": "workspace:*",
-    "@iamyoungjohn-kit/receipts": "workspace:*",
+    "@codkit/contracts": "workspace:*",
+    "@codkit/pay": "workspace:*",
+    "@codkit/policy": "workspace:*",
+    "@codkit/receipts": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.32.0",
     "viem": "^2.48.0",
     "@x402/core": "~2.28.0",

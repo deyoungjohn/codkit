@@ -1,7 +1,7 @@
 {
-  "name": "@iamyoungjohn-kit/contracts",
+  "name": "@codkit/contracts",
   "version": "0.1.0",
-  "description": "Escrow (create → fund → deliver → release/refund) + reputation counter. Solidity (Foundry) with typed viem bindings that plug into @iamyoungjohn-kit/policy.",
+  "description": "Escrow (create → fund → deliver → release/refund) + reputation counter. Solidity (Foundry) with typed viem bindings that plug into @codkit/policy.",
   "license": "MIT",
   "author": "Young John",
   "repository": {
@@ -54,10 +54,10 @@
   "peerDependencies": {
     "viem": "^2.48.0",
     "@mysten/sui": "^2.0.0",
-    "@iamyoungjohn-kit/policy": "workspace:^"
+    "@codkit/policy": "workspace:^"
   },
   "devDependencies": {
-    "@iamyoungjohn-kit/policy": "workspace:*",
+    "@codkit/policy": "workspace:*",
     "viem": "^2.48.0",
     "@mysten/sui": "^2.36.0"
   },
@@ -68,7 +68,7 @@
     "viem": {
       "optional": true
     },
-    "@iamyoungjohn-kit/policy": {
+    "@codkit/policy": {
       "optional": true
     }
   }

@@ -1,4 +1,4 @@
-import { verifyLog } from "@iamyoungjohn-kit/receipts";
+import { verifyLog } from "@codkit/receipts";
 import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 import { callTool, defineTool, instrument, type ToolEvent } from "../src/index.js";

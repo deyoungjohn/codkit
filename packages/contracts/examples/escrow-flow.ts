@@ -3,10 +3,10 @@
  * an AI-agent client pays a provider through escrow, with every client tx
  * guarded by policy + simulation.
  *
- *   pnpm --filter @iamyoungjohn-kit/contracts example
+ *   pnpm --filter @codkit/contracts example
  */
-import { createPolicyEngine, fromAtomic, usdc } from "@iamyoungjohn-kit/policy";
-import { createEvmGuard } from "@iamyoungjohn-kit/policy/evm";
+import { createPolicyEngine, fromAtomic, usdc } from "@codkit/policy";
+import { createEvmGuard } from "@codkit/policy/evm";
 import { dealIdFromLogs, deployData, escrowAbi, escrowTxs, hashText, readDeal, readReputation } from "../src/index.js";
 import { artifact, deployed, KEYS, startAnvil, wallet } from "../test/anvil.js";
 

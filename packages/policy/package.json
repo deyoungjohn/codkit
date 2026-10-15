@@ -1,5 +1,5 @@
 {
-  "name": "@iamyoungjohn-kit/policy",
+  "name": "@codkit/policy",
   "version": "0.1.0",
   "description": "Chain-agnostic guardrails for AI agents that move money: spend caps, allow/deny lists, human approval, mandatory simulation, kill switch.",
   "license": "MIT",

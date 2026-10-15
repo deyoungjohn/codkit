@@ -1,5 +1,5 @@
-import type { Anchorer, ReceiptLog, Uploader } from "@iamyoungjohn-kit/receipts";
-import { verifyLog } from "@iamyoungjohn-kit/receipts";
+import type { Anchorer, ReceiptLog, Uploader } from "@codkit/receipts";
+import { verifyLog } from "@codkit/receipts";
 import { z } from "zod";
 import { defineTool, type AnyKitTool } from "../tool.js";
 

@@ -3,7 +3,7 @@
  * instruction object compatible with `@solana/kit`'s `Instruction` — append it
  * to any transaction message you already build and sign.
  *
- * Import from `@iamyoungjohn-kit/receipts/solana`.
+ * Import from `@codkit/receipts/solana`.
  */
 import type { Checkpoint } from "../types.js";
 
