@@ -14,7 +14,7 @@ The pattern that keeps winning is an **AI agent that takes a real onchain action
 | [`@iamyoungjohn-kit/pay`](packages/pay) | ✅ v0.1 | x402 paywall middleware (Hono / Express) and a budget-aware x402 client bounded by `policy`. |
 | [`@iamyoungjohn-kit/contracts`](packages/contracts) | 🟡 EVM + Sui v0.1 | Escrow (create → fund → deliver → release/refund) and reputation in Solidity (Foundry) and Sui Move, with TS bindings. Anchor (Solana) is still to do. |
 | [`@iamyoungjohn-kit/receipts`](packages/receipts) | ✅ v0.1 | Hash-chained, signed action log. Records policy events automatically, anchors onchain (EVM event or calldata, Solana memo, Sui event), stores the full log on Walrus, and lets anyone verify it. |
-| `mcp` | planned | MCP server exposing kit tools, plus a Claude tool-calling loop. |
+| [`@iamyoungjohn-kit/mcp`](packages/mcp) | ✅ v0.1 | Define tools once with Zod and serve them as an MCP server (stdio or HTTP), a Claude agent loop, or WebMCP. Includes kit tools for policy, x402, wallet, escrow and receipts. |
 | `demo-shell` | planned | Next.js dashboard (wallet, live tx feed, reasoning trace, policy decisions) and a submission kit. |
 
 Each package works on its own, and the core of each package imports no chain SDK. Chain and sponsor code lives in thin adapters, because sponsor SDKs change monthly.
