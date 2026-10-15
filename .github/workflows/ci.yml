@@ -33,3 +33,40 @@ jobs:
       - name: Move unit tests
         working-directory: packages/contracts/sui
         run: sui move test < /dev/null
+  solana:
+    runs-on: ubuntu-latest
+    env:
+      SOLANA_VERSION: v4.1.2 # the release avm pairs with Anchor 1.2.1
+      ANCHOR_VERSION: 1.2.1
+    defaults:
+      run:
+        working-directory: packages/contracts/solana
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cache/solana
+            packages/contracts/solana/target
+          key: solana-${{ env.SOLANA_VERSION }}-${{ hashFiles('packages/contracts/solana/Cargo.lock', 'packages/contracts/solana/rust-toolchain.toml') }}
+      - name: Install Solana CLI and Anchor
+        run: |
+          sh -c "$(curl -sSfL https://release.anza.xyz/${SOLANA_VERSION}/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> "$GITHUB_PATH"
+          mkdir -p "$HOME/.local/bin"
+          curl -sSfL -o "$HOME/.local/bin/anchor" "https://github.com/solana-foundation/anchor/releases/download/v${ANCHOR_VERSION}/anchor-${ANCHOR_VERSION}-x86_64-unknown-linux-gnu"
+          chmod +x "$HOME/.local/bin/anchor"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Program keypair (CI only; matches nothing deployed)
+        run: |
+          mkdir -p target/deploy
+          [ -f target/deploy/kit_escrow-keypair.json ] || solana-keygen new --no-bip39-passphrase --silent -o target/deploy/kit_escrow-keypair.json
+      - name: Build (SBPF v3) and test with LiteSVM
+        run: |
+          anchor --version && solana --version
+          anchor build --ignore-keys
+          cargo test
+          cargo clippy --all-targets -- -D warnings
+          cargo fmt --check

@@ -23,7 +23,7 @@ codkit answers each of these with a tested module, so a new project starts from 
 | --- | --- |
 | [`@codkit/policy`](packages/policy) | **Guardrails.** Spend caps (per transaction, per period, total), allow and deny lists, a human-approval threshold, a mandatory simulation before anything is signed, and a kill switch. Chain-agnostic, with an EVM adapter. |
 | [`@codkit/pay`](packages/pay) | **Payments.** [x402](https://x402.org) paywall middleware for Hono and Express, plus a client that pays for HTTP requests in USDC within the policy budget. |
-| [`@codkit/contracts`](packages/contracts) | **Escrow and reputation.** Create → fund → deliver → release or refund, with a reputation counter. Solidity (Foundry) and Sui Move, with TypeScript bindings. |
+| [`@codkit/contracts`](packages/contracts) | **Escrow and reputation.** Create → fund → deliver → release or refund, with a reputation counter. Solidity (Foundry), Sui Move and Solana (Anchor), with TypeScript bindings for EVM and Sui. |
 | [`@codkit/receipts`](packages/receipts) | **A verifiable log.** Every decision and action goes into a hash-chained, signed log. Its head is anchored onchain (EVM, Solana or Sui) and the full log can go to Walrus, so anyone can check it. |
 | [`@codkit/mcp`](packages/mcp) | **Agent tools.** Define a tool once with Zod, then serve it over MCP, run it in a tool-calling loop on any OpenAI-compatible LLM (Groq, Gemini, NVIDIA NIM, OpenRouter, a local model…), or expose it in the browser via WebMCP. |
 | [`@codkit/feed`](packages/feed) | **Live events.** A server-sent event stream of the agent's reasoning, tool calls, policy decisions, transactions and receipts, plus a human-approval broker. |
@@ -58,7 +58,7 @@ Hand the same guarded wallet to an LLM as tools, and the model can only act with
 
 ## Proven on testnet
 
-The contracts are deployed on **Base Sepolia** (source-verified) and **Sui testnet**. An end-to-end check runs the full flow against them with real transactions:
+The contracts are deployed on **Base Sepolia** (source-verified) and **Sui testnet**. An end-to-end check runs the full flow against them with real transactions. (These deployments predate the [security review](docs/security/escrow-review.md) fixes; redeployment is pending.)
 
 - **Base Sepolia, 12/12** ([report](apps/testnet-e2e/reports/base-sepolia-2026-10-15T15-29-44-296Z.md)): escrow create, fund, deliver and release; a reputation update; three guardrail refusals (over the cap, an unlisted contract, a failing simulation); an x402 payment settled through the public facilitator; and the receipt log anchored and verified onchain.
 - **Sui testnet** ([report](apps/testnet-e2e/reports/sui-testnet-2026-10-15T18-03-01-050Z.md)): a policy check, the full escrow lifecycle, and the receipt log anchored via `kit_escrow::anchor` and verified.
@@ -105,7 +105,7 @@ codkit is public, MIT-licensed and existed before your event. Many hackathons re
 
 ## Status
 
-v0.1 ([npm](https://www.npmjs.com/org/codkit)), testnet only. The contracts are **unaudited**: don't use them with real funds. On the roadmap: Solana (Anchor) escrow, more payment rails, persistent storage for the policy engine and logs, and agent wallets with session keys.
+v0.1 ([npm](https://www.npmjs.com/org/codkit)), testnet only. The contracts have had a [security review](docs/security/escrow-review.md) with fuzzing, static analysis and 100% test coverage, but **no independent audit**, so don't use them with real funds. On the roadmap: a Solana devnet deployment with a TypeScript client, more payment rails, persistent storage for the policy engine and logs, and agent wallets with session keys.
 
 Contributions and issues are welcome.
 

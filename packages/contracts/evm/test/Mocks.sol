@@ -65,3 +65,33 @@ contract FalseToken is MockERC20 {
         return super.transfer(to, amount);
     }
 }
+
+interface IEscrowLike {
+    function release(uint256 id) external;
+    function refund(uint256 id) external;
+    function claim(uint256 id) external;
+}
+
+/// ERC777-style hook: on every transfer out of the escrow it tries to re-enter
+/// release / refund / claim for the same deal, and records whether any succeeded.
+contract ReentrantToken is MockERC20 {
+    address public escrow;
+    uint256 public targetId;
+    uint256 public reentrySucceeded;
+    uint256 public reentryAttempts;
+
+    function arm(address escrow_, uint256 id) external {
+        escrow = escrow_;
+        targetId = id;
+    }
+
+    function _move(address from, address to, uint256 amount) internal override {
+        super._move(from, to, amount);
+        if (from == escrow && escrow != address(0)) {
+            reentryAttempts++;
+            try IEscrowLike(escrow).release(targetId) { reentrySucceeded++; } catch {}
+            try IEscrowLike(escrow).refund(targetId) { reentrySucceeded++; } catch {}
+            try IEscrowLike(escrow).claim(targetId) { reentrySucceeded++; } catch {}
+        }
+    }
+}

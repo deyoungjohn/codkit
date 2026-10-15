@@ -20,3 +20,5 @@ apps/demo-shell/next-env.d.ts
 packages/contracts/deployments/*local*.json
 packages/contracts/deployments/anvil*.json
 packages/contracts/evm/broadcast/**/dry-run/
+packages/contracts/sui/.coverage_map.mvcov
+packages/contracts/sui/traces/

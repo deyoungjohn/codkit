@@ -347,3 +347,185 @@ fun rejects_provider_as_arbiter() {
     create_deal(&mut s, &clock, option::some(PROVIDER));
     finish(s, clock);
 }
+
+// Security review fixes ----------------------------------------------------
+
+#[test]
+fun client_refunds_unresolved_dispute_after_arbiter_timeout() {
+    let (mut s, mut clock) = setup();
+    create_deal(&mut s, &clock, option::some(ARBITER));
+    deliver(&mut s, &clock);
+    dispute(&mut s, &clock);
+    clock.increment_for_testing(DAY + escrow::arbiter_timeout_ms());
+    refund_as(&mut s, &clock, CLIENT);
+    assert!(received(&mut s, CLIENT) == AMOUNT);
+    s.next_tx(CLIENT);
+    let rep = s.take_shared<Reputation>();
+    let st = reputation::stats(&rep, PROVIDER);
+    assert!(reputation::refunded(&st) == 1 && reputation::disputed(&st) == 1);
+    ts::return_shared(rep);
+    finish(s, clock);
+}
+
+#[test, expected_failure(abort_code = escrow::ETooEarly)]
+fun client_cannot_refund_dispute_before_arbiter_timeout() {
+    let (mut s, mut clock) = setup();
+    create_deal(&mut s, &clock, option::some(ARBITER));
+    deliver(&mut s, &clock);
+    dispute(&mut s, &clock);
+    clock.increment_for_testing(DAY + escrow::arbiter_timeout_ms() - 1);
+    refund_as(&mut s, &clock, CLIENT);
+    finish(s, clock);
+}
+
+#[test]
+fun arbiter_can_still_decide_before_timeout() {
+    let (mut s, mut clock) = setup();
+    create_deal(&mut s, &clock, option::some(ARBITER));
+    deliver(&mut s, &clock);
+    dispute(&mut s, &clock);
+    clock.increment_for_testing(10 * DAY);
+    release_as(&mut s, ARBITER);
+    assert!(received(&mut s, PROVIDER) == AMOUNT);
+    finish(s, clock);
+}
+
+#[test, expected_failure(abort_code = escrow::EUnauthorized)]
+fun client_cannot_refund_delivered_deal() {
+    let (mut s, mut clock) = setup();
+    create_deal(&mut s, &clock, option::some(ARBITER));
+    deliver(&mut s, &clock);
+    clock.increment_for_testing(365 * DAY);
+    refund_as(&mut s, &clock, CLIENT);
+    finish(s, clock);
+}
+
+#[test, expected_failure(abort_code = escrow::EInvalidParams)]
+fun review_period_above_max_rejected() {
+    let (mut s, clock) = setup();
+    s.next_tx(CLIENT);
+    let payment = coin::mint_for_testing<SUI>(AMOUNT, s.ctx());
+    escrow::create(PROVIDER, option::none(), payment, clock.timestamp_ms() + DAY, escrow::max_review_period_ms() + 1, b"", &clock, s.ctx());
+    finish(s, clock);
+}
+
+#[test, expected_failure(abort_code = escrow::EInvalidParams)]
+fun arbiter_with_zero_review_period_rejected() {
+    let (mut s, clock) = setup();
+    s.next_tx(CLIENT);
+    let payment = coin::mint_for_testing<SUI>(AMOUNT, s.ctx());
+    escrow::create(PROVIDER, option::some(ARBITER), payment, clock.timestamp_ms() + DAY, 0, b"", &clock, s.ctx());
+    finish(s, clock);
+}
+
+#[test]
+fun review_period_bounds_accepted() {
+    let (mut s, clock) = setup();
+    s.next_tx(CLIENT);
+    let p1 = coin::mint_for_testing<SUI>(AMOUNT, s.ctx());
+    escrow::create(PROVIDER, option::none(), p1, clock.timestamp_ms() + DAY, 0, b"", &clock, s.ctx());
+    let p2 = coin::mint_for_testing<SUI>(AMOUNT, s.ctx());
+    escrow::create(PROVIDER, option::some(ARBITER), p2, clock.timestamp_ms() + DAY, escrow::max_review_period_ms(), b"", &clock, s.ctx());
+    finish(s, clock);
+}
+
+// Failure paths found uncovered by `sui move test --coverage` --------------
+
+#[test, expected_failure(abort_code = escrow::EWrongStatus)]
+fun cannot_deliver_twice() {
+    let (mut s, clock) = setup();
+    create_deal(&mut s, &clock, option::none());
+    deliver(&mut s, &clock);
+    deliver(&mut s, &clock);
+    finish(s, clock);
+}
+
+#[test, expected_failure(abort_code = escrow::EUnauthorized)]
+fun cannot_dispute_without_arbiter() {
+    let (mut s, clock) = setup();
+    create_deal(&mut s, &clock, option::none());
+    deliver(&mut s, &clock);
+    dispute(&mut s, &clock);
+    finish(s, clock);
+}
+
+#[test, expected_failure(abort_code = escrow::EUnauthorized)]
+fun stranger_cannot_dispute() {
+    let (mut s, clock) = setup();
+    create_deal(&mut s, &clock, option::some(ARBITER));
+    deliver(&mut s, &clock);
+    s.next_tx(STRANGER);
+    let mut e = s.take_shared<Escrow<SUI>>();
+    let mut rep = s.take_shared<Reputation>();
+    escrow::dispute(&mut e, &mut rep, &clock, s.ctx());
+    ts::return_shared(e);
+    ts::return_shared(rep);
+    finish(s, clock);
+}
+
+#[test, expected_failure(abort_code = escrow::EWrongStatus)]
+fun cannot_dispute_before_delivery() {
+    let (mut s, clock) = setup();
+    create_deal(&mut s, &clock, option::some(ARBITER));
+    dispute(&mut s, &clock);
+    finish(s, clock);
+}
+
+#[test, expected_failure(abort_code = escrow::EWrongStatus)]
+fun cannot_release_twice() {
+    let (mut s, clock) = setup();
+    create_deal(&mut s, &clock, option::none());
+    release_as(&mut s, CLIENT);
+    release_as(&mut s, CLIENT);
+    finish(s, clock);
+}
+
+#[test, expected_failure(abort_code = escrow::EUnauthorized)]
+fun stranger_cannot_claim() {
+    let (mut s, mut clock) = setup();
+    create_deal(&mut s, &clock, option::none());
+    deliver(&mut s, &clock);
+    clock.increment_for_testing(2 * DAY);
+    s.next_tx(STRANGER);
+    let mut e = s.take_shared<Escrow<SUI>>();
+    let mut rep = s.take_shared<Reputation>();
+    escrow::claim(&mut e, &mut rep, &clock, s.ctx());
+    ts::return_shared(e);
+    ts::return_shared(rep);
+    finish(s, clock);
+}
+
+#[test, expected_failure(abort_code = escrow::EInvalidParams)]
+fun rejects_client_as_arbiter() {
+    let (mut s, clock) = setup();
+    s.next_tx(CLIENT);
+    let payment = coin::mint_for_testing<SUI>(AMOUNT, s.ctx());
+    escrow::create(PROVIDER, option::some(CLIENT), payment, clock.timestamp_ms() + DAY, DAY, b"", &clock, s.ctx());
+    finish(s, clock);
+}
+
+#[test]
+fun getters_reflect_deal() {
+    let (mut s, clock) = setup();
+    create_deal(&mut s, &clock, option::some(ARBITER));
+    s.next_tx(CLIENT);
+    let e = s.take_shared<Escrow<SUI>>();
+    assert!(escrow::arbiter(&e) == option::some(ARBITER));
+    assert!(escrow::deadline_ms(&e) == clock.timestamp_ms() + 3 * DAY);
+    assert!(escrow::terms_hash(&e) == b"terms");
+    assert!(!escrow::is_refunded(&escrow::status(&e)) && !escrow::is_disputed(&escrow::status(&e)));
+    ts::return_shared(e);
+    finish(s, clock);
+}
+
+#[test]
+fun reputation_defaults_for_unknown_subject() {
+    let (mut s, clock) = setup();
+    s.next_tx(CLIENT);
+    let rep = s.take_shared<Reputation>();
+    let st = reputation::stats(&rep, STRANGER);
+    assert!(reputation::completed(&st) == 0 && reputation::volume(&st) == 0);
+    assert!(reputation::score(&rep, STRANGER) == 0);
+    ts::return_shared(rep);
+    finish(s, clock);
+}

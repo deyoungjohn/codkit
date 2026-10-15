@@ -4,7 +4,7 @@ pragma solidity ^0.8.24;
 import {Test} from "forge-std/Test.sol";
 import {Escrow} from "../src/Escrow.sol";
 import {Reputation} from "../src/Reputation.sol";
-import {MockERC20, FeeToken, FalseToken} from "./Mocks.sol";
+import {MockERC20, FeeToken, FalseToken, ReentrantToken} from "./Mocks.sol";
 
 contract EscrowTest is Test {
     Escrow escrow;
@@ -316,6 +316,92 @@ contract EscrowTest is Test {
         assertEq(usd.balanceOf(address(escrow)), 0);
         assertEq(usd.balanceOf(provider) + usd.balanceOf(client) - clientBefore, amount);
     }
+
+    // ------------------------------------------------- security review fixes
+
+    function test_clientCanRefundUnresolvedDisputeAfterArbiterTimeout() public {
+        uint256 id = _delivered();
+        vm.prank(client);
+        escrow.dispute(id);
+        uint256 end = escrow.getDeal(id).deliveredAt + REVIEW + escrow.ARBITER_TIMEOUT();
+
+        vm.warp(end - 1);
+        vm.prank(client);
+        vm.expectRevert(Escrow.TooEarly.selector);
+        escrow.refund(id);
+
+        vm.warp(end);
+        uint256 before = usd.balanceOf(client);
+        vm.prank(client);
+        escrow.refund(id);
+        assertEq(usd.balanceOf(client) - before, AMOUNT);
+        assertEq(uint8(escrow.getDeal(id).status), uint8(Escrow.Status.Refunded));
+        assertEq(rep.stats(provider).refunded, 1);
+    }
+
+    function test_arbiterCanStillDecideBeforeTimeout() public {
+        uint256 id = _delivered();
+        vm.prank(client);
+        escrow.dispute(id);
+        vm.warp(block.timestamp + 10 days);
+        vm.prank(arbiter);
+        escrow.release(id);
+        assertEq(usd.balanceOf(provider), AMOUNT);
+    }
+
+    function test_clientCannotRefundDeliveredDeal() public {
+        uint256 id = _delivered();
+        vm.warp(block.timestamp + 365 days);
+        vm.prank(client);
+        vm.expectRevert(Escrow.Unauthorized.selector);
+        escrow.refund(id);
+    }
+
+    function test_reviewPeriodBounds() public {
+        uint32 max = escrow.MAX_REVIEW_PERIOD();
+        vm.startPrank(client);
+        vm.expectRevert(Escrow.InvalidParams.selector);
+        escrow.createDeal(provider, arbiter, address(usd), AMOUNT, _deadline(), max + 1, TERMS);
+        vm.expectRevert(Escrow.InvalidParams.selector); // an arbiter with no review window could never be used
+        escrow.createDeal(provider, arbiter, address(usd), AMOUNT, _deadline(), 0, TERMS);
+        escrow.createDeal(provider, address(0), address(usd), AMOUNT, _deadline(), 0, TERMS); // fine without an arbiter
+        escrow.createDeal(provider, arbiter, address(usd), AMOUNT, _deadline(), max, TERMS);
+        vm.stopPrank();
+    }
+
+    function test_cannotFundAfterDeadline() public {
+        vm.prank(client);
+        uint256 id = escrow.createDeal(provider, arbiter, address(usd), AMOUNT, _deadline(), REVIEW, TERMS);
+        vm.warp(escrow.getDeal(id).deadline + 1);
+        vm.prank(client);
+        vm.expectRevert(Escrow.TooLate.selector);
+        escrow.fund(id);
+    }
+
+    function test_payoutToCodelessTokenFails() public {
+        uint256 id = _funded();
+        vm.etch(address(usd), ""); // token code gone: transfers must fail loudly, not "succeed" silently
+        vm.prank(client);
+        vm.expectRevert(Escrow.TransferFailed.selector);
+        escrow.release(id);
+    }
+
+    function test_reentrantTokenCannotDoublePay() public {
+        ReentrantToken t = new ReentrantToken();
+        t.mint(client, AMOUNT);
+        vm.startPrank(client);
+        t.approve(address(escrow), AMOUNT);
+        uint256 id = escrow.createAndFund(provider, arbiter, address(t), AMOUNT, _deadline(), REVIEW, TERMS);
+        vm.stopPrank();
+        t.arm(address(escrow), id);
+
+        vm.prank(client);
+        escrow.release(id);
+        assertGt(t.reentryAttempts(), 0);
+        assertEq(t.reentrySucceeded(), 0, "re-entry must fail");
+        assertEq(t.balanceOf(provider), AMOUNT);
+        assertEq(t.balanceOf(address(escrow)), 0);
+    }
 }
 
 contract ReputationTest is Test {
@@ -338,7 +424,25 @@ contract ReputationTest is Test {
         vm.expectRevert(Reputation.NotOwner.selector);
         rep.setWriter(writer, false);
         rep.transferOwnership(writer);
+        assertEq(rep.owner(), address(this), "two-step: owner unchanged until accepted");
+        assertEq(rep.pendingOwner(), writer);
+        vm.prank(subject);
+        vm.expectRevert(Reputation.NotOwner.selector);
+        rep.acceptOwnership();
+        vm.prank(writer);
+        rep.acceptOwnership();
         assertEq(rep.owner(), writer);
+        assertEq(rep.pendingOwner(), address(0));
+    }
+
+    function test_cannotRenounceToZero() public {
+        vm.expectRevert(Reputation.ZeroAddress.selector);
+        new Reputation(address(0));
+        rep.transferOwnership(address(0)); // cancels a pending transfer; nobody can accept it
+        vm.prank(address(0));
+        vm.expectRevert(Reputation.NotOwner.selector);
+        rep.acceptOwnership();
+        assertEq(rep.owner(), address(this));
     }
 
     function test_score() public {

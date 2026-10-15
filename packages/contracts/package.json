@@ -46,7 +46,13 @@
     "!deployments/*local*.json",
     "!deployments/anvil*.json",
     "deployments/README.md",
-    "sui/Published.toml"
+    "sui/Published.toml",
+    "solana/programs/kit_escrow/src",
+    "solana/programs/kit_escrow/Cargo.toml",
+    "solana/Anchor.toml",
+    "solana/Cargo.toml",
+    "solana/rust-toolchain.toml",
+    "solana/idl"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

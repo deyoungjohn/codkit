@@ -4,9 +4,11 @@
 ///   create(+fund) ─▶ deliver ─▶ release (client / arbiter)
 ///        │              │   └──▶ claim   (provider, after the review period)
 ///        │              └─────▶ dispute (client) ─▶ arbiter release / refund
-///        └────────────────────▶ refund  (client after deadline, provider any time, arbiter)
+///        └────────────────────▶ refund  (client after deadline, provider any time, arbiter;
+///                                        client also once an unresolved dispute times out)
 ///
-/// Each deal is a shared `Escrow<T>` object. Not audited — testnet / devnet only.
+/// Each deal is a shared `Escrow<T>` object. Reviewed (docs/security/escrow-review.md)
+/// but not audited — testnet / devnet only.
 module kit_escrow::escrow;
 
 use kit_escrow::reputation::{Self, Reputation};
@@ -76,6 +78,18 @@ const ETooEarly: vector<u8> = b"Too early";
 #[error]
 const ETooLate: vector<u8> = b"Too late";
 
+// Limits -------------------------------------------------------------------
+
+/// Longest review period a deal may set — protects providers from funds parked
+/// for years, and keeps `delivered_at_ms + review_period_ms` far from overflow.
+const MAX_REVIEW_PERIOD_MS: u64 = 30 * 24 * 60 * 60 * 1000;
+/// How long an arbiter has to resolve a dispute, counted from the end of the review period.
+const ARBITER_TIMEOUT_MS: u64 = 30 * 24 * 60 * 60 * 1000;
+
+public fun max_review_period_ms(): u64 { MAX_REVIEW_PERIOD_MS }
+
+public fun arbiter_timeout_ms(): u64 { ARBITER_TIMEOUT_MS }
+
 // Create -------------------------------------------------------------------
 
 /// Lock `payment` in a new shared escrow. Returns the deal's object ID.
@@ -92,9 +106,11 @@ public fun create<T>(
     let client = ctx.sender();
     let amount = payment.value();
     assert!(provider != client && amount > 0 && deadline_ms > clock.timestamp_ms(), EInvalidParams);
+    assert!(review_period_ms <= MAX_REVIEW_PERIOD_MS, EInvalidParams);
     if (arbiter.is_some()) {
         let a = *arbiter.borrow();
-        assert!(a != client && a != provider, EInvalidParams);
+        // with an arbiter, a zero review period would make disputes impossible
+        assert!(a != client && a != provider && review_period_ms > 0, EInvalidParams);
     };
     let escrow = Escrow<T> {
         id: object::new(ctx),
@@ -162,7 +178,8 @@ public fun claim<T>(e: &mut Escrow<T>, rep: &mut Reputation, clock: &Clock, ctx:
 }
 
 /// Return funds to the client. Provider or arbiter: any time while funds are held.
-/// Client: only if nothing was delivered by the deadline.
+/// Client: if nothing was delivered by the deadline, or if a dispute is still
+/// unresolved `ARBITER_TIMEOUT_MS` after the review period ended.
 public fun refund<T>(e: &mut Escrow<T>, rep: &mut Reputation, clock: &Clock, ctx: &mut TxContext) {
     let sender = ctx.sender();
     assert!(
@@ -170,8 +187,15 @@ public fun refund<T>(e: &mut Escrow<T>, rep: &mut Reputation, clock: &Clock, ctx
         EWrongStatus,
     );
     if (sender == e.client) {
-        assert!(e.status == Status::Funded, EUnauthorized);
-        assert!(clock.timestamp_ms() > e.deadline_ms, ETooEarly);
+        let now = clock.timestamp_ms();
+        if (e.status == Status::Funded) {
+            assert!(now > e.deadline_ms, ETooEarly);
+        } else if (e.status == Status::Disputed) {
+            let review_end = *e.delivered_at_ms.borrow() + e.review_period_ms;
+            assert!(now >= review_end + ARBITER_TIMEOUT_MS, ETooEarly);
+        } else {
+            abort EUnauthorized
+        };
     } else {
         assert!(sender == e.provider || is_arbiter(e, sender), EUnauthorized);
     };

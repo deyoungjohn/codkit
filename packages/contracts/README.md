@@ -4,11 +4,16 @@ Escrow and reputation primitives for agent commerce: **create → fund → deliv
 
 | Chain | Status | Location |
 | --- | --- | --- |
-| EVM (Solidity, Foundry) | ✅ v0.1, tested (unit, fuzz, anvil integration) | [`evm/`](evm) |
-| Solana (Anchor) | planned | `solana/` |
-| Sui (Move) | ✅ v0.1, tested (Move unit tests, localnet end to end) | [`sui/`](sui) |
+| EVM (Solidity, Foundry) | ✅ tested: unit, invariant fuzzing, 100% coverage, testnet end to end | [`evm/`](evm) |
+| Sui (Move) | ✅ tested: unit, 100% coverage, testnet end to end | [`sui/`](sui) |
+| Solana (Anchor) | ✅ tested: LiteSVM unit + random-walk invariants on the SBPF v3 binary; not deployed yet | [`solana/`](solana) |
 
-> Not audited. Use it on testnets and in hackathon demos only.
+> Reviewed ([security review](https://github.com/deyoungjohn/codkit/blob/main/docs/security/escrow-review.md)) but **not independently audited**. Use it on testnets and in hackathon demos only.
+
+All three implement the same rules:
+- **Review period:** at most 30 days, and above zero when there's an arbiter.
+- **Arbiter timeout:** if a dispute is still unresolved 30 days after the review period ends, the client can refund it.
+- **Fee-charging tokens** are rejected.
 
 ## Escrow (EVM)
 
@@ -18,6 +23,8 @@ create ─▶ fund ─▶ deliver ─▶ release (client / arbiter)
   │         │        └─────▶ dispute (client) ─▶ arbiter release / refund
   │         └──────────────▶ refund  (client after deadline, provider any time, arbiter)
   └──▶ cancel (client, before funding)
+
+  disputed and the arbiter silent for ARBITER_TIMEOUT (30 days) after the review period ─▶ client refund
 ```
 
 - Works with ERC20 tokens only (stablecoins are the point). Fee-on-transfer tokens are rejected, and tokens that return `false` are handled.
@@ -70,6 +77,28 @@ forge script script/Deploy.s.sol --rpc-url base_sepolia --account <cast-wallet-n
 ```
 
 The script deploys `Reputation`, `Escrow`, and `ReceiptAnchor` (used by `@codkit/receipts`), then authorises the escrow as a reputation writer. Record the addresses in your project's deployed-contracts table.
+
+## Solana (Anchor)
+
+The `kit_escrow` program has the same lifecycle as Sui: the deal is funded when it's created.
+- **Accounts:**
+  - each deal is a PDA at `["deal", client, deal_id]`;
+  - its tokens sit in the deal PDA's associated token account, which is closed on settlement so its rent returns to the client;
+  - reputation lives at `["reputation", provider]`, and only the program can write it.
+- **Tokens:** SPL Token and Token-2022 both work. Mints that take a transfer fee are rejected.
+
+```bash
+cd packages/contracts/solana
+anchor build      # SBPF v3 (devnet supports v1–v3; v0–v2 deployments are being phased out)
+cargo test        # LiteSVM: lifecycle, auth, account-substitution attacks, Token-2022, random walk
+```
+
+Toolchain: Anchor 1.2.1 with Solana 4.1.2 (`avm install 1.2.1`). The host Rust is pinned to 1.99.1 because LiteSVM 0.17 needs at least 1.97. The program itself builds with Solana's platform tools.
+
+**The program ID** comes from `target/deploy/kit_escrow-keypair.json`, which is not committed. Before the first devnet deploy:
+1. create or keep that keypair;
+2. run `anchor keys sync`;
+3. deploy with `anchor deploy --provider.cluster devnet` from your own wallet.
 
 ## Develop
 

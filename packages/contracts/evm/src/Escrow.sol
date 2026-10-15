@@ -16,8 +16,12 @@ interface IERC20Min {
 ///     │         └──────────────▶ refund  (client after deadline, provider any time, arbiter)
 ///     └──▶ cancel (client, before funding)
 ///
+/// A dispute the arbiter never resolves can be refunded by the client once
+/// `ARBITER_TIMEOUT` has passed after the review period, so funds can't be locked forever.
+///
 /// Outcomes are recorded in an optional `Reputation` contract. Recording can never
-/// block a payout. Not audited — testnets and hackathon demos only.
+/// block a payout. Reviewed (docs/security/escrow-review.md) but not audited —
+/// testnets and hackathon demos only.
 contract Escrow {
     enum Status {
         None,
@@ -43,6 +47,11 @@ contract Escrow {
         bytes32 termsHash; // hash / CID of what was agreed
         bytes32 deliveryHash; // hash / CID of what was delivered
     }
+
+    /// Longest review period a deal may set (protects providers from funds parked for years).
+    uint32 public constant MAX_REVIEW_PERIOD = 30 days;
+    /// How long an arbiter has to resolve a dispute, counted from the end of the review period.
+    uint256 public constant ARBITER_TIMEOUT = 30 days;
 
     Reputation public immutable reputation;
     uint256 public dealCount;
@@ -100,7 +109,8 @@ contract Escrow {
         if (
             provider == address(0) || provider == msg.sender || token == address(0) || amount == 0
                 || deadline <= block.timestamp || arbiter == provider || arbiter == msg.sender
-        ) revert InvalidParams();
+                || reviewPeriod > MAX_REVIEW_PERIOD || (arbiter != address(0) && reviewPeriod == 0)
+        ) revert InvalidParams(); // with an arbiter, a zero review period would make disputes impossible
         id = ++dealCount;
         _deals[id] = Deal({
             client: msg.sender,
@@ -123,6 +133,7 @@ contract Escrow {
         Deal storage d = _deals[id];
         if (msg.sender != d.client) revert Unauthorized();
         _expect(d, Status.Created);
+        if (block.timestamp > d.deadline) revert TooLate(); // the provider could no longer deliver
         d.status = Status.Funded;
         uint256 before = IERC20Min(d.token).balanceOf(address(this));
         _call(d.token, abi.encodeWithSelector(0x23b872dd, msg.sender, address(this), d.amount)); // transferFrom
@@ -159,6 +170,7 @@ contract Escrow {
         _expect(d, Status.Funded);
         if (block.timestamp > d.deadline) revert TooLate();
         d.status = Status.Delivered;
+        // forge-lint: disable-next-line(unsafe-typecast) — seconds fit in uint64 for ~585 billion years
         d.deliveredAt = uint64(block.timestamp);
         d.deliveryHash = deliveryHash;
         emit Delivered(id, deliveryHash);
@@ -171,8 +183,8 @@ contract Escrow {
         _expect(d, Status.Delivered);
         if (block.timestamp >= uint256(d.deliveredAt) + d.reviewPeriod) revert TooLate();
         d.status = Status.Disputed;
-        _record(d, Reputation.Outcome.Disputed, id);
         emit Disputed(id, msg.sender);
+        _record(d, Reputation.Outcome.Disputed, id);
     }
 
     // ------------------------------------------------------------------ settle
@@ -200,22 +212,28 @@ contract Escrow {
 
     /// @notice Return funds to the client.
     ///         Provider or arbiter: any time while funds are held.
-    ///         Client: only if nothing was delivered by the deadline.
+    ///         Client: if nothing was delivered by the deadline, or if a dispute is still
+    ///         unresolved `ARBITER_TIMEOUT` after the review period ended.
     function refund(uint256 id) external nonReentrant {
         Deal storage d = _deals[id];
         Status s = d.status;
         if (s != Status.Funded && s != Status.Delivered && s != Status.Disputed) revert WrongStatus(s);
         bool isArbiter = msg.sender == d.arbiter && d.arbiter != address(0);
         if (msg.sender == d.client) {
-            if (s != Status.Funded) revert Unauthorized();
-            if (block.timestamp <= d.deadline) revert TooEarly();
+            if (s == Status.Funded) {
+                if (block.timestamp <= d.deadline) revert TooEarly();
+            } else if (s == Status.Disputed) {
+                if (block.timestamp < uint256(d.deliveredAt) + d.reviewPeriod + ARBITER_TIMEOUT) revert TooEarly();
+            } else {
+                revert Unauthorized();
+            }
         } else if (msg.sender != d.provider && !isArbiter) {
             revert Unauthorized();
         }
         d.status = Status.Refunded;
+        emit Refunded(id, d.client, d.amount, msg.sender);
         _record(d, Reputation.Outcome.Refunded, id);
         _call(d.token, abi.encodeWithSelector(0xa9059cbb, d.client, d.amount)); // transfer
-        emit Refunded(id, d.client, d.amount, msg.sender);
     }
 
     // -------------------------------------------------------------------- read
@@ -228,9 +246,9 @@ contract Escrow {
 
     function _payProvider(Deal storage d, uint256 id) private {
         d.status = Status.Released;
+        emit Released(id, d.provider, d.amount, msg.sender);
         _record(d, Reputation.Outcome.Completed, id);
         _call(d.token, abi.encodeWithSelector(0xa9059cbb, d.provider, d.amount)); // transfer
-        emit Released(id, d.provider, d.amount, msg.sender);
     }
 
     function _record(Deal storage d, Reputation.Outcome outcome, uint256 id) private {

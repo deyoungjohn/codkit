@@ -12,27 +12,36 @@ contract Reputation {
         Disputed
     }
 
+    /// Counters are only as meaningful as the deals behind them: any token and any
+    /// counterparty can produce them (including a worthless token between two of the
+    /// same person's addresses). Weigh them using the `Recorded` events, e.g. counting
+    /// only deals in tokens you trust. `volume` sums raw amounts across all tokens.
     struct Stats {
         uint64 completed;
         uint64 refunded;
         uint64 disputed;
-        uint128 volume; // sum of completed amounts, in the deal's token units
+        uint128 volume; // sum of completed amounts, in each deal's token units (mixed tokens summed as-is)
     }
 
     address public owner;
+    /// Two-step ownership: the new owner must accept, so a typo can't brick `setWriter`.
+    address public pendingOwner;
     mapping(address => bool) public isWriter;
     mapping(address => Stats) internal _stats;
 
     event WriterSet(address indexed writer, bool allowed);
     event OwnerTransferred(address indexed previousOwner, address indexed newOwner);
+    event OwnershipTransferStarted(address indexed previousOwner, address indexed newOwner);
     event Recorded(
         address indexed subject, address indexed counterparty, Outcome indexed outcome, uint256 amount, bytes32 ref
     );
 
     error NotOwner();
     error NotWriter();
+    error ZeroAddress();
 
     constructor(address owner_) {
+        if (owner_ == address(0)) revert ZeroAddress();
         owner = owner_;
         emit OwnerTransferred(address(0), owner_);
     }
@@ -47,9 +56,17 @@ contract Reputation {
         emit WriterSet(writer, allowed);
     }
 
+    /// @notice Start a transfer; `newOwner` must call `acceptOwnership`. Pass address(0) to cancel.
     function transferOwnership(address newOwner) external onlyOwner {
-        emit OwnerTransferred(owner, newOwner);
-        owner = newOwner;
+        pendingOwner = newOwner;
+        emit OwnershipTransferStarted(owner, newOwner);
+    }
+
+    function acceptOwnership() external {
+        if (msg.sender != pendingOwner || msg.sender == address(0)) revert NotOwner();
+        emit OwnerTransferred(owner, msg.sender);
+        owner = msg.sender;
+        pendingOwner = address(0);
     }
 
     /// @param subject     whose record changes (usually the service provider)
@@ -62,6 +79,7 @@ contract Reputation {
             s.completed += 1;
             // saturate rather than revert: reputation must never block a payout
             uint256 v = uint256(s.volume) + amount;
+            // forge-lint: disable-next-line(unsafe-typecast) — clamped to uint128 max on the line itself
             s.volume = v > type(uint128).max ? type(uint128).max : uint128(v);
         } else if (outcome == Outcome.Refunded) {
             s.refunded += 1;
