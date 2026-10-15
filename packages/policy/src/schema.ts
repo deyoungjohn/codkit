@@ -25,6 +25,8 @@ export const limitSchema = z
     chain: z.string().optional(),
     /** Optional label for UIs, e.g. `USDC`. */
     label: z.string().optional(),
+    /** Token decimals; when set, reasons show human amounts (`2.5`) instead of atomic units. */
+    decimals: z.number().int().min(0).max(36).optional(),
     perTx: amountSchema.optional(),
     perPeriod: z
       .object({

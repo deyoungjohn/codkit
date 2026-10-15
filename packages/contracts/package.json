@@ -48,7 +48,8 @@
     "clean": "rm -rf dist .turbo evm/out evm/cache",
     "example": "tsx examples/escrow-flow.ts",
     "example:sui": "tsx examples/sui-localnet.ts",
-    "test:move": "sh -c \"command -v sui >/dev/null && cd sui && sui move test < /dev/null || echo \\\"sui CLI not found; skipping Move tests\\\"\""
+    "test:move": "sh -c \"command -v sui >/dev/null && cd sui && sui move test < /dev/null || echo \\\"sui CLI not found; skipping Move tests\\\"\"",
+    "deployments": "node scripts/deployments-table.mjs"
   },
   "peerDependencies": {
     "viem": "^2.48.0",

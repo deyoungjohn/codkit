@@ -1,0 +1,55 @@
+#!/usr/bin/env node
+// Markdown "Deployed contracts" table from Foundry broadcasts, for your submission README.
+//
+//   forge script script/Deploy.s.sol --rpc-url base_sepolia --account dev --broadcast
+//   node scripts/deployments-table.mjs                 # every chain found in evm/broadcast
+//   node scripts/deployments-table.mjs --chain 84532   # one chain
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const EXPLORERS = {
+  1: ["Ethereum", "https://etherscan.io"],
+  11155111: ["Sepolia", "https://sepolia.etherscan.io"],
+  8453: ["Base", "https://basescan.org"],
+  84532: ["Base Sepolia", "https://sepolia.basescan.org"],
+  10: ["Optimism", "https://optimistic.etherscan.io"],
+  11155420: ["OP Sepolia", "https://sepolia-optimism.etherscan.io"],
+  42161: ["Arbitrum", "https://arbiscan.io"],
+  421614: ["Arbitrum Sepolia", "https://sepolia.arbiscan.io"],
+  137: ["Polygon", "https://polygonscan.com"],
+  80002: ["Polygon Amoy", "https://amoy.polygonscan.com"],
+  31337: ["Anvil (local)", null],
+};
+
+export function deploymentsTable(broadcastDir, only) {
+  const rows = [];
+  if (!existsSync(broadcastDir)) return { rows, markdown: "_No deployments found — run the deploy script with --broadcast._" };
+  for (const script of readdirSync(broadcastDir)) {
+    for (const chainId of readdirSync(join(broadcastDir, script))) {
+      if (only && chainId !== String(only)) continue;
+      const file = join(broadcastDir, script, chainId, "run-latest.json");
+      if (!existsSync(file)) continue;
+      const run = JSON.parse(readFileSync(file, "utf8"));
+      for (const tx of run.transactions ?? []) {
+        if (tx.transactionType !== "CREATE" && tx.transactionType !== "CREATE2") continue;
+        rows.push({ chainId: Number(chainId), contract: tx.contractName, address: tx.contractAddress, tx: tx.hash, script });
+      }
+    }
+  }
+  const head = "| Contract | Network | Address | Deploy tx |\n| --- | --- | --- | --- |";
+  const body = rows.map((r) => {
+    const [name, url] = EXPLORERS[r.chainId] ?? [`chain ${r.chainId}`, null];
+    const addr = url ? `[\`${r.address}\`](${url}/address/${r.address})` : `\`${r.address}\``;
+    const tx = url ? `[${r.tx.slice(0, 10)}…](${url}/tx/${r.tx})` : `\`${r.tx.slice(0, 10)}…\``;
+    return `| ${r.contract} | ${name} (${r.chainId}) | ${addr} | ${tx} |`;
+  });
+  return { rows, markdown: rows.length ? [head, ...body].join("\n") : "_No deployments found._" };
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+  const i = process.argv.indexOf("--chain");
+  const { markdown } = deploymentsTable(join(root, "evm", "broadcast"), i > 0 ? process.argv[i + 1] : undefined);
+  console.log(markdown);
+}

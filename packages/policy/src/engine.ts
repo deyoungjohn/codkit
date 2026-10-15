@@ -1,4 +1,5 @@
 import { PolicyError } from "./errors.js";
+import { fromAtomic } from "./units.js";
 import { parsePolicy, type Limit, type Policy, type PolicyInput } from "./schema.js";
 import { MemorySpendStore, type SpendStore } from "./store.js";
 import type {
@@ -316,9 +317,10 @@ export class PolicyEngine {
       }
       for (const limit of limits) {
         const name = limitName(limit);
+        const fmt = (v: bigint) => (limit.decimals === undefined ? v.toString() : fromAtomic(v, limit.decimals));
         const scope = { asset, ...(limit.chain !== undefined && { chain: limit.chain }) };
         if (limit.perTx !== undefined) {
-          if (amount > limit.perTx) add("per_tx", "deny", `${name}: ${amount} exceeds per-tx cap ${limit.perTx}`);
+          if (amount > limit.perTx) add("per_tx", "deny", `${name}: ${fmt(amount)} exceeds per-tx cap ${fmt(limit.perTx)}`);
           else add("per_tx", "allow");
         }
         if (limit.perPeriod) {
@@ -328,19 +330,19 @@ export class PolicyEngine {
             add(
               "per_period",
               "deny",
-              `${name}: ${spent} spent + ${amount} exceeds ${limit.perPeriod.amount} per ${limit.perPeriod.seconds}s`,
+              `${name}: ${fmt(spent)} spent + ${fmt(amount)} exceeds ${fmt(limit.perPeriod.amount)} per ${limit.perPeriod.seconds}s`,
             );
           else add("per_period", "allow");
         }
         if (limit.total !== undefined) {
           const spent = await this.store.sum({ ...scope, ...(reservedAfter !== undefined && { reservedAfter }) });
           if (spent + amount > limit.total)
-            add("total", "deny", `${name}: ${spent} spent + ${amount} exceeds total cap ${limit.total}`);
+            add("total", "deny", `${name}: ${fmt(spent)} spent + ${fmt(amount)} exceeds total cap ${fmt(limit.total)}`);
           else add("total", "allow");
         }
         if (limit.approvalAbove !== undefined) {
           if (amount > limit.approvalAbove)
-            add("approval_threshold", "require_approval", `${name}: ${amount} above approval threshold ${limit.approvalAbove}`);
+            add("approval_threshold", "require_approval", `${name}: ${fmt(amount)} above approval threshold ${fmt(limit.approvalAbove)}`);
           else add("approval_threshold", "allow");
         }
       }

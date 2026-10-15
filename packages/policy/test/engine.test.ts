@@ -309,6 +309,18 @@ describe("execute", () => {
   });
 });
 
+describe("human-readable reasons", () => {
+  it("formats amounts with the limit's decimals", async () => {
+    const engine = createPolicyEngine({
+      policy: { limits: [{ asset: USDC, label: "USDC", decimals: 6, perTx: usdc("0.5"), approvalAbove: usdc("0.1") }], requireSimulation: false },
+    });
+    expect((await engine.evaluate(pay(usdc("2.25")))).reasons).toEqual([
+      "USDC: 2.25 exceeds per-tx cap 0.5",
+      "USDC: 2.25 above approval threshold 0.1",
+    ]);
+  });
+});
+
 describe("policy schema", () => {
   it("accepts string / number / bigint amounts", () => {
     const engine = createPolicyEngine({

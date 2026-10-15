@@ -1,0 +1,40 @@
+{
+  "name": "@iamyoungjohn-kit/feed",
+  "version": "0.1.0",
+  "description": "One live event stream for agent demos: policy decisions, tool calls, reasoning, transactions and receipts, served over Server-Sent Events.",
+  "license": "MIT",
+  "author": "Young John",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deyoungjohn/kit.git",
+    "directory": "packages/feed"
+  },
+  "homepage": "https://github.com/deyoungjohn/kit/tree/main/packages/feed#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" }
+  },
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@iamyoungjohn-kit/receipts": "workspace:^"
+  },
+  "peerDependencies": {
+    "@iamyoungjohn-kit/policy": "workspace:^"
+  },
+  "peerDependenciesMeta": {
+    "@iamyoungjohn-kit/policy": { "optional": true }
+  },
+  "devDependencies": {
+    "@iamyoungjohn-kit/policy": "workspace:*"
+  }
+}
