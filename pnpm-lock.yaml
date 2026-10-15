@@ -201,8 +201,8 @@ importers:
         version: 4.6.7
     devDependencies:
       '@anthropic-ai/sdk':
-        specifier: ^0.134.0
-        version: 0.134.0(zod@4.6.7)
+        specifier: ~0.133.0
+        version: 0.133.0(zod@4.6.7)
       '@iamyoungjohn-kit/contracts':
         specifier: workspace:*
         version: link:../contracts
@@ -316,8 +316,8 @@ packages:
   '@adraffy/ens-normalize@1.11.1':
     resolution: {integrity: sha512-nhCBV3quEgesuf7c7KYfperqSS14T8bYuvJ8PcLJp6znkZpFc0AuW4qBtr8eKVyPPe/8RSr7sglCWPU5eaxwKQ==}
 
-  '@anthropic-ai/sdk@0.134.0':
-    resolution: {integrity: sha512-j0DNXXKUKkr3kKyVR/I3pPWVv93g7vgHjgGYgh9uCXv5IKoXZPWmTwXKiVq/SZSbhBaD3KmtKhIszzt8dBnzog==}
+  '@anthropic-ai/sdk@0.133.0':
+    resolution: {integrity: sha512-jlqUN8p8ESTJj+GJnA4KjzbEfF1waEoGzRT8jwytlYGFFgv+/DUQOxlYGvYw10UzhD1kwLqYzxvA3FrTB2YWuQ==}
     hasBin: true
     peerDependencies:
       zod: ^3.25.0 || ^4.0.0
@@ -573,10 +573,6 @@ packages:
   '@noble/post-quantum@0.7.1':
     resolution: {integrity: sha512-+P9981IiAnVh+rmcubozzVwrEy3XsN/tMhTnvsjV9VDaYpOnNCqWqKo2FLWxbu92YHfjGIlE5XnW175UK+ln+Q==}
     engines: {node: '>= 20.19.0'}
-
-  '@opentelemetry/api@1.9.1':
-    resolution: {integrity: sha512-gLyJlPHPZYdAk1JENA9LeHejZe1Ti77/pTeFm/nMXmQH/HFZlcS/O2XJB+L8fkbrNSqhdtlvjBVjxwUYanNH5Q==}
-    engines: {node: '>=8.0.0'}
 
   '@protobuf-ts/grpcweb-transport@2.11.1':
     resolution: {integrity: sha512-1W4utDdvOB+RHMFQ0soL4JdnxjXV+ddeGIUg08DvZrA8Ms6k5NN6GBFU2oHZdTOcJVpPrDJ02RJlqtaoCMNBtw==}
@@ -1563,9 +1559,8 @@ snapshots:
 
   '@adraffy/ens-normalize@1.11.1': {}
 
-  '@anthropic-ai/sdk@0.134.0(zod@4.6.7)':
+  '@anthropic-ai/sdk@0.133.0(zod@4.6.7)':
     dependencies:
-      '@opentelemetry/api': 1.9.1
       json-schema-to-ts: 3.1.1
       standardwebhooks: 1.1.1
     optionalDependencies:
@@ -1752,8 +1747,6 @@ snapshots:
       '@noble/ciphers': 2.4.0
       '@noble/curves': 2.4.0
       '@noble/hashes': 2.4.0
-
-  '@opentelemetry/api@1.9.1': {}
 
   '@protobuf-ts/grpcweb-transport@2.11.1':
     dependencies:
