@@ -6,7 +6,7 @@ Escrow and reputation primitives for agent commerce: **create → fund → deliv
 | --- | --- | --- |
 | EVM (Solidity, Foundry) | ✅ v0.1, tested (unit, fuzz, anvil integration) | [`evm/`](evm) |
 | Solana (Anchor) | planned | `solana/` |
-| Sui (Move) | planned | `sui/` |
+| Sui (Move) | ✅ v0.1, tested (Move unit tests, localnet end to end) | [`sui/`](sui) |
 
 > Not audited. Use it on testnets and in hackathon demos only.
 
@@ -44,7 +44,25 @@ const id = dealIdFromLogs((await publicClient.waitForTransactionReceipt({ hash }
 
 The package also provides `readDeal`, `readReputation`, `parseEscrowLogs`, `deployData`, and the ABIs and bytecode. If you change the contracts, run `pnpm abi` to regenerate them.
 
-## Deploy (run by a human)
+## Sui (Move)
+
+The Sui package has the same lifecycle. The only difference is that there is no unfunded state, because the coin is locked when the deal is created. Each deal is a shared `Escrow<T>` object, so it works with any coin type (SUI or USDC). `Reputation` is a singleton shared object created on publish, and only the package's `escrow` module can write to it.
+
+```ts
+import { suiEscrow, suiEscrowCreateAction, Transaction } from "@iamyoungjohn-kit/contracts/sui";
+
+const escrow = suiEscrow({ packageId, reputationId });
+const tx = new Transaction();
+const [coin] = tx.splitCoins(tx.gas, [amount]);
+escrow.create(tx, { coinType: "0x2::sui::SUI", payment: coin, provider, deadline: Date.now() + 86_400_000, terms: "spec" });
+// also: deliver / dispute / release / claim / refund
+
+await engine.authorize(suiEscrowCreateAction({ packageId }, { coinType, provider, amount })); // gate it with policy
+```
+
+Publish (run by a human): `cd sui && sui client publish`. Record the package id and the created `Reputation` object id.
+
+## Deploy EVM (run by a human)
 
 ```bash
 cd packages/contracts/evm
@@ -58,6 +76,9 @@ The script deploys `Reputation` and `Escrow`, then authorises the escrow as a re
 ```bash
 pnpm --filter @iamyoungjohn-kit/contracts test      # forge test + anvil integration (needs Foundry)
 pnpm --filter @iamyoungjohn-kit/contracts example   # narrated lifecycle on a local anvil
+pnpm --filter @iamyoungjohn-kit/contracts example:sui   # publish + lifecycle on a Sui localnet
 ```
+
+`test` also runs `sui move test` when the `sui` CLI is installed. To run the Sui example, first start a localnet in another terminal with `sui start --with-faucet --force-regenesis`.
 
 Clone with `--recurse-submodules` (forge-std), or run `git submodule update --init`.

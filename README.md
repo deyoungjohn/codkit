@@ -12,7 +12,7 @@ The pattern that keeps winning is an **AI agent that takes a real onchain action
 | --- | --- | --- |
 | [`@iamyoungjohn-kit/policy`](packages/policy) | ✅ v0.1 | Guardrail engine: spend caps, allow/deny lists, human approval, mandatory simulation, kill switch. Includes an EVM adapter (viem). |
 | [`@iamyoungjohn-kit/pay`](packages/pay) | ✅ v0.1 | x402 paywall middleware (Hono / Express) and a budget-aware x402 client bounded by `policy`. |
-| [`@iamyoungjohn-kit/contracts`](packages/contracts) | 🟡 EVM v0.1 | Escrow (create → fund → deliver → release/refund) and reputation. Solidity is done; Anchor and Sui Move are next. |
+| [`@iamyoungjohn-kit/contracts`](packages/contracts) | 🟡 EVM + Sui v0.1 | Escrow (create → fund → deliver → release/refund) and reputation in Solidity (Foundry) and Sui Move, with TS bindings. Anchor (Solana) is still to do. |
 | `receipts` | planned | Hash-chained, signed action log anchored onchain or on Walrus/IPFS. |
 | `mcp` | planned | MCP server exposing kit tools, plus a Claude tool-calling loop. |
 | `demo-shell` | planned | Next.js dashboard (wallet, live tx feed, reasoning trace, policy decisions) and a submission kit. |
@@ -28,7 +28,7 @@ pnpm test
 pnpm typecheck
 ```
 
-Requirements: Node ≥ 22, pnpm, and [Foundry](https://getfoundry.sh) for `contracts`. Clone with `--recurse-submodules`.
+Requirements: Node ≥ 22, pnpm, [Foundry](https://getfoundry.sh), and optionally the [Sui CLI](https://docs.sui.io/guides/developer/getting-started/sui-install) for `contracts`. Clone with `--recurse-submodules`.
 
 ## Rules of the repo
 

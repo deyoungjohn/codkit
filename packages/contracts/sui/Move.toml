@@ -1,0 +1,7 @@
+[package]
+name = "kit_escrow"
+edition = "2024"
+license = "MIT"
+
+[addresses]
+kit_escrow = "0x0"

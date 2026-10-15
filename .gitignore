@@ -14,3 +14,4 @@ id.json
 packages/contracts/evm/out/
 packages/contracts/evm/cache/
 packages/contracts/evm/broadcast/*/31337/
+packages/contracts/sui/build/
