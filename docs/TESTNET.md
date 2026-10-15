@@ -39,12 +39,26 @@ pnpm deploy:sui --network testnet --expect-address <your Sui address>
 
 This writes `packages/contracts/deployments/sui-testnet.json`, and the Sui CLI records the publication in `packages/contracts/sui/`. Commit both.
 
+## 2b. Solana devnet (program `kit_escrow`)
+
+Deployed from your wallet with `anchor deploy --provider.cluster devnet --provider.wallet <deployer.json>`, then `anchor idl init`. Your deployer is the upgrade authority. See `packages/contracts/README.md`. The deployment is recorded in `packages/contracts/deployments/solana-devnet.json`.
+
 ## 3. Run the end-to-end checks
 
 ```bash
 pnpm e2e:evm --network base-sepolia            # add --walrus to also store the receipt log on Walrus
 pnpm e2e:sui --network testnet
+pnpm e2e:solana                                 # SOLANA_AGENT_KEYPAIR: a separate devnet key with ~0.05 SOL
 ```
+
+**Solana checks:**
+- the run creates its own test mint (or use `--mint` for devnet USDC);
+- a policy-guarded escrow create, simulated before sending;
+- an over-cap funding is refused;
+- deliver, then release: the provider is paid, the vault closed, and reputation recorded;
+- a second payout is refused in simulation;
+- the receipt head is anchored in an SPL memo, read back from the chain and verified;
+- the provider returns the tokens and closes its token account.
 
 **EVM checks:**
 - agent funds a fresh provider (policy-guarded);

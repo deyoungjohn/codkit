@@ -8,17 +8,21 @@
   "scripts": {
     "evm": "tsx --env-file-if-exists=../../.env src/evm.ts",
     "sui": "tsx --env-file-if-exists=../../.env src/sui.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "solana": "tsx --env-file-if-exists=../../.env src/solana.ts"
   },
   "dependencies": {
     "@codkit/contracts": "workspace:*",
     "@codkit/pay": "workspace:*",
     "@codkit/policy": "workspace:*",
     "@codkit/receipts": "workspace:*",
+    "@hono/node-server": "^1.19.0",
     "@mysten/sui": "^2.36.0",
+    "@solana-program/system": "0.15.0",
+    "@solana-program/token": "0.17.0",
+    "@solana/kit": "~8.4.0",
     "@x402/core": "~2.28.0",
     "@x402/hono": "~2.28.0",
-    "@hono/node-server": "^1.19.0",
     "hono": "^4.10.0",
     "viem": "^2.48.0"
   }

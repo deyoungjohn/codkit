@@ -93,6 +93,19 @@ anchor build      # SBPF v3 (devnet supports v1–v3; v0–v2 deployments are be
 cargo test        # LiteSVM: lifecycle, auth, account-substitution attacks, Token-2022, random walk
 ```
 
+TypeScript client (`@codkit/contracts/solana`, needs `@solana/kit`):
+
+```ts
+import { createDealInstruction, deliverInstruction, releaseInstruction, fetchDeal, solanaEscrowCreateAction } from "@codkit/contracts/solana";
+
+const ix = await createDealInstruction({ client: agentSigner, dealId: 1n, provider, mint, amount: 100_000n, deadline: new Date(Date.now() + 3_600_000) });
+// gate it like any spend: engine.execute(solanaEscrowCreateAction({ mint, provider, amount: 100_000n }), { simulate, execute })
+const deal = await fetchDeal(rpc, ix.deal);
+const release = await releaseInstruction({ signer: agentSigner, deal: deal! });
+```
+
+The instructions carry their signers, so `signTransactionMessageWithSigners` signs them. The client also derives the deal, vault and reputation addresses (checked against `solana find-program-derived-address`) and decodes `Deal` and `Reputation` accounts.
+
 Toolchain: Anchor 1.2.1 with Solana 4.1.2 (`avm install 1.2.1`). The host Rust is pinned to 1.99.1 because LiteSVM 0.17 needs at least 1.97. The program itself builds with Solana's platform tools.
 
 **The program ID** comes from `target/deploy/kit_escrow-keypair.json`, which is not committed. Before the first devnet deploy:

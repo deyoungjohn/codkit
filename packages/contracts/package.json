@@ -1,7 +1,7 @@
 {
   "name": "@codkit/contracts",
   "version": "0.1.0",
-  "description": "Escrow (create \u2192 fund \u2192 deliver \u2192 release/refund) + reputation counter. Solidity (Foundry) with typed viem bindings that plug into @codkit/policy.",
+  "description": "Escrow (create → fund → deliver → release/refund) + reputation counter in Solidity (Foundry), Sui Move and Solana (Anchor), with typed viem, Sui and @solana/kit bindings that plug into @codkit/policy.",
   "license": "MIT",
   "engines": {
     "node": ">=22"
@@ -30,6 +30,10 @@
     "./sui": {
       "types": "./dist/sui/index.d.ts",
       "import": "./dist/sui/index.js"
+    },
+    "./solana": {
+      "types": "./dist/solana/index.d.ts",
+      "import": "./dist/solana/index.js"
     }
   },
   "files": [
@@ -72,12 +76,14 @@
   "peerDependencies": {
     "viem": "^2.48.0",
     "@mysten/sui": "^2.0.0",
-    "@codkit/policy": "workspace:^"
+    "@codkit/policy": "workspace:^",
+    "@solana/kit": ">=6.0.0"
   },
   "devDependencies": {
     "@codkit/policy": "workspace:*",
     "viem": "^2.48.0",
-    "@mysten/sui": "^2.36.0"
+    "@mysten/sui": "^2.36.0",
+    "@solana/kit": "~8.4.0"
   },
   "peerDependenciesMeta": {
     "@mysten/sui": {
@@ -87,6 +93,9 @@
       "optional": true
     },
     "@codkit/policy": {
+      "optional": true
+    },
+    "@solana/kit": {
       "optional": true
     }
   }

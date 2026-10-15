@@ -16,7 +16,8 @@
     "deploy:evm": "pnpm --filter @codkit/contracts run deploy:evm",
     "deploy:sui": "pnpm --filter @codkit/contracts run deploy:sui",
     "e2e:evm": "pnpm --filter testnet-e2e run evm",
-    "e2e:sui": "pnpm --filter testnet-e2e run sui"
+    "e2e:sui": "pnpm --filter testnet-e2e run sui",
+    "e2e:solana": "pnpm --filter testnet-e2e run solana"
   },
   "devDependencies": {
     "@types/node": "^22.13.0",
