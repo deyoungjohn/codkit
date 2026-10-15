@@ -58,16 +58,16 @@ Hand the same guarded wallet to an LLM as tools, and the model can only act with
 
 ## Proven on testnet
 
-The contracts are deployed on **Base Sepolia** (source-verified) and **Sui testnet**. An end-to-end check runs the full flow against them with real transactions. (These deployments predate the [security review](docs/security/escrow-review.md) fixes; redeployment is pending.)
+The contracts are deployed on **Base Sepolia** (source-verified) and **Sui testnet**. An end-to-end check runs the full flow against them with real transactions. The Base Sepolia contracts include the [security review](docs/security/escrow-review.md) fixes; the Sui package predates them, and its redeployment is pending.
 
-- **Base Sepolia, 12/12** ([report](apps/testnet-e2e/reports/base-sepolia-2026-10-15T15-29-44-296Z.md)): escrow create, fund, deliver and release; a reputation update; three guardrail refusals (over the cap, an unlisted contract, a failing simulation); an x402 payment settled through the public facilitator; and the receipt log anchored and verified onchain.
+- **Base Sepolia, 12/12** ([report](apps/testnet-e2e/reports/base-sepolia-2026-10-15T22-24-11-266Z.md)): escrow create, fund, deliver and release; a reputation update; three guardrail refusals (over the cap, an unlisted contract, a failing simulation); an x402 payment settled through the public facilitator; and the receipt log anchored and verified onchain.
 - **Sui testnet** ([report](apps/testnet-e2e/reports/sui-testnet-2026-10-15T18-03-01-050Z.md)): a policy check, the full escrow lifecycle, and the receipt log anchored via `kit_escrow::anchor` and verified.
 
 | Contract | Network | Address | Deploy tx |
 | --- | --- | --- | --- |
-| Reputation | Base Sepolia (84532) | [`0x51ac7b594345dfec761f3e9c48b79f80bfab3061`](https://sepolia.basescan.org/address/0x51ac7b594345dfec761f3e9c48b79f80bfab3061) | [0x49934871…](https://sepolia.basescan.org/tx/0x49934871339103a2632b95c99508eeeafbbec7798d680769f4a1f7bea4dee9ad) |
-| Escrow | Base Sepolia (84532) | [`0x7934bd7b6e7a3732ac866c6d784244f5ebd79109`](https://sepolia.basescan.org/address/0x7934bd7b6e7a3732ac866c6d784244f5ebd79109) | [0xe79f0939…](https://sepolia.basescan.org/tx/0xe79f0939059ab42fe4261e6f1a706525eaa07128d88dd9f41484302671bb83d7) |
-| ReceiptAnchor | Base Sepolia (84532) | [`0xd2c2c972d883f7fe9c61e2624bc87e1e6621f326`](https://sepolia.basescan.org/address/0xd2c2c972d883f7fe9c61e2624bc87e1e6621f326) | [0x88aeead7…](https://sepolia.basescan.org/tx/0x88aeead79cefbb6c51114c20df3fac987991ee7cce497225e93b0e1a1602fca2) |
+| Reputation | Base Sepolia (84532) | [`0x62d9258d0707e29650a8300a716312fb976557a2`](https://sepolia.basescan.org/address/0x62d9258d0707e29650a8300a716312fb976557a2) | [0x5f390e50…](https://sepolia.basescan.org/tx/0x5f390e50b7fd8f9673696349be484dd52f2ccf524bdf1606ac10d2575e5189e4) |
+| Escrow | Base Sepolia (84532) | [`0xb32ea9219afc9ba5e77db9fd414d5a4a8746c023`](https://sepolia.basescan.org/address/0xb32ea9219afc9ba5e77db9fd414d5a4a8746c023) | [0x45c95da0…](https://sepolia.basescan.org/tx/0x45c95da052ed63c024c4924d347d25aeb74ed7106140abed3aab15a3fca4a8d7) |
+| ReceiptAnchor | Base Sepolia (84532) | [`0x308023e44fe2e0411b515272fda9049af7330828`](https://sepolia.basescan.org/address/0x308023e44fe2e0411b515272fda9049af7330828) | [0xa4ca19c5…](https://sepolia.basescan.org/tx/0xa4ca19c5c7b8142c7903112577f4fc1cdd42f94f262db7f2e2ea3bf5feabf450) |
 | kit_escrow package | Sui testnet | [`0xb285fb9fe4181908efd684e62216c436d605c371d761c3db921cfea0bd5b7481`](https://suiscan.xyz/testnet/object/0xb285fb9fe4181908efd684e62216c436d605c371d761c3db921cfea0bd5b7481) | [6jKiWHKT1J…](https://suiscan.xyz/testnet/tx/6jKiWHKT1JGqkqdyCDAqKobDdV5ANWDRJCFFm2aNLssu) |
 | Reputation (shared object) | Sui testnet | [`0xb25726d35d2ffbb10a53469e79b920c019c888e8939a41cb54b017ac81f076c8`](https://suiscan.xyz/testnet/object/0xb25726d35d2ffbb10a53469e79b920c019c888e8939a41cb54b017ac81f076c8) | [6jKiWHKT1J…](https://suiscan.xyz/testnet/tx/6jKiWHKT1JGqkqdyCDAqKobDdV5ANWDRJCFFm2aNLssu) |
 

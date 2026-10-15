@@ -6,24 +6,24 @@ export const deployments = {
     "network": "base-sepolia",
     "chainId": 84532,
     "deployer": "0xefa0913b8a51359ebdf897a434e2783b1c86001a",
-    "deployedAt": "2026-10-15T13:01:02.374Z",
+    "deployedAt": "2026-10-15T22:21:07.293Z",
     "verified": "etherscan",
-    "commit": "78306f5",
+    "commit": "423e514",
     "contracts": {
       "Reputation": {
-        "address": "0x51ac7b594345dfec761f3e9c48b79f80bfab3061",
-        "tx": "0x49934871339103a2632b95c99508eeeafbbec7798d680769f4a1f7bea4dee9ad",
-        "url": "https://sepolia.basescan.org/address/0x51ac7b594345dfec761f3e9c48b79f80bfab3061"
+        "address": "0x62d9258d0707e29650a8300a716312fb976557a2",
+        "tx": "0x5f390e50b7fd8f9673696349be484dd52f2ccf524bdf1606ac10d2575e5189e4",
+        "url": "https://sepolia.basescan.org/address/0x62d9258d0707e29650a8300a716312fb976557a2"
       },
       "Escrow": {
-        "address": "0x7934bd7b6e7a3732ac866c6d784244f5ebd79109",
-        "tx": "0xe79f0939059ab42fe4261e6f1a706525eaa07128d88dd9f41484302671bb83d7",
-        "url": "https://sepolia.basescan.org/address/0x7934bd7b6e7a3732ac866c6d784244f5ebd79109"
+        "address": "0xb32ea9219afc9ba5e77db9fd414d5a4a8746c023",
+        "tx": "0x45c95da052ed63c024c4924d347d25aeb74ed7106140abed3aab15a3fca4a8d7",
+        "url": "https://sepolia.basescan.org/address/0xb32ea9219afc9ba5e77db9fd414d5a4a8746c023"
       },
       "ReceiptAnchor": {
-        "address": "0xd2c2c972d883f7fe9c61e2624bc87e1e6621f326",
-        "tx": "0x88aeead79cefbb6c51114c20df3fac987991ee7cce497225e93b0e1a1602fca2",
-        "url": "https://sepolia.basescan.org/address/0xd2c2c972d883f7fe9c61e2624bc87e1e6621f326"
+        "address": "0x308023e44fe2e0411b515272fda9049af7330828",
+        "tx": "0xa4ca19c5c7b8142c7903112577f4fc1cdd42f94f262db7f2e2ea3bf5feabf450",
+        "url": "https://sepolia.basescan.org/address/0x308023e44fe2e0411b515272fda9049af7330828"
       }
     }
   },
