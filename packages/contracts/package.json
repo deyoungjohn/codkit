@@ -1,0 +1,45 @@
+{
+  "name": "@iamyoungjohn-kit/contracts",
+  "version": "0.1.0",
+  "description": "Escrow (create → fund → deliver → release/refund) + reputation counter. Solidity (Foundry) with typed viem bindings that plug into @iamyoungjohn-kit/policy.",
+  "license": "MIT",
+  "author": "Young John",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deyoungjohn/kit.git",
+    "directory": "packages/contracts"
+  },
+  "homepage": "https://github.com/deyoungjohn/kit/tree/main/packages/contracts#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./evm": {
+      "types": "./dist/evm/index.d.ts",
+      "import": "./dist/evm/index.js"
+    }
+  },
+  "files": ["dist", "evm/src", "evm/script", "evm/foundry.toml", "README.md"],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "pnpm run test:sol && vitest run",
+    "test:sol": "forge test --root evm",
+    "abi": "forge build --root evm && node scripts/gen-abi.mjs",
+    "clean": "rm -rf dist .turbo evm/out evm/cache",
+    "example": "tsx examples/escrow-flow.ts"
+  },
+  "peerDependencies": {
+    "viem": "^2.48.0"
+  },
+  "devDependencies": {
+    "@iamyoungjohn-kit/policy": "workspace:*",
+    "viem": "^2.48.0"
+  }
+}

@@ -182,6 +182,15 @@ importers:
         specifier: ^3.2.0
         version: 3.2.7(@types/node@22.20.5)(tsx@4.23.15)
 
+  packages/contracts:
+    devDependencies:
+      '@iamyoungjohn-kit/policy':
+        specifier: workspace:*
+        version: link:../policy
+      viem:
+        specifier: ^2.48.0
+        version: 2.57.5(typescript@5.9.3)(zod@4.6.7)
+
   packages/pay:
     dependencies:
       '@iamyoungjohn-kit/policy':

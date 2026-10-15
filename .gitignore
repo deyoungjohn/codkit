@@ -11,3 +11,6 @@ coverage/
 keypair*.json
 id.json
 .DS_Store
+packages/contracts/evm/out/
+packages/contracts/evm/cache/
+packages/contracts/evm/broadcast/*/31337/
