@@ -37,7 +37,7 @@ export async function startAnvil(): Promise<{ url: string; stop: () => void; pub
   const port = await freePort();
   const proc: ChildProcess = spawn("anvil", ["--port", String(port), "--silent"], { stdio: "ignore" });
   const url = `http://127.0.0.1:${port}`;
-  const publicClient = createPublicClient({ chain: foundry, transport: http(url) });
+  const publicClient = createPublicClient({ chain: foundry, transport: http(url), pollingInterval: 50 });
   for (let i = 0; i < 100; i++) {
     try {
       await publicClient.getChainId();
@@ -51,7 +51,7 @@ export async function startAnvil(): Promise<{ url: string; stop: () => void; pub
 }
 
 export function wallet(url: string, key: Hex) {
-  return createWalletClient({ account: privateKeyToAccount(key), chain: foundry, transport: http(url) });
+  return createWalletClient({ account: privateKeyToAccount(key), chain: foundry, transport: http(url), pollingInterval: 50 });
 }
 
 const outDir = join(dirname(fileURLToPath(import.meta.url)), "../evm/out");
