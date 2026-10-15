@@ -58,9 +58,10 @@ Hand the same guarded wallet to an LLM as tools, and the model can only act with
 
 ## Proven on testnet
 
-The contracts are deployed on **Base Sepolia** (source-verified), **Sui testnet** and **Solana devnet**, all with the [security review](docs/security/escrow-review.md) fixes. An end-to-end check runs the full flow against the EVM and Sui deployments with real transactions:
+The contracts are deployed on **Base Sepolia** (source-verified), **Sui testnet** and **Solana devnet**, all with the [security review](docs/security/escrow-review.md) fixes. An end-to-end check runs the full flow against each of them with real transactions:
 
 - **Base Sepolia, 12/12** ([report](apps/testnet-e2e/reports/base-sepolia-2026-10-15T22-24-11-266Z.md)): escrow create, fund, deliver and release; a reputation update; three guardrail refusals (over the cap, an unlisted contract, a failing simulation); an x402 payment settled through the public facilitator; and the receipt log anchored and verified onchain.
+- **Solana devnet, 10/10** ([report](apps/testnet-e2e/reports/solana-devnet-2026-10-15T23-04-25-099Z.md)): a policy-guarded escrow create (simulated first), an over-cap refusal, deliver and release with the vault closed and reputation recorded, a refused second payout, and a receipt head anchored in an SPL memo and verified from the chain.
 - **Sui testnet** ([report](apps/testnet-e2e/reports/sui-testnet-2026-10-15T22-46-02-058Z.md)): a policy check, the full escrow lifecycle, and the receipt log anchored via `kit_escrow::anchor` and verified.
 
 | Contract | Network | Address | Deploy tx |
@@ -72,7 +73,7 @@ The contracts are deployed on **Base Sepolia** (source-verified), **Sui testnet*
 | Reputation (shared object) | Sui testnet | [`0xa03b50fe14f685602811348b86a378651aca3e674abd78229287222b5df80aa8`](https://suiscan.xyz/testnet/object/0xa03b50fe14f685602811348b86a378651aca3e674abd78229287222b5df80aa8) | [G1Rf7icqRK…](https://suiscan.xyz/testnet/tx/G1Rf7icqRKhMXPo5rCn5pUQrR7NKTCJb3nvohFGCLMDm) |
 | kit_escrow program | Solana devnet | [`8kQBzMWRWAEssN4wtBzrH4G8fHtbhrbHs9e24V2jWMkX`](https://explorer.solana.com/address/8kQBzMWRWAEssN4wtBzrH4G8fHtbhrbHs9e24V2jWMkX?cluster=devnet) | [TYneZ6tPZu…](https://explorer.solana.com/tx/TYneZ6tPZuxAumyyiUg4uvLLkwuTpNQGass2FbnKbYTgGQ2BhJPhS29hNW3sQQdDrb1NDxiC4vkP3meJzRbRYPE?cluster=devnet) |
 
-The Solana program is byte-for-byte the SBPF v3 binary its 16 LiteSVM tests run against (SHA-256 checked against the on-chain program); its end-to-end check is next.
+The Solana program is byte-for-byte the SBPF v3 binary its 16 LiteSVM tests run against (SHA-256 checked against the on-chain program).
 
 The addresses are also exported as `deployments` from `@codkit/contracts`. Want to reproduce the run with your own wallet? [docs/TESTNET.md](docs/TESTNET.md) explains how, and you can report results with a [Testnet feedback](https://github.com/deyoungjohn/codkit/issues/new?template=testnet-feedback.yml) issue.
 

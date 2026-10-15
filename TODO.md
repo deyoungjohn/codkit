@@ -53,7 +53,7 @@ Install Rust, the Solana CLI and Anchor (`avm`). Then the Solana items in sectio
 
 - [x] **Anchor escrow + reputation** (Solana): `packages/contracts/solana`. It has 16 LiteSVM tests on the SBPF v3 binary and runs in CI (2026-10-15).
 - [x] Solana program deployed to devnet by `FvWq…zMow`, the upgrade authority (2026-10-15). The IDL is on-chain, and the binary matches the tested build (SHA-256).
-- [ ] TypeScript client (`@codkit/contracts/solana`) and `pnpm e2e:solana`, like the EVM and Sui ones.
+- [x] TypeScript client (`@codkit/contracts/solana`) and `pnpm e2e:solana`: passes 10/10 on devnet (2026-10-16). The agent is `~/.config/solana/codkit-agent.json`, separate from the deployer.
 - [x] EVM redeployed with the security-review fixes (Base Sepolia, 2026-10-15). `e2e:evm` passes 12/12.
 - [x] Sui republished with the fixes (package `0x9bc0…3944`, 2026-10-15). `e2e:sui` passes.
 - [ ] Release `@codkit/contracts` 0.2.0 with the new ABI and deployment addresses (after the Sui redeploy).
@@ -69,7 +69,7 @@ Install Rust, the Solana CLI and Anchor (`avm`). Then the Solana items in sectio
 
 ### receipts
 
-- [ ] Live-test the Solana memo anchor on devnet. Only the instruction shape is tested today.
+- [x] Solana memo anchor live-tested on devnet by `e2e:solana`: the memo is read back from the chain and verified.
 - [ ] An IPFS uploader (Pinata or web3.storage) next to the Walrus one.
 - [ ] Persistent anchoring on a schedule (for example, every N receipts).
 
