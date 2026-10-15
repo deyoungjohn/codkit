@@ -25,12 +25,13 @@ Each package works on its own, and the core of each package imports no chain SDK
 
 ## Testnet deployments
 
-Not deployed yet. See [docs/TESTNET.md](docs/TESTNET.md): deploy with your own wallet, run `pnpm e2e:evm` / `pnpm e2e:sui`, and publish the reports here.
+Base Sepolia, deployed 2026-10-15 and source-verified. The `Reputation` owner is the deployer `0xefa0913b8a51359ebdf897a434e2783b1c86001a`. Sui testnet and the e2e reports are pending: see [docs/TESTNET.md](docs/TESTNET.md). The addresses are also exported as `deployments` from `@codkit/contracts`.
 
-| Contract | Network | Address |
-| --- | --- | --- |
-| _pending_ | Base Sepolia | |
-| _pending_ | Sui testnet | |
+| Contract | Network | Address | Deploy tx |
+| --- | --- | --- | --- |
+| Reputation | Base Sepolia (84532) | [`0x51ac7b594345dfec761f3e9c48b79f80bfab3061`](https://sepolia.basescan.org/address/0x51ac7b594345dfec761f3e9c48b79f80bfab3061) | [0x49934871…](https://sepolia.basescan.org/tx/0x49934871339103a2632b95c99508eeeafbbec7798d680769f4a1f7bea4dee9ad) |
+| Escrow | Base Sepolia (84532) | [`0x7934bd7b6e7a3732ac866c6d784244f5ebd79109`](https://sepolia.basescan.org/address/0x7934bd7b6e7a3732ac866c6d784244f5ebd79109) | [0xe79f0939…](https://sepolia.basescan.org/tx/0xe79f0939059ab42fe4261e6f1a706525eaa07128d88dd9f41484302671bb83d7) |
+| ReceiptAnchor | Base Sepolia (84532) | [`0xd2c2c972d883f7fe9c61e2624bc87e1e6621f326`](https://sepolia.basescan.org/address/0xd2c2c972d883f7fe9c61e2624bc87e1e6621f326) | [0x88aeead7…](https://sepolia.basescan.org/tx/0x88aeead79cefbb6c51114c20df3fac987991ee7cce497225e93b0e1a1602fca2) |
 
 Ran it yourself? File a [Testnet feedback](https://github.com/deyoungjohn/codkit/issues/new?template=testnet-feedback.yml) issue.
 

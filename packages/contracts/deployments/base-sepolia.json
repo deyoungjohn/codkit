@@ -1,0 +1,25 @@
+{
+  "network": "base-sepolia",
+  "chainId": 84532,
+  "deployer": "0xefa0913b8a51359ebdf897a434e2783b1c86001a",
+  "deployedAt": "2026-10-15T13:01:02.374Z",
+  "verified": "etherscan",
+  "commit": "78306f5",
+  "contracts": {
+    "Reputation": {
+      "address": "0x51ac7b594345dfec761f3e9c48b79f80bfab3061",
+      "tx": "0x49934871339103a2632b95c99508eeeafbbec7798d680769f4a1f7bea4dee9ad",
+      "url": "https://sepolia.basescan.org/address/0x51ac7b594345dfec761f3e9c48b79f80bfab3061"
+    },
+    "Escrow": {
+      "address": "0x7934bd7b6e7a3732ac866c6d784244f5ebd79109",
+      "tx": "0xe79f0939059ab42fe4261e6f1a706525eaa07128d88dd9f41484302671bb83d7",
+      "url": "https://sepolia.basescan.org/address/0x7934bd7b6e7a3732ac866c6d784244f5ebd79109"
+    },
+    "ReceiptAnchor": {
+      "address": "0xd2c2c972d883f7fe9c61e2624bc87e1e6621f326",
+      "tx": "0x88aeead79cefbb6c51114c20df3fac987991ee7cce497225e93b0e1a1602fca2",
+      "url": "https://sepolia.basescan.org/address/0xd2c2c972d883f7fe9c61e2624bc87e1e6621f326"
+    }
+  }
+}

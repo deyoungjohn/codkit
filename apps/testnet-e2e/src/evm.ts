@@ -12,7 +12,7 @@
  * → x402 payment via the public facilitator → receipts anchored onchain (+ Walrus) and verified
  * → provider refunds the agent. Writes reports/<network>-<time>.md.
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { deployments, dealIdFromLogs, escrowAbi, escrowTxs, hashText, readDeal, readReputation } from "@codkit/contracts";
 import { createBudgetedFetch, registerExactEvmScheme, x402Client } from "@codkit/pay";
 import { paywall } from "@codkit/pay/hono";
@@ -28,6 +28,12 @@ import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { baseSepolia, foundry } from "viem/chains";
 import { arg, flag, Report } from "./report.js";
 
+
+/** The JSON the deploy script just wrote (no rebuild of @codkit/contracts needed), else the built registry. */
+const recorded = (name: string): unknown => {
+  const file = new URL(`../../../packages/contracts/deployments/${name}.json`, import.meta.url);
+  return existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : undefined;
+};
 const NETWORKS: Record<string, { chain: Chain; rpc: string; usdc?: Address; x402: boolean }> = {
   "base-sepolia": { chain: baseSepolia, rpc: process.env.BASE_SEPOLIA_RPC_URL ?? "https://sepolia.base.org", usdc: "0x036CbD53842c5426634e7929541eC2318f3dCF7e", x402: true },
   local: { chain: foundry, rpc: process.env.LOCAL_RPC_URL ?? "http://127.0.0.1:8545", x402: false },
@@ -42,7 +48,7 @@ if (!agentKey) throw new Error("set AGENT_PRIVATE_KEY (a funded testnet-only key
 type Dep = { contracts: Record<"Escrow" | "Reputation" | "ReceiptAnchor", { address: Address }> };
 const dep: Dep = arg("deployments")
   ? JSON.parse(readFileSync(arg("deployments")!, "utf8"))
-  : ((deployments as Record<string, unknown>)[network] as Dep | undefined) ??
+  : ((recorded(network) ?? (deployments as Record<string, unknown>)[network]) as Dep | undefined) ??
     (() => {
       throw new Error(`no deployment recorded for ${network} — run the deploy script first`);
     })();

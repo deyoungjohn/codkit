@@ -24,6 +24,12 @@ import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { Transaction } from "@mysten/sui/transactions";
 import { arg, Report } from "./report.js";
 
+
+/** The JSON the deploy script just wrote (no rebuild of @codkit/contracts needed), else the built registry. */
+const recorded = (name: string): unknown => {
+  const file = new URL(`../../../packages/contracts/deployments/${name}.json`, import.meta.url);
+  return existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : undefined;
+};
 const SUI = "0x2::sui::SUI";
 const MIST = 1_000_000_000n;
 const network = arg("network") ?? "testnet";
@@ -37,7 +43,7 @@ const explorer = (digest: string) => (["testnet", "devnet"].includes(network) ? 
 type Dep = { packageId: string; reputationId: string };
 const dep: Dep = arg("deployments")
   ? JSON.parse(readFileSync(arg("deployments")!, "utf8"))
-  : ((deployments as Record<string, unknown>)[`sui-${network}`] as Dep | undefined) ??
+  : ((recorded(`sui-${network}`) ?? (deployments as Record<string, unknown>)[`sui-${network}`]) as Dep | undefined) ??
     (() => {
       throw new Error(`no Sui deployment recorded for ${network} — run deploy-sui first`);
     })();
