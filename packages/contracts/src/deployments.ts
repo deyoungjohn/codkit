@@ -27,17 +27,33 @@ export const deployments = {
       }
     }
   },
+  "solana-devnet": {
+    "network": "solana:devnet",
+    "deployer": "FvWqH2t3cuCcAVVzTde4nhxn2KXQqXm1SjcKoTFgzMow",
+    "upgradeAuthority": "FvWqH2t3cuCcAVVzTde4nhxn2KXQqXm1SjcKoTFgzMow",
+    "deployedAt": "2026-10-15T22:40:40.000Z",
+    "slot": 511503212,
+    "commit": "dba1e8f",
+    "programId": "8kQBzMWRWAEssN4wtBzrH4G8fHtbhrbHs9e24V2jWMkX",
+    "programData": "7bLjth5odhvcuDbrk7KNHUcEgnPRfJXYbqoX9zy57gCC",
+    "sbpf": "v3",
+    "sha256": "7a56bc7f78ba71936a9814c672a7c63d76bd8cce1f0a0b11b232c0b2bc2fd3f5",
+    "idl": "onchain (anchor idl init)",
+    "tx": "TYneZ6tPZuxAumyyiUg4uvLLkwuTpNQGass2FbnKbYTgGQ2BhJPhS29hNW3sQQdDrb1NDxiC4vkP3meJzRbRYPE",
+    "url": "https://explorer.solana.com/address/8kQBzMWRWAEssN4wtBzrH4G8fHtbhrbHs9e24V2jWMkX?cluster=devnet",
+    "txUrl": "https://explorer.solana.com/tx/TYneZ6tPZuxAumyyiUg4uvLLkwuTpNQGass2FbnKbYTgGQ2BhJPhS29hNW3sQQdDrb1NDxiC4vkP3meJzRbRYPE?cluster=devnet"
+  },
   "sui-testnet": {
     "network": "sui:testnet",
     "deployer": "0x0edf9ba9df762186979b58d8caa3b3d37bc9d6035ed79a5a773f664be7d2bc55",
-    "deployedAt": "2026-10-15T17:27:19.724Z",
-    "commit": "2d39955",
-    "packageId": "0xb285fb9fe4181908efd684e62216c436d605c371d761c3db921cfea0bd5b7481",
-    "reputationId": "0xb25726d35d2ffbb10a53469e79b920c019c888e8939a41cb54b017ac81f076c8",
-    "upgradeCap": "0x9a283ca35dbe82fd422e6aedf99ceeb910eab6b27171daeb8dc38898a9a3e1d5",
-    "digest": "6jKiWHKT1JGqkqdyCDAqKobDdV5ANWDRJCFFm2aNLssu",
-    "url": "https://suiscan.xyz/testnet/object/0xb285fb9fe4181908efd684e62216c436d605c371d761c3db921cfea0bd5b7481",
-    "tx": "https://suiscan.xyz/testnet/tx/6jKiWHKT1JGqkqdyCDAqKobDdV5ANWDRJCFFm2aNLssu"
+    "deployedAt": "2026-10-15T22:30:51.088Z",
+    "commit": "dba1e8f",
+    "packageId": "0x9bc025aaff8b63103a4cea136304c11267af7816e0ae2b8eeeb51bea99293944",
+    "reputationId": "0xa03b50fe14f685602811348b86a378651aca3e674abd78229287222b5df80aa8",
+    "upgradeCap": "0x4f3ec3878fe724a592aad23c8c1658d1e352b647b37a20e0bbf24ce8bee9c189",
+    "digest": "G1Rf7icqRKhMXPo5rCn5pUQrR7NKTCJb3nvohFGCLMDm",
+    "url": "https://suiscan.xyz/testnet/object/0x9bc025aaff8b63103a4cea136304c11267af7816e0ae2b8eeeb51bea99293944",
+    "tx": "https://suiscan.xyz/testnet/tx/G1Rf7icqRKhMXPo5rCn5pUQrR7NKTCJb3nvohFGCLMDm"
   },
 } as const;
 

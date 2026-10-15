@@ -1,0 +1,16 @@
+{
+  "network": "solana:devnet",
+  "deployer": "FvWqH2t3cuCcAVVzTde4nhxn2KXQqXm1SjcKoTFgzMow",
+  "upgradeAuthority": "FvWqH2t3cuCcAVVzTde4nhxn2KXQqXm1SjcKoTFgzMow",
+  "deployedAt": "2026-10-15T22:40:40.000Z",
+  "slot": 511503212,
+  "commit": "dba1e8f",
+  "programId": "8kQBzMWRWAEssN4wtBzrH4G8fHtbhrbHs9e24V2jWMkX",
+  "programData": "7bLjth5odhvcuDbrk7KNHUcEgnPRfJXYbqoX9zy57gCC",
+  "sbpf": "v3",
+  "sha256": "7a56bc7f78ba71936a9814c672a7c63d76bd8cce1f0a0b11b232c0b2bc2fd3f5",
+  "idl": "onchain (anchor idl init)",
+  "tx": "TYneZ6tPZuxAumyyiUg4uvLLkwuTpNQGass2FbnKbYTgGQ2BhJPhS29hNW3sQQdDrb1NDxiC4vkP3meJzRbRYPE",
+  "url": "https://explorer.solana.com/address/8kQBzMWRWAEssN4wtBzrH4G8fHtbhrbHs9e24V2jWMkX?cluster=devnet",
+  "txUrl": "https://explorer.solana.com/tx/TYneZ6tPZuxAumyyiUg4uvLLkwuTpNQGass2FbnKbYTgGQ2BhJPhS29hNW3sQQdDrb1NDxiC4vkP3meJzRbRYPE?cluster=devnet"
+}

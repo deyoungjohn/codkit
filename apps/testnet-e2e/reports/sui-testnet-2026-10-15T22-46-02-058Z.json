@@ -1,77 +1,77 @@
 {
   "network": "sui-testnet",
-  "startedAt": "2026-10-15T18:03:01.050Z",
+  "startedAt": "2026-10-15T22:46:02.058Z",
   "ok": true,
   "passed": 8,
   "total": 8,
   "meta": {
     "agent": "0xc78c8272acfff753f8f00c871e56db8900f54bee9751ff378f2df695ee6f723b",
-    "provider": "0x1142acbbc15f05753d920ad109880ac86614682ee3dc0c1ff7b01319a5416c4e",
-    "packageId": "0xb285fb9fe4181908efd684e62216c436d605c371d761c3db921cfea0bd5b7481"
+    "provider": "0xe0684cdc7f2e124dfd7f0832f107b8100cb6a1815192db4262b74436c18e1e8e",
+    "packageId": "0x9bc025aaff8b63103a4cea136304c11267af7816e0ae2b8eeeb51bea99293944"
   },
   "steps": [
     {
       "name": "preflight balance",
       "ok": true,
-      "ms": 695,
-      "detail": "1 SUI"
+      "ms": 906,
+      "detail": "0.987990072 SUI"
     },
     {
       "name": "policy: authorize escrow funding (0.01 SUI ≤ 0.1 cap)",
       "ok": true,
-      "ms": 8,
+      "ms": 12,
       "detail": "1 SUI denied: SUI: 1 exceeds per-tx cap 0.1"
     },
     {
       "name": "fund provider gas (0.05 SUI)",
       "ok": true,
-      "ms": 1602,
+      "ms": 1811,
       "links": [
-        "https://suiscan.xyz/testnet/tx/DDzsRrCSqrfqUFbvtWigpMHqgDVCW4UdKK4NwePNrjuV"
+        "https://suiscan.xyz/testnet/tx/3bG6FNnDCfSWnWLC6J6JeqZTeACLEJLaTgMfn63Swj9x"
       ]
     },
     {
       "name": "escrow: create + fund 0.01 SUI",
       "ok": true,
-      "ms": 1504,
-      "detail": "0x5d5732f3d0d66f9d6ae904931b702a2c64d5b906eaaa26f9b0d850f80592e783",
+      "ms": 2434,
+      "detail": "0x2a126a9e686cc2c57b4ac847fd42697e738fa0ed685870f8d0a5365ecc10293d",
       "links": [
-        "https://suiscan.xyz/testnet/tx/x77UESbUNkMF9Zpyg6GUsv5hKztUu24qMUC1gTWrwsQ"
+        "https://suiscan.xyz/testnet/tx/GmyZCbwbEngdFttf6EXqkrWKvFA53cYjSUdJhvxoBi7v"
       ]
     },
     {
       "name": "escrow: provider delivers",
       "ok": true,
-      "ms": 1730,
+      "ms": 1439,
       "links": [
-        "https://suiscan.xyz/testnet/tx/9GVAPQgx9vsc1ckz777QXMdZBvXiYMJorP3onbervgE2"
+        "https://suiscan.xyz/testnet/tx/GdSSaTNqZqpvA5hTMcFSJuRgLmR7hLT4iYSWBk42HxaA"
       ]
     },
     {
       "name": "escrow: agent releases",
       "ok": true,
-      "ms": 1729,
+      "ms": 1887,
       "detail": "provider received 0.01 SUI; Released event emitted",
       "links": [
-        "https://suiscan.xyz/testnet/tx/6L3piA8UNVcN9Rgxb4hxVAjb9hMMpyKYCCsmuNVTYcAc"
+        "https://suiscan.xyz/testnet/tx/7RVKQcAUt5ZwSCEF6teGXFj3LWAq35zkuetwq4c3PFzi"
       ]
     },
     {
       "name": "receipts: anchor head via kit_escrow::anchor and verify",
       "ok": true,
-      "ms": 1472,
-      "detail": "3 receipts, head 0x5fe69b837c3f29e0…",
+      "ms": 1556,
+      "detail": "3 receipts, head 0xc5125d38555e8aee…",
       "links": [
-        "https://suiscan.xyz/testnet/tx/ABtZcaNCDsru3uzGpUqZGjSbkvHtfdej23qPxtFXYx4s"
+        "https://suiscan.xyz/testnet/tx/He19xaSRk3TbcJo52jozwdpGT65fBNThk9ZJbmNFrUib"
       ]
     },
     {
       "name": "cleanup: provider returns all SUI to agent",
       "ok": true,
-      "ms": 1897,
-      "detail": "~0.058760448 SUI minus gas",
+      "ms": 1682,
+      "detail": "~0.058794456 SUI minus gas",
       "links": [
-        "https://suiscan.xyz/testnet/tx/9ZTZGDp4x5pCxxSh5BDfVmc9BjfS9Fin3CLGJ3fMYwJg"
+        "https://suiscan.xyz/testnet/tx/Bn9sKppyyscK3kVZAZ8VDhuHfonZ2v4EnmsPS7TwSfFj"
       ]
     }
   ]

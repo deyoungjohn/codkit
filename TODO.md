@@ -52,9 +52,10 @@ Install Rust, the Solana CLI and Anchor (`avm`). Then the Solana items in sectio
 ### contracts
 
 - [x] **Anchor escrow + reputation** (Solana): `packages/contracts/solana`. It has 16 LiteSVM tests on the SBPF v3 binary and runs in CI (2026-10-15).
-- [ ] Deploy the Solana program to devnet from your wallet: `anchor keys sync`, then `anchor deploy --provider.cluster devnet`. Then add a TypeScript client (`@codkit/contracts/solana`) and a `pnpm e2e:solana` like the EVM and Sui ones.
+- [x] Solana program deployed to devnet by `FvWq…zMow`, the upgrade authority (2026-10-15). The IDL is on-chain, and the binary matches the tested build (SHA-256).
+- [ ] TypeScript client (`@codkit/contracts/solana`) and `pnpm e2e:solana`, like the EVM and Sui ones.
 - [x] EVM redeployed with the security-review fixes (Base Sepolia, 2026-10-15). `e2e:evm` passes 12/12.
-- [ ] **Redeploy Sui** with the fixes. The current package `0xb285…7481` predates them. Run `pnpm deploy:sui --network testnet --expect-address <your address> --fresh`, then `pnpm e2e:sui`.
+- [x] Sui republished with the fixes (package `0x9bc0…3944`, 2026-10-15). `e2e:sui` passes.
 - [ ] Release `@codkit/contracts` 0.2.0 with the new ABI and deployment addresses (after the Sui redeploy).
 - [ ] Sui policy adapter (`@codkit/policy/sui`): Sui tx → `Action`, plus a dry-run via `simulateTransaction`. Today only the `suiEscrowCreateAction` helper exists.
 - [x] Security review of the EVM, Sui and Solana escrows: [docs/security/escrow-review.md](docs/security/escrow-review.md) (2026-10-15). All fixes applied. An independent audit is still needed before mainnet.

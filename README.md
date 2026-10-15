@@ -58,18 +58,21 @@ Hand the same guarded wallet to an LLM as tools, and the model can only act with
 
 ## Proven on testnet
 
-The contracts are deployed on **Base Sepolia** (source-verified) and **Sui testnet**. An end-to-end check runs the full flow against them with real transactions. The Base Sepolia contracts include the [security review](docs/security/escrow-review.md) fixes; the Sui package predates them, and its redeployment is pending.
+The contracts are deployed on **Base Sepolia** (source-verified), **Sui testnet** and **Solana devnet**, all with the [security review](docs/security/escrow-review.md) fixes. An end-to-end check runs the full flow against the EVM and Sui deployments with real transactions:
 
 - **Base Sepolia, 12/12** ([report](apps/testnet-e2e/reports/base-sepolia-2026-10-15T22-24-11-266Z.md)): escrow create, fund, deliver and release; a reputation update; three guardrail refusals (over the cap, an unlisted contract, a failing simulation); an x402 payment settled through the public facilitator; and the receipt log anchored and verified onchain.
-- **Sui testnet** ([report](apps/testnet-e2e/reports/sui-testnet-2026-10-15T18-03-01-050Z.md)): a policy check, the full escrow lifecycle, and the receipt log anchored via `kit_escrow::anchor` and verified.
+- **Sui testnet** ([report](apps/testnet-e2e/reports/sui-testnet-2026-10-15T22-46-02-058Z.md)): a policy check, the full escrow lifecycle, and the receipt log anchored via `kit_escrow::anchor` and verified.
 
 | Contract | Network | Address | Deploy tx |
 | --- | --- | --- | --- |
 | Reputation | Base Sepolia (84532) | [`0x62d9258d0707e29650a8300a716312fb976557a2`](https://sepolia.basescan.org/address/0x62d9258d0707e29650a8300a716312fb976557a2) | [0x5f390e50…](https://sepolia.basescan.org/tx/0x5f390e50b7fd8f9673696349be484dd52f2ccf524bdf1606ac10d2575e5189e4) |
 | Escrow | Base Sepolia (84532) | [`0xb32ea9219afc9ba5e77db9fd414d5a4a8746c023`](https://sepolia.basescan.org/address/0xb32ea9219afc9ba5e77db9fd414d5a4a8746c023) | [0x45c95da0…](https://sepolia.basescan.org/tx/0x45c95da052ed63c024c4924d347d25aeb74ed7106140abed3aab15a3fca4a8d7) |
 | ReceiptAnchor | Base Sepolia (84532) | [`0x308023e44fe2e0411b515272fda9049af7330828`](https://sepolia.basescan.org/address/0x308023e44fe2e0411b515272fda9049af7330828) | [0xa4ca19c5…](https://sepolia.basescan.org/tx/0xa4ca19c5c7b8142c7903112577f4fc1cdd42f94f262db7f2e2ea3bf5feabf450) |
-| kit_escrow package | Sui testnet | [`0xb285fb9fe4181908efd684e62216c436d605c371d761c3db921cfea0bd5b7481`](https://suiscan.xyz/testnet/object/0xb285fb9fe4181908efd684e62216c436d605c371d761c3db921cfea0bd5b7481) | [6jKiWHKT1J…](https://suiscan.xyz/testnet/tx/6jKiWHKT1JGqkqdyCDAqKobDdV5ANWDRJCFFm2aNLssu) |
-| Reputation (shared object) | Sui testnet | [`0xb25726d35d2ffbb10a53469e79b920c019c888e8939a41cb54b017ac81f076c8`](https://suiscan.xyz/testnet/object/0xb25726d35d2ffbb10a53469e79b920c019c888e8939a41cb54b017ac81f076c8) | [6jKiWHKT1J…](https://suiscan.xyz/testnet/tx/6jKiWHKT1JGqkqdyCDAqKobDdV5ANWDRJCFFm2aNLssu) |
+| kit_escrow package | Sui testnet | [`0x9bc025aaff8b63103a4cea136304c11267af7816e0ae2b8eeeb51bea99293944`](https://suiscan.xyz/testnet/object/0x9bc025aaff8b63103a4cea136304c11267af7816e0ae2b8eeeb51bea99293944) | [G1Rf7icqRK…](https://suiscan.xyz/testnet/tx/G1Rf7icqRKhMXPo5rCn5pUQrR7NKTCJb3nvohFGCLMDm) |
+| Reputation (shared object) | Sui testnet | [`0xa03b50fe14f685602811348b86a378651aca3e674abd78229287222b5df80aa8`](https://suiscan.xyz/testnet/object/0xa03b50fe14f685602811348b86a378651aca3e674abd78229287222b5df80aa8) | [G1Rf7icqRK…](https://suiscan.xyz/testnet/tx/G1Rf7icqRKhMXPo5rCn5pUQrR7NKTCJb3nvohFGCLMDm) |
+| kit_escrow program | Solana devnet | [`8kQBzMWRWAEssN4wtBzrH4G8fHtbhrbHs9e24V2jWMkX`](https://explorer.solana.com/address/8kQBzMWRWAEssN4wtBzrH4G8fHtbhrbHs9e24V2jWMkX?cluster=devnet) | [TYneZ6tPZu…](https://explorer.solana.com/tx/TYneZ6tPZuxAumyyiUg4uvLLkwuTpNQGass2FbnKbYTgGQ2BhJPhS29hNW3sQQdDrb1NDxiC4vkP3meJzRbRYPE?cluster=devnet) |
+
+The Solana program is byte-for-byte the SBPF v3 binary its 16 LiteSVM tests run against (SHA-256 checked against the on-chain program); its end-to-end check is next.
 
 The addresses are also exported as `deployments` from `@codkit/contracts`. Want to reproduce the run with your own wallet? [docs/TESTNET.md](docs/TESTNET.md) explains how, and you can report results with a [Testnet feedback](https://github.com/deyoungjohn/codkit/issues/new?template=testnet-feedback.yml) issue.
 

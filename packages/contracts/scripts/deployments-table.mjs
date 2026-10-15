@@ -4,7 +4,7 @@
 //   forge script script/Deploy.s.sol --rpc-url base_sepolia --account dev --broadcast
 //   node scripts/deployments-table.mjs                 # every chain found in evm/broadcast
 //   node scripts/deployments-table.mjs --chain 84532   # one chain
-// Sui publications recorded in deployments/sui-*.json (non-local) are appended when no --chain is given.
+// Sui and Solana deployments recorded in deployments/{sui,solana}-*.json (non-local) are appended when no --chain is given.
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -67,11 +67,26 @@ export function suiRows(deploymentsDir) {
     });
 }
 
+/** Rows for Solana programs (deployments/solana-<cluster>.json). */
+export function solanaRows(deploymentsDir) {
+  if (!existsSync(deploymentsDir)) return [];
+  return readdirSync(deploymentsDir)
+    .filter((f) => /^solana-.+\.json$/.test(f) && !/local/.test(f))
+    .sort()
+    .map((f) => {
+      const d = JSON.parse(readFileSync(join(deploymentsDir, f), "utf8"));
+      const cluster = f.replace(/^solana-|\.json$/g, "");
+      const q = cluster === "mainnet" ? "" : `?cluster=${cluster}`;
+      const tx = d.tx ? `[${d.tx.slice(0, 10)}…](https://explorer.solana.com/tx/${d.tx}${q})` : "";
+      return `| kit_escrow program | Solana ${cluster} | [\`${d.programId}\`](https://explorer.solana.com/address/${d.programId}${q}) | ${tx} |`;
+    });
+}
+
 if (import.meta.url === `file://${process.argv[1]}`) {
   const root = join(dirname(fileURLToPath(import.meta.url)), "..");
   const i = process.argv.indexOf("--chain");
   const { rows, markdown } = deploymentsTable(join(root, "evm", "broadcast"), i > 0 ? process.argv[i + 1] : undefined);
-  const sui = i > 0 ? [] : suiRows(join(root, "deployments"));
+  const sui = i > 0 ? [] : [...suiRows(join(root, "deployments")), ...solanaRows(join(root, "deployments"))];
   if (!sui.length) console.log(markdown);
   else console.log([rows.length ? markdown : "| Contract | Network | Address | Deploy tx |\n| --- | --- | --- | --- |", ...sui].join("\n"));
 }
