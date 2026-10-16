@@ -1,6 +1,6 @@
 {
   "name": "@codkit/mcp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Define agent tools once with Zod; expose them as an MCP server (stdio / HTTP), an agent loop on any OpenAI-compatible LLM (Gemini, Groq, NVIDIA NIM, OpenRouter, …), and WebMCP browser tools. Ships kit tools for policy, x402 pay, escrow and receipts.",
   "license": "MIT",
   "engines": {
