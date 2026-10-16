@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 // Publish every public workspace package whose current version isn't on npm yet.
-// Run by .github/workflows/release.yml after the "Version Packages" PR is merged.
+// Run by the `release` job in .github/workflows/ci.yml after a "Version Packages" PR is merged.
 //
 //   node scripts/release.mjs [--dry-run]
 //
 // pnpm packs each package (rewriting workspace:^ ranges to real versions); npm >= 11.5.1
 // publishes the tarball. In GitHub Actions that npm authenticates with Trusted Publishing
 // (OIDC — no token) and attaches provenance automatically. Packages go out in dependency
-// order. The "New tag:" lines are what changesets/action reads to tag and create releases.
+// order. For each publish it appends a {"type":"git-tag"} event to $CHANGESETS_OUTPUT, which is
+// how changesets/action v2 learns what to tag and turn into a GitHub release.
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdtempSync, readdirSync, readFileSync } from "node:fs";
+import { appendFileSync, mkdtempSync, readdirSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -49,7 +50,12 @@ for (const p of ordered) {
   const args = ["-y", NPM, "publish", tarball, "--access", "public", ...(dryRun ? ["--dry-run"] : [])];
   console.log(`> npx ${args.join(" ")}`);
   execFileSync("npx", args, { stdio: "inherit" });
-  if (!dryRun) console.log(`🦋  New tag:  ${name}@${version}`);
+  if (!dryRun) {
+    console.log(`🦋  New tag:  ${name}@${version}`);
+    if (process.env.CHANGESETS_OUTPUT) {
+      appendFileSync(process.env.CHANGESETS_OUTPUT, `${JSON.stringify({ type: "git-tag", tag: `${name}@${version}`, packageName: name })}\n`);
+    }
+  }
   count++;
 }
 console.log(count ? `${dryRun ? "would publish" : "published"} ${count} package(s)` : "nothing to publish");
