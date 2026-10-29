@@ -12,6 +12,7 @@ npm install @codkit/pay @codkit/policy
 npm install hono @x402/hono                                 # for @codkit/pay/hono
 npm install express @x402/express && npm i -D @types/express # for @codkit/pay/express
 npm install @x402/mcp @modelcontextprotocol/sdk               # for @codkit/pay/mcp
+npm install @x402/svm @solana/kit                             # for @codkit/pay/svm (Solana)
 ```
 
 The server frameworks are optional peer dependencies, so install only the one you use.
@@ -33,7 +34,22 @@ app.use(paywall({
 }));
 ```
 
-Options: `network` (default `eip155:84532`), `facilitator` (URL or `FacilitatorClient`), `schemes` (add `ExactSvmScheme` from `@x402/svm` for Solana), and full x402 route configs, which are passed through unchanged.
+Options: `network` (default `eip155:84532`), `facilitator` (URL or `FacilitatorClient`), `schemes` (see Solana below), and full x402 route configs, which are passed through unchanged.
+
+## Solana
+
+`@codkit/pay/svm` adds x402's `exact` SVM scheme. The payer signs an SPL `TransferChecked`, and the facilitator pays the fees and submits it. The public testnet facilitator supports Solana devnet.
+
+```ts
+import { svmSchemes, SOLANA_DEVNET, registerExactSvmScheme } from "@codkit/pay/svm";
+
+app.use(paywall({ network: SOLANA_DEVNET, payTo: "YourSolanaAddress", schemes: svmSchemes(), routes: { "GET /weather": "$0.001" } }));
+
+// agent side: same budgeted client, Solana signer (@solana/kit)
+registerExactSvmScheme(client, { signer: await createKeyPairSignerFromBytes(secretKey) });
+```
+
+To use your own RPC, register `new ExactSvmScheme(signer, { rpcUrl })` instead. Policy limits key on the USDC mint (`USDC_DEVNET_ADDRESS`), and the chain is the CAIP-2 id (`SOLANA_DEVNET`). EVM routes still get their scheme automatically, so one paywall can accept both.
 
 ## Client (agent side)
 
@@ -95,4 +111,4 @@ The client example needs Base Sepolia USDC, which you can get from https://fauce
 
 ## Not yet
 
-FastAPI middleware, plain USDC transfers, payment links / QR, and webhooks are planned for this package.
+FastAPI middleware, plain USDC transfers, payment links / QR, and webhooks are planned for this package. Solana x402 is tested against a stubbed RPC and facilitator; a live devnet run needs devnet USDC (https://faucet.circle.com).
