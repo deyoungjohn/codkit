@@ -62,10 +62,11 @@ Install Rust, the Solana CLI and Anchor (`avm`). Then the Solana items in sectio
 
 ### pay (rest of module 2)
 
-- [ ] x402 for **MCP tool calls**: a paid-tool wrapper so an MCP server can charge per call.
+- [x] x402 for **MCP tool calls** (2026-10-29): `@codkit/pay/mcp` (`mcpPaywall`, `withPaidTools`) over `@x402/mcp`; `createMcpServer({ wrapHandler })`. Tested in-process; not yet against a live facilitator.
 - [ ] FastAPI middleware (a Python sidecar).
-- [ ] Plain USDC transfer helpers, payment links and QR codes, and webhooks for settlement events.
-- [ ] Solana x402 (`@x402/svm` `ExactSvmScheme`) in `paywall()` and the budgeted client.
+- [x] Payment links (EIP-681 / Solana Pay), SVG QR codes, `usdcTransferTx` for the EVM guard, and signed webhooks with retries (2026-10-29): `@codkit/pay/links`, `@codkit/pay/webhooks`.
+- [ ] Detect payment to a Solana Pay link onchain (`reference` lookup via `getSignaturesForAddress`).
+- [x] Solana x402 (2026-10-29): `@codkit/pay/svm` (`svmSchemes`, `ExactSvmScheme`). Tested against a stub RPC and facilitator. **Live devnet run needs you:** devnet USDC for the agent key from https://faucet.circle.com (Solana devnet).
 
 ### receipts
 

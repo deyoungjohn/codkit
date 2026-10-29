@@ -99,10 +99,48 @@ await mcp.connect(transport);
 const res = await mcp.callTool("premium_report", { topic: "SOL" }); // { content, paymentMade, paymentResponse }
 ```
 
+## Payment links, QR codes and USDC transfers
+
+`@codkit/pay/links` covers payments that aren't x402: an invoice, a tip jar, a checkout QR. Links are standard URIs that any wallet opens: EIP-681 on EVM, Solana Pay on Solana.
+
+```ts
+import { paymentLink, paymentQrSvg, usdcTransferTx } from "@codkit/pay/links";
+
+paymentLink({ chain: "eip155:84532", to: "0x…", amount: usdc("1.50") });
+// ethereum:0x036C…CF7e@84532/transfer?address=0x…&uint256=1500000
+paymentLink({ chain: SOLANA_DEVNET, to: "9xQe…", amount: usdc("1.50"), reference, label: "Shop", message: "Order #1" });
+// solana:9xQe…?amount=1.5&spl-token=4zMM…&reference=…&label=Shop&message=Order%20%231
+paymentQrSvg({ chain, to, amount }); // <svg …>
+
+// agent side: a USDC transfer that goes through the policy pipeline
+const guard = createEvmGuard({ engine, account, reader: publicClient, sender: walletClient, chainId: 84532 });
+await guard.send(usdcTransferTx({ chain: "eip155:84532", to: "0x…", amount: usdc(5) }));
+```
+
+`asset` defaults to Circle USDC on the chain (the `USDC` table covers Ethereum, Base, Optimism, Arbitrum, Polygon and Solana, mainnet and testnet). Pass a token address or `"native"` for anything else.
+
+## Webhooks
+
+`@codkit/pay/webhooks` posts signed events to your backend. The signature is HMAC-SHA256 over `"<timestamp>.<body>"` in an `x-codkit-signature: t=…,v1=…` header (Stripe-style). It uses Web Crypto only, so it runs on Node, edge runtimes and Next.js route handlers.
+
+```ts
+import { webhookSender, verifyWebhook, SIGNATURE_HEADER } from "@codkit/pay/webhooks";
+
+const hooks = webhookSender({ url: "https://shop.example/hooks", secret: process.env.WEBHOOK_SECRET! });
+app.use(paywall({ payTo, routes, onSettled: hooks.onSettled })); // payment.settled, sent without delaying the response
+await hooks.send("order.paid", { orderId: 42 });                // any event
+
+// receiver
+const event = await verifyWebhook({ body: await req.text(), signature: req.headers.get(SIGNATURE_HEADER), secret });
+```
+
+Failed deliveries (network errors, 5xx, 408, 429) are retried with exponential backoff, by default 4 attempts starting at 500 ms; other 4xx responses are not retried. Verification rejects signatures older than 5 minutes. Events carry an `id`, so receivers should deduplicate on it.
+
 ## Examples
 
 ```bash
 pnpm --filter @codkit/pay example:local                                  # whole loop in-process, no funds
+pnpm --filter @codkit/pay example:links                                  # payment links as terminal QR codes + a webhook round trip
 PAY_TO=0x… pnpm --filter @codkit/pay example:server                      # real paywall on Base Sepolia
 EVM_PRIVATE_KEY=0x… pnpm --filter @codkit/pay example:client -- http://localhost:4021/weather
 ```
@@ -111,4 +149,4 @@ The client example needs Base Sepolia USDC, which you can get from https://fauce
 
 ## Not yet
 
-FastAPI middleware, plain USDC transfers, payment links / QR, and webhooks are planned for this package. Solana x402 is tested against a stubbed RPC and facilitator; a live devnet run needs devnet USDC (https://faucet.circle.com).
+FastAPI middleware (a Python sidecar) and detecting payments to a link onchain (Solana Pay `reference` lookup) are planned. Solana x402 is tested against a stubbed RPC and facilitator; a live devnet run needs devnet USDC (https://faucet.circle.com).
