@@ -1,14 +1,15 @@
 import { usdc } from "@codkit/policy";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
-import { describe, expect, it } from "vitest";
+import { mcpPaywall } from "@codkit/pay/mcp";
+import { describe, expect, it, vi } from "vitest";
 import { createMcpServer, mcpHttpHandler } from "../src/server.js";
 import { policyTools } from "../src/tools/policy.js";
 import { receiptTools } from "../src/tools/receipts.js";
 import { boom, CHAIN, echo, fixtures, USDC } from "./helpers.js";
 
-async function connect(tools: Parameters<typeof createMcpServer>[0]) {
-  const server = createMcpServer(tools, { name: "test-agent", instructions: "Use policy_check first." });
+async function connect(tools: Parameters<typeof createMcpServer>[0], extra: Partial<Parameters<typeof createMcpServer>[1]> = {}) {
+  const server = createMcpServer(tools, { name: "test-agent", instructions: "Use policy_check first.", ...extra });
   const [a, b] = InMemoryTransport.createLinkedPair();
   const client = new Client({ name: "test-client", version: "0.0.0" });
   await Promise.all([server.connect(a), client.connect(b)]);
@@ -36,6 +37,22 @@ describe("MCP server", () => {
     const failed = await client.callTool({ name: "boom", arguments: {} });
     expect(failed.isError).toBe(true);
     expect(text(failed)).toBe("Error: kaboom");
+  });
+
+  it("charges for priced tools through wrapHandler (x402 over MCP)", async () => {
+    const facilitator = {
+      verify: vi.fn(),
+      settle: vi.fn(),
+      getSupported: vi.fn(async () => ({ kinds: [{ x402Version: 2, scheme: "exact", network: CHAIN as `${string}:${string}` }], extensions: [], signers: {} })),
+    };
+    const paywall = mcpPaywall({ payTo: "0x2222222222222222222222222222222222222222", facilitator, tools: { echo: "$0.01" } });
+    const client = await connect([echo, boom], { wrapHandler: paywall.wrap });
+
+    const unpaid = await client.callTool({ name: "echo", arguments: { message: "yo" } });
+    expect(unpaid.isError).toBe(true);
+    expect(JSON.stringify(unpaid)).toContain('"amount":"10000"');
+    expect(text(await client.callTool({ name: "boom", arguments: {} }))).toBe("Error: kaboom"); // unpriced: untouched
+    expect(facilitator.verify).not.toHaveBeenCalled();
   });
 
   it("serves the kit's policy and receipt tools", async () => {

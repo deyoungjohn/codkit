@@ -47,6 +47,13 @@ app.all("/mcp", (c) => mcp(c.req.raw));
 
 A missing or wrong token gets `401` with `WWW-Authenticate: Bearer`. Calling the handler with no auth decision at all throws at startup.
 
+To charge per call, pass `wrapHandler`, which `createMcpServer`, `serveStdio` and `mcpHttpHandler` all accept. Each tool's MCP handler goes through it. With [`@codkit/pay/mcp`](../pay#paid-mcp-tools), priced tools demand an x402 payment:
+
+```ts
+const paywall = mcpPaywall({ payTo: "0x…", tools: { premium_report: "$0.05" } });
+const mcp = mcpHttpHandler(tools, { name: "data-shop", auth, wrapHandler: paywall.wrap });
+```
+
 ## Run an agent
 
 ```ts

@@ -340,6 +340,9 @@ importers:
       '@x402/core':
         specifier: ~2.28.0
         version: 2.28.0
+      '@x402/mcp':
+        specifier: ~2.28.0
+        version: 2.28.0
       hono:
         specifier: ^4.10.0
         version: 4.13.13
@@ -365,6 +368,9 @@ importers:
       '@hono/node-server':
         specifier: ^1.19.0
         version: 1.19.17(hono@4.13.13)
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.32.1
+        version: 1.32.1(zod@4.6.7)
       '@types/express':
         specifier: ^5.0.0
         version: 5.0.6
@@ -374,6 +380,9 @@ importers:
       '@x402/hono':
         specifier: ~2.28.0
         version: 2.28.0(hono@4.13.13)(typescript@5.9.3)
+      '@x402/mcp':
+        specifier: ~2.28.0
+        version: 2.28.0
       express:
         specifier: ^5.1.0
         version: 5.3.0
@@ -382,7 +391,10 @@ importers:
         version: 4.13.13
       viem:
         specifier: ^2.48.0
-        version: 2.57.5(typescript@5.9.3)(zod@3.25.76)
+        version: 2.57.5(typescript@5.9.3)(zod@4.6.7)
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
 
   packages/policy:
     dependencies:
@@ -1813,6 +1825,9 @@ packages:
       '@x402/paywall':
         optional: true
 
+  '@x402/mcp@2.28.0':
+    resolution: {integrity: sha512-I84qbst4aazR8lqfcw/XRURjECxzKuFsNMWgELgD63OBK39Jqjz0dar9o0X7Vdm4FcsWA/QET+F1MFFEU4QmKQ==}
+
   abitype@1.2.3:
     resolution: {integrity: sha512-Ofer5QUnuUdTFsBRwARMoWKOH1ND5ehwYhJ3OJ/BQO+StkwQjHw0XyVh4vDttzHB7QOFhPHa/o413PJ82gU/Tg==}
     peerDependencies:
@@ -3086,6 +3101,28 @@ snapshots:
       tinyglobby: 0.2.17
       yaml: 2.9.1
 
+  '@modelcontextprotocol/sdk@1.32.1(zod@3.25.76)':
+    dependencies:
+      '@hono/node-server': 1.19.17(hono@4.13.13)
+      ajv: 8.20.0
+      ajv-formats: 3.0.1
+      content-type: 1.0.5
+      cors: 2.8.6
+      cross-spawn: 7.0.6
+      eventsource: 3.0.7
+      eventsource-parser: 3.1.1
+      express: 5.3.0
+      express-rate-limit: 8.7.1(express@5.3.0)
+      hono: 4.13.13
+      jose: 6.2.12
+      json-schema-typed: 8.0.2
+      pkce-challenge: 5.0.1
+      raw-body: 3.0.2
+      zod: 3.25.76
+      zod-to-json-schema: 3.25.2(zod@3.25.76)
+    transitivePeerDependencies:
+      - supports-color
+
   '@modelcontextprotocol/sdk@1.32.1(zod@4.6.7)':
     dependencies:
       '@hono/node-server': 1.19.17(hono@4.13.13)
@@ -4064,6 +4101,15 @@ snapshots:
       - typescript
       - utf-8-validate
 
+  '@x402/mcp@2.28.0':
+    dependencies:
+      '@modelcontextprotocol/sdk': 1.32.1(zod@3.25.76)
+      '@x402/core': 2.28.0
+      zod: 3.25.76
+    transitivePeerDependencies:
+      - '@cfworker/json-schema'
+      - supports-color
+
   abitype@1.2.3(typescript@5.9.3)(zod@3.25.76):
     optionalDependencies:
       typescript: 5.9.3
@@ -4981,6 +5027,10 @@ snapshots:
   ws@8.22.0: {}
 
   yaml@2.9.1: {}
+
+  zod-to-json-schema@3.25.2(zod@3.25.76):
+    dependencies:
+      zod: 3.25.76
 
   zod-to-json-schema@3.25.2(zod@4.6.7):
     dependencies:

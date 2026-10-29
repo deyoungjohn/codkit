@@ -2,6 +2,7 @@
  * Serve kit tools over MCP. Import from `@codkit/mcp/server`.
  */
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { callTool, type AnyKitTool } from "./tool.js";
@@ -11,7 +12,14 @@ export interface KitServerOptions {
   version?: string;
   /** Shown to clients that support it: how to use these tools together. */
   instructions?: string;
+  /**
+   * Wrap each tool's MCP handler, e.g. to charge for it:
+   * `wrapHandler: mcpPaywall({ payTo, tools: { report: "$0.05" } }).wrap` (from `@codkit/pay/mcp`).
+   */
+  wrapHandler?: <H extends ToolHandler>(toolName: string, handler: H) => H;
 }
+
+type ToolHandler = (args: unknown, extra: { signal?: AbortSignal }) => Promise<CallToolResult>;
 
 /**
  * Who may call the HTTP endpoint. Required: these tools can move money, so the
@@ -42,6 +50,10 @@ export function createMcpServer(tools: AnyKitTool[], opts: KitServerOptions): Mc
     opts.instructions ? { instructions: opts.instructions } : {},
   );
   for (const tool of tools) {
+    const handler: ToolHandler = async (args, extra) => {
+      const res = await callTool(tool, args, extra.signal ? { signal: extra.signal } : {});
+      return { content: [{ type: "text" as const, text: res.text }], ...(!res.ok && { isError: true }) };
+    };
     server.registerTool(
       tool.name,
       {
@@ -50,10 +62,7 @@ export function createMcpServer(tools: AnyKitTool[], opts: KitServerOptions): Mc
         ...(tool.title && { title: tool.title }),
         ...(tool.annotations && { annotations: tool.annotations }),
       },
-      async (args: unknown, extra: { signal?: AbortSignal }) => {
-        const res = await callTool(tool, args, extra.signal ? { signal: extra.signal } : {});
-        return { content: [{ type: "text" as const, text: res.text }], ...(!res.ok && { isError: true }) };
-      },
+      opts.wrapHandler ? opts.wrapHandler(tool.name, handler) : handler,
     );
   }
   return server;
