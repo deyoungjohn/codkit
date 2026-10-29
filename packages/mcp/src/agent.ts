@@ -31,7 +31,7 @@ export interface ProviderPreset {
 /** Presets, in auto-detect order (most generous free tier with solid tool calling first). */
 export const PROVIDERS = {
   groq: { baseUrl: "https://api.groq.com/openai/v1", keyEnv: "GROQ_API_KEY", model: "openai/gpt-oss-120b" },
-  gemini: { baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai", keyEnv: "GEMINI_API_KEY", model: "gemini-2.5-flash" },
+  gemini: { baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai", keyEnv: "GEMINI_API_KEY", model: "gemini-3.5-flash,gemini-flash-lite-latest" },
   nvidia: { baseUrl: "https://integrate.api.nvidia.com/v1", keyEnv: "NVIDIA_API_KEY", model: "openai/gpt-oss-120b" },
   openrouter: {
     baseUrl: "https://openrouter.ai/api/v1",
@@ -140,6 +140,8 @@ export interface RunAgentOptions {
   retries?: number;
   /** Cap on a single backoff wait (ms). Default 20 000. */
   maxBackoffMs?: number;
+  /** Give up on one model request after this long (ms) and fail over without retrying. Default 60 000. */
+  requestTimeoutMs?: number;
   onEvent?: (e: AgentEvent) => void;
   signal?: AbortSignal;
   fetch?: typeof globalThis.fetch;
@@ -167,7 +169,10 @@ class HttpError extends Error {
   }
 }
 
-const retryable = (e: unknown) => !(e instanceof HttpError) || e.status === 429 || e.status >= 500;
+/** The provider accepted the connection but never answered: retrying the same one rarely helps. */
+class RequestTimeout extends Error {}
+
+const retryable = (e: unknown) => !(e instanceof RequestTimeout) && (!(e instanceof HttpError) || e.status === 429 || e.status >= 500);
 
 /** Agentic loop: the model calls tools until it answers without one. */
 export async function runAgent(opts: RunAgentOptions): Promise<RunAgentResult> {
@@ -215,17 +220,27 @@ export async function runAgent(opts: RunAgentOptions): Promise<RunAgentResult> {
       ...(opts.maxTokens !== undefined && { max_tokens: opts.maxTokens }),
       ...(opts.temperature !== undefined && { temperature: opts.temperature }),
     };
-    const r = await fetchFn(`${provider.baseUrl.replace(/\/+$/, "")}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        ...(provider.apiKey && { authorization: `Bearer ${provider.apiKey}` }),
-        ...provider.headers,
-      },
-      body: JSON.stringify(body),
-      ...(opts.signal && { signal: opts.signal }),
-    });
-    const raw = await r.text();
+    const timeoutMs = opts.requestTimeoutMs ?? 60_000;
+    const timeout = AbortSignal.timeout(timeoutMs);
+    const signal = opts.signal ? AbortSignal.any([opts.signal, timeout]) : timeout;
+    let r: Response;
+    let raw: string;
+    try {
+      r = await fetchFn(`${provider.baseUrl.replace(/\/+$/, "")}/chat/completions`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          ...(provider.apiKey && { authorization: `Bearer ${provider.apiKey}` }),
+          ...provider.headers,
+        },
+        body: JSON.stringify(body),
+        signal,
+      });
+      raw = await r.text();
+    } catch (e) {
+      if (timeout.aborted && !opts.signal?.aborted) throw new RequestTimeout(`${provider.name}: no response within ${timeoutMs / 1000}s`);
+      throw e;
+    }
     let json: ChatResponse | undefined;
     try {
       json = JSON.parse(raw) as ChatResponse;

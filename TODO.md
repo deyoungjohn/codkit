@@ -13,15 +13,17 @@ Status as of 2026-10-15. Modules 1 to 6 are built, tested and pushed. CI is gree
 
 ### LLM keys (no Anthropic API: free tiers only)
 
-The agent loop (`@codkit/mcp/agent`) works with any OpenAI-compatible provider. It's tested against a scripted API, so its first real run is still to do. Get one or more free keys: Groq (console.groq.com), Gemini (aistudio.google.com), NVIDIA NIM (build.nvidia.com), OpenRouter (`:free` models), or AgentRouter. Put them in `.env` (see `.env.example`). With two or more set, a rate-limited provider fails over to the next.
+The agent loop (`@codkit/mcp/agent`) works with any OpenAI-compatible provider. **First live run done (2026-10-29):** `example:agent` with Gemini (`gemini-3.5-flash`), which failed over to Groq on a mid-run 429. The model called `policy_status` first, bought the two $0.01 prices, declined the $2 report with a receipted rationale, and the receipt log verifies.
+
+- **Your `.env` has `GEMINI_MODEL=gemini-3.8-flash`. That model (and the `gemini-flash-latest` alias) hung for 90 s+ on 2026-10-29.** Change it to `gemini-3.5-flash,gemini-flash-lite-latest` (the new preset default), or delete the line. Hung requests now time out after 60 s (`requestTimeoutMs`) and fail over.
+- The Gemini free tier ran out of quota after about 5 turns; Groq covered the rest.
+- Before relying on AgentRouter, confirm that it accepts generic API clients and not just Claude Code or Codex, and remember that it sees every prompt.
 
 ```bash
 pnpm --filter @codkit/mcp example:models          # which models your keys can use
 pnpm --filter @codkit/mcp example:agent           # the LLM buys data within budget
 pnpm --filter demo-shell dev                      # the dashboard switches to "LLM live"
 ```
-
-Check that the model calls `policy_status` before buying, asks for approval on the $0.25 summary, and is blocked on the $2 report. If a default model ID has been retired, set `<PROVIDER>_MODEL` and update the preset in `packages/mcp/src/agent.ts`. Before relying on AgentRouter, confirm that it accepts generic API clients and not just Claude Code or Codex, and remember that it sees every prompt.
 
 ### Testnet funds and deployments
 

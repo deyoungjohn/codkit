@@ -104,6 +104,23 @@ describe("runAgent (OpenAI-compatible loop)", () => {
     expect(requests[0]!.body).not.toHaveProperty("tools");
   });
 
+  it("fails over without retrying when a provider hangs past requestTimeoutMs", async () => {
+    const hosts: string[] = [];
+    const fetch = (async (url: string | URL | Request, init?: RequestInit) => {
+      hosts.push(new URL(String(url)).host);
+      if (hosts.length === 1) {
+        // never answers; only the abort signal ends it
+        return new Promise<Response>((_, reject) => init!.signal!.addEventListener("abort", () => reject(init!.signal!.reason)));
+      }
+      return new Response(JSON.stringify(completion({ content: "hi" }).body), { status: 200 });
+    }) as typeof globalThis.fetch;
+    const events: AgentEvent[] = [];
+    const res = await runAgent({ fetch, providers: [gemini, groq], requestTimeoutMs: 50, tools: [], prompt: "hi", onEvent: (e) => events.push(e) });
+    expect(hosts).toEqual(["gemini.test", "api.groq.test"]);
+    expect(events.find((e) => e.type === "failover")).toMatchObject({ from: "gemini/flash", error: expect.stringMatching(/no response within/) });
+    expect(res).toMatchObject({ text: "hi", provider: "groq" });
+  });
+
   it("stops at maxIterations", async () => {
     const { engine } = fixtures();
     const loop = completion({ tool_calls: [call("c", "policy_status", {})] });
