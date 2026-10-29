@@ -64,11 +64,11 @@ Install Rust, the Solana CLI and Anchor (`avm`). Then the Solana items in sectio
 
 ### pay (rest of module 2)
 
-- [x] x402 for **MCP tool calls** (2026-10-29): `@codkit/pay/mcp` (`mcpPaywall`, `withPaidTools`) over `@x402/mcp`; `createMcpServer({ wrapHandler })`. Tested in-process; not yet against a live facilitator.
+- [x] x402 for **MCP tool calls** (2026-10-29): `@codkit/pay/mcp` (`mcpPaywall`, `withPaidTools`) over `@x402/mcp`; `createMcpServer({ wrapHandler })`. Settled live on Solana devnet by `e2e:x402-solana`.
 - [ ] FastAPI middleware (a Python sidecar).
 - [x] Payment links (EIP-681 / Solana Pay), SVG QR codes, `usdcTransferTx` for the EVM guard, and signed webhooks with retries (2026-10-29): `@codkit/pay/links`, `@codkit/pay/webhooks`.
 - [ ] Detect payment to a Solana Pay link onchain (`reference` lookup via `getSignaturesForAddress`).
-- [x] Solana x402 (2026-10-29): `@codkit/pay/svm` (`svmSchemes`, `ExactSvmScheme`). Tested against a stub RPC and facilitator. **Live devnet run needs you:** devnet USDC for the e2e agent `Bc8MUG6gkGGie7fYftZpZNHBCPnLiV3r1hkhUNALnN38` from https://faucet.circle.com (Solana devnet).
+- [x] Solana x402 (2026-10-29): `@codkit/pay/svm` (`svmSchemes`, `ExactSvmScheme`). `pnpm e2e:x402-solana` passes 8/8 on devnet through the public facilitator (2026-10-29): an HTTP payment and a paid MCP tool call settled onchain, and a $0.50 purchase was blocked by policy. Agent `Bc8M…nN38` holds devnet USDC.
 
 ### receipts
 

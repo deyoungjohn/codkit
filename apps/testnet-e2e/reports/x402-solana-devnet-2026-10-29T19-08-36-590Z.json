@@ -1,0 +1,75 @@
+{
+  "network": "x402-solana-devnet",
+  "startedAt": "2026-10-29T19:08:36.590Z",
+  "ok": true,
+  "passed": 8,
+  "total": 8,
+  "meta": {
+    "agent": "Bc8MUG6gkGGie7fYftZpZNHBCPnLiV3r1hkhUNALnN38",
+    "merchant": "5vWuEXyGJtzYSUuUE8BGFgqhWNmTNM49rVLkwbyuU1kv",
+    "facilitator": "https://x402.org/facilitator",
+    "asset": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"
+  },
+  "steps": [
+    {
+      "name": "preflight balances",
+      "ok": true,
+      "ms": 575,
+      "detail": "0.29445336 SOL, 20 USDC"
+    },
+    {
+      "name": "merchant USDC account (agent pays rent)",
+      "ok": true,
+      "ms": 1018,
+      "detail": "4YWq5VSH9VBYM6JakfnLeoTUCsLLLWGdHa7ATsaf6G7w",
+      "links": [
+        "https://explorer.solana.com/tx/v8Nh9oYvFbp1rZTyR3nqDJrjG8KheeKSkJLTudavubC6KzkqDE1hzhcxwbokSgFEu3pCJ5tT1M7qZdWqsGTx2fo?cluster=devnet"
+      ]
+    },
+    {
+      "name": "paywall answers 402 with the facilitator's fee payer",
+      "ok": true,
+      "ms": 64,
+      "detail": "$0.01 USDC to 5vWu…, fee payer CKPKJWNdJEqa81x7CkZ14BVPiY6y16Sxs7owznqtWYp5"
+    },
+    {
+      "name": "budgeted fetch pays $0.01 (HTTP x402)",
+      "ok": true,
+      "ms": 1878,
+      "detail": "settled; merchant holds 0.01 USDC",
+      "links": [
+        "https://explorer.solana.com/tx/2GL65tB2vJMHTnWA585RkfDb7FLvqpxaytXn8vXDGNdzbaA8iKcWV2V15VBntzLekYr4fX7hXHYmeknWFXnF1c3k?cluster=devnet"
+      ]
+    },
+    {
+      "name": "paid MCP tool call pays $0.01 (x402 over MCP)",
+      "ok": true,
+      "ms": 2322,
+      "detail": "\"SOL: 182.10 USD\"; merchant holds 0.02 USDC",
+      "links": [
+        "https://explorer.solana.com/tx/4zPtkTCJh7AtxD5AN4QUr7PSdED6ct9cqcVNhMbdBxQqjhtmBg1142ca9Y8BrsrNzf6W5oeZxPXm3nDBD9j14rZj?cluster=devnet"
+      ]
+    },
+    {
+      "name": "$0.50 report blocked by policy before signing",
+      "ok": true,
+      "ms": 266,
+      "detail": "denied: exceeds the $0.10 per-tx cap; nothing signed"
+    },
+    {
+      "name": "spend ledger and receipts",
+      "ok": true,
+      "ms": 42,
+      "detail": "2 committed spends ($0.02 of $0.05/h); 5 signed receipts verify"
+    },
+    {
+      "name": "merchant returns the USDC and closes its account",
+      "ok": true,
+      "ms": 1316,
+      "detail": "0.02 USDC back to the agent, rent refunded",
+      "links": [
+        "https://explorer.solana.com/tx/2gdwjmBZ8T8a87wYy9Q9XSAsTou1YXyYTpuweN6ZTQHpSD5fKm379Mq7mQHkwqNLTJM3wugcVHZH3sbY6gNar8uh?cluster=devnet"
+      ]
+    }
+  ]
+}

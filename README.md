@@ -62,6 +62,7 @@ The contracts are deployed on **Base Sepolia** (source-verified), **Sui testnet*
 
 - **Base Sepolia, 12/12** ([report](apps/testnet-e2e/reports/base-sepolia-2026-10-15T22-24-11-266Z.md)): escrow create, fund, deliver and release; a reputation update; three guardrail refusals (over the cap, an unlisted contract, a failing simulation); an x402 payment settled through the public facilitator; and the receipt log anchored and verified onchain.
 - **Solana devnet, 10/10** ([report](apps/testnet-e2e/reports/solana-devnet-2026-10-15T23-04-25-099Z.md)): a policy-guarded escrow create (simulated first), an over-cap refusal, deliver and release with the vault closed and reputation recorded, a refused second payout, and a receipt head anchored in an SPL memo and verified from the chain.
+- **x402 on Solana devnet, 8/8** ([report](apps/testnet-e2e/reports/x402-solana-devnet-2026-10-29T19-08-36-590Z.md)): an agent bounded by the policy engine paid $0.01 over HTTP and $0.01 for a paid MCP tool call. Both payments were settled onchain by the public x402 facilitator, and a $0.50 purchase was blocked before signing.
 - **Sui testnet** ([report](apps/testnet-e2e/reports/sui-testnet-2026-10-15T22-46-02-058Z.md)): a policy check, the full escrow lifecycle, and the receipt log anchored via `kit_escrow::anchor` and verified.
 
 | Contract | Network | Address | Deploy tx |

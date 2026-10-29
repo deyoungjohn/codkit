@@ -49,6 +49,7 @@ Deployed from your wallet with `anchor deploy --provider.cluster devnet --provid
 pnpm e2e:evm --network base-sepolia            # add --walrus to also store the receipt log on Walrus
 pnpm e2e:sui --network testnet
 pnpm e2e:solana                                 # SOLANA_AGENT_KEYPAIR: a separate devnet key with ~0.05 SOL
+pnpm e2e:x402-solana                            # same agent key + devnet USDC (faucet.circle.com): x402 over HTTP and MCP via the public facilitator
 ```
 
 **Solana checks:**

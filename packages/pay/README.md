@@ -149,4 +149,4 @@ The client example needs Base Sepolia USDC, which you can get from https://fauce
 
 ## Not yet
 
-FastAPI middleware (a Python sidecar) and detecting payments to a link onchain (Solana Pay `reference` lookup) are planned. Solana x402 is tested against a stubbed RPC and facilitator; a live devnet run needs devnet USDC (https://faucet.circle.com).
+FastAPI middleware (a Python sidecar) and detecting payments to a link onchain (Solana Pay `reference` lookup) are planned. Solana x402 and paid MCP tools are checked live on devnet by `pnpm e2e:x402-solana`.
