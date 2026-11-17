@@ -1,5 +1,15 @@
 # @codkit/mcp
 
+## 0.2.2
+
+### Patch Changes
+
+- a1fc1c2: Builds move from tsc to tsup: every entry point now ships ESM (`.js`) and CommonJS (`.cjs`), each with its own types (`.d.ts` / `.d.cts`), so `require()` and older bundlers work. Package-level `main` / `module` / `types` are added for tools that ignore `exports`.
+- Updated dependencies [a1fc1c2]
+  - @codkit/policy@0.1.1
+  - @codkit/contracts@0.1.2
+  - @codkit/receipts@0.1.1
+
 ## 0.2.1
 
 ### Patch Changes

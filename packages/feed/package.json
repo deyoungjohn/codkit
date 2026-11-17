@@ -1,6 +1,6 @@
 {
   "name": "@codkit/feed",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "One live event stream for agent demos: policy decisions, tool calls, reasoning, transactions and receipts, served over Server-Sent Events.",
   "license": "MIT",
   "engines": {
