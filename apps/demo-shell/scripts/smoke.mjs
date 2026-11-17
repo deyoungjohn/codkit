@@ -18,7 +18,12 @@ const server = spawn(process.execPath, ["node_modules/next/dist/bin/next", "star
   // blank every LLM key so the smoke test always runs the scripted demo agent
   env: {
     ...process.env,
-    LLM_PROVIDER: "", GROQ_API_KEY: "", GEMINI_API_KEY: "", NVIDIA_API_KEY: "", OPENROUTER_API_KEY: "", AGENTROUTER_API_KEY: "",
+    LLM_PROVIDER: "",
+    GROQ_API_KEY: "",
+    GEMINI_API_KEY: "",
+    NVIDIA_API_KEY: "",
+    OPENROUTER_API_KEY: "",
+    AGENTROUTER_API_KEY: "",
     DEMO_STEP_MS: "0",
     DASHBOARD_PASSWORD: PASSWORD,
     SESSION_SECRET: "",
@@ -50,15 +55,22 @@ try {
   }
   const authChecks = {};
   const page = await fetch(base, { redirect: "manual" });
-  authChecks["signed-out page redirects to /login"] = page.status === 307 && new URL(page.headers.get("location"), base).pathname === "/login";
+  authChecks["signed-out page redirects to /login"] =
+    page.status === 307 && new URL(page.headers.get("location"), base).pathname === "/login";
   authChecks["signed-out API refused (401)"] = (await fetch(`${base}/api/run`, { method: "POST", body: "{}" })).status === 401;
   const login = (password) =>
-    fetch(`${base}/api/login`, { method: "POST", headers: { "content-type": "application/json", origin: base }, body: JSON.stringify({ password }) });
+    fetch(`${base}/api/login`, {
+      method: "POST",
+      headers: { "content-type": "application/json", origin: base },
+      body: JSON.stringify({ password }),
+    });
   authChecks["wrong password refused"] = (await login("nope")).status === 401;
   const ok = await login(PASSWORD);
   const cookie = (ok.headers.get("set-cookie") ?? "").split(";")[0];
-  authChecks["sign-in sets an HttpOnly, SameSite=Strict session"] = ok.ok && /HttpOnly/.test(ok.headers.get("set-cookie")) && /SameSite=Strict/.test(ok.headers.get("set-cookie"));
-  authChecks["forged session refused"] = (await fetch(`${base}/api/state`, { headers: { cookie: `${cookie.split(".").slice(0, -1).join(".")}.forged` } })).status === 401;
+  authChecks["sign-in sets an HttpOnly, SameSite=Strict session"] =
+    ok.ok && /HttpOnly/.test(ok.headers.get("set-cookie")) && /SameSite=Strict/.test(ok.headers.get("set-cookie"));
+  authChecks["forged session refused"] =
+    (await fetch(`${base}/api/state`, { headers: { cookie: `${cookie.split(".").slice(0, -1).join(".")}.forged` } })).status === 401;
   const H = { cookie, origin: base, "content-type": "application/json" };
   authChecks["cross-origin POST refused (403)"] =
     (await fetch(`${base}/api/kill`, { method: "POST", headers: { ...H, origin: "https://evil.example" }, body: "{}" })).status === 403;
@@ -66,13 +78,20 @@ try {
   const mcp = (headers) =>
     fetch(`${base}/api/mcp`, {
       method: "POST",
-      headers: { "content-type": "application/json", accept: "application/json, text/event-stream", "mcp-protocol-version": "2025-06-18", ...headers },
+      headers: {
+        "content-type": "application/json",
+        accept: "application/json, text/event-stream",
+        "mcp-protocol-version": "2025-06-18",
+        ...headers,
+      },
       body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list", params: {} }),
     });
   const mcpDenied = await mcp({});
-  authChecks["MCP without token: 401 + WWW-Authenticate"] = mcpDenied.status === 401 && /^Bearer/.test(mcpDenied.headers.get("www-authenticate") ?? "");
+  authChecks["MCP without token: 401 + WWW-Authenticate"] =
+    mcpDenied.status === 401 && /^Bearer/.test(mcpDenied.headers.get("www-authenticate") ?? "");
   const mcpOk = await mcp({ authorization: `Bearer ${MCP_TOKEN}` });
-  authChecks["MCP with token lists the agent's tools"] = mcpOk.ok && ((await mcpOk.json()).result?.tools ?? []).some((t) => t.name === "pay_fetch");
+  authChecks["MCP with token lists the agent's tools"] =
+    mcpOk.ok && ((await mcpOk.json()).result?.tools ?? []).some((t) => t.name === "pay_fetch");
   for (const [name, ok] of Object.entries(authChecks)) console.log(`${ok ? "✓" : "✗"} ${name}`);
   if (Object.values(authChecks).some((v) => !v)) fail("auth checks failed");
 
@@ -124,10 +143,12 @@ try {
     "final answer": count((e) => e.kind === "message") === 1,
   };
   const state = await (await fetch(`${base}/api/state`, { headers: { cookie } })).json();
-  checks["state: 3 payments, 0.27 USDC spent, receipts verify"] = state.payments === 3 && state.budget.spent === "0.27" && state.receipts.ok;
+  checks["state: 3 payments, 0.27 USDC spent, receipts verify"] =
+    state.payments === 3 && state.budget.spent === "0.27" && state.receipts.ok;
 
   const kill = await (await fetch(`${base}/api/kill`, { method: "POST", headers: H, body: "{}" })).json();
-  checks["kill switch"] = kill.killed === true && (await (await fetch(`${base}/api/state`, { headers: { cookie } })).json()).killed === true;
+  checks["kill switch"] =
+    kill.killed === true && (await (await fetch(`${base}/api/state`, { headers: { cookie } })).json()).killed === true;
 
   const failed = Object.entries(checks).filter(([, ok]) => !ok);
   if (process.env.SMOKE_DEBUG) for (const e of seen.filter((e) => e.kind === "tool_result" && !e.ok)) console.log("tool error:", e.output);

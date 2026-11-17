@@ -5,9 +5,11 @@ Releases are automated with [Changesets](https://github.com/changesets/changeset
 ## Day to day
 
 1. In the PR that makes a user-facing change, add a changeset:
+
    ```bash
    pnpm changeset
    ```
+
    Pick the packages and the bump, write one line for the changelog, and commit the generated `.changeset/*.md` file.
 2. Merge to `main`. Once CI is green, the `release` job opens or updates a **Version Packages** PR, which bumps versions, writes the `CHANGELOG.md` files and updates internal dependency ranges.
 3. Merge the Version Packages PR. The `release` job runs `scripts/release.mjs`, which publishes every package version that isn't on npm yet (in dependency order), then tags them and creates GitHub releases.

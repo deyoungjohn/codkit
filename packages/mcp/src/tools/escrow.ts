@@ -34,8 +34,15 @@ export function escrowTools(opts: EscrowToolOptions) {
       description: `Lock ${sym} in escrow for a provider to earn by delivering. Approves the token and funds the deal (two policy-checked transactions). Returns the deal id.`,
       input: z.object({
         provider: addressSchema,
-        amount: z.string().regex(/^\d+(\.\d+)?$/).describe(`${sym}, human units`),
-        deadlineHours: z.number().positive().max(24 * 90).describe("Provider must deliver within this many hours"),
+        amount: z
+          .string()
+          .regex(/^\d+(\.\d+)?$/)
+          .describe(`${sym}, human units`),
+        deadlineHours: z
+          .number()
+          .positive()
+          .max(24 * 90)
+          .describe("Provider must deliver within this many hours"),
         terms: z.string().max(4000).describe("What is being bought; its hash is stored onchain"),
         arbiter: addressSchema.optional(),
       }),
@@ -58,7 +65,8 @@ export function escrowTools(opts: EscrowToolOptions) {
     }),
     defineTool({
       name: "escrow_status",
-      description: "Read a deal: parties, amount, deadline, status (Funded / Delivered / Released / Refunded / Disputed) and delivery hash.",
+      description:
+        "Read a deal: parties, amount, deadline, status (Funded / Delivered / Released / Refunded / Disputed) and delivery hash.",
       input: z.object({ dealId }),
       annotations: { readOnlyHint: true },
       run: async ({ dealId: id }) => {

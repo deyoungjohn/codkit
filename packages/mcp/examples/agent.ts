@@ -44,7 +44,14 @@ vendor.get("/report/full", (c) => c.json({ report: "…" }));
 // --- the agent's guardrails, wallet and receipts ----------------------------
 const engine = createPolicyEngine({
   policy: {
-    limits: [{ asset: "0x036CbD53842c5426634e7929541eC2318f3dCF7e", label: "USDC", perTx: usdc("0.50"), perPeriod: { amount: usdc("1"), seconds: 3600 } }],
+    limits: [
+      {
+        asset: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+        label: "USDC",
+        perTx: usdc("0.50"),
+        perPeriod: { amount: usdc("1"), seconds: 3600 },
+      },
+    ],
   },
 });
 const receipts = new ReceiptLog({ signer: ed25519Signer() });
@@ -53,13 +60,23 @@ const client = new x402Client();
 registerExactEvmScheme(client, { signer: privateKeyToAccount(generatePrivateKey()) });
 const fetchPaid = createBudgetedFetch({ engine, client, fetch: async (i, init) => vendor.fetch(new Request(i, init)) });
 
-const tools = instrument([...payTools({ fetch: fetchPaid, allowedHosts: ["vendor.local"] }), ...policyTools(engine), ...receiptTools(receipts)], {
-  onEvent: (e) => console.log(e.type === "tool_call" ? `  → ${e.name} ${JSON.stringify(e.input)}` : `  ← ${e.name} ${e.ok ? "ok" : `ERROR ${e.output}`} (${e.ms}ms)`),
-});
+const tools = instrument(
+  [...payTools({ fetch: fetchPaid, allowedHosts: ["vendor.local"] }), ...policyTools(engine), ...receiptTools(receipts)],
+  {
+    onEvent: (e) =>
+      console.log(
+        e.type === "tool_call"
+          ? `  → ${e.name} ${JSON.stringify(e.input)}`
+          : `  ← ${e.name} ${e.ok ? "ok" : `ERROR ${e.output}`} (${e.ms}ms)`,
+      ),
+  },
+);
 
 // --- run -------------------------------------------------------------------
 const providers = providersFromEnv();
-console.log(`providers: ${providers.map((p) => `${p.name} (${p.model})`).join(" → ") || "none — set GROQ_API_KEY, GEMINI_API_KEY, NVIDIA_API_KEY, OPENROUTER_API_KEY or AGENTROUTER_API_KEY"}`);
+console.log(
+  `providers: ${providers.map((p) => `${p.name} (${p.model})`).join(" → ") || "none — set GROQ_API_KEY, GEMINI_API_KEY, NVIDIA_API_KEY, OPENROUTER_API_KEY or AGENTROUTER_API_KEY"}`,
+);
 const res = await runAgent({
   providers,
   tools,
@@ -69,7 +86,8 @@ const res = await runAgent({
     "The data vendor is at http://vendor.local/. Get me current ETH and SOL prices. If the full market report fits the budget, buy it too; otherwise explain why not.",
   onEvent: (e) => {
     if (e.type === "thinking") console.log(`  💭 ${e.text.replace(/\s+/g, " ").slice(0, 200)}`);
-    if (e.type === "turn") console.log(`  [${e.provider}/${e.model}: ${e.stopReason}, ${e.usage.input_tokens} in / ${e.usage.output_tokens} out]`);
+    if (e.type === "turn")
+      console.log(`  [${e.provider}/${e.model}: ${e.stopReason}, ${e.usage.input_tokens} in / ${e.usage.output_tokens} out]`);
     if (e.type === "failover") console.log(`  ⚠ ${e.from} failed (${e.error}) → trying ${e.to}`);
   },
 });

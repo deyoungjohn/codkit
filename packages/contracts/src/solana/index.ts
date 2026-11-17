@@ -181,7 +181,12 @@ export async function createDealInstruction(d: SolanaNewDeal): Promise<Instructi
   };
 }
 
-export function deliverInstruction(a: { provider: Who; deal: Address; deliveryHash?: Uint8Array | string; programId?: Address }): Instruction {
+export function deliverInstruction(a: {
+  provider: Who;
+  deal: Address;
+  deliveryHash?: Uint8Array | string;
+  programId?: Address;
+}): Instruction {
   return {
     programAddress: a.programId ?? KIT_ESCROW_PROGRAM_ID,
     accounts: [signer(a.provider, false), w(a.deal)],
@@ -201,7 +206,10 @@ export async function disputeInstruction(a: { client: Who; deal: Address; provid
 /** Accounts a settlement needs from the deal: pass a fetched `SolanaDeal` or the fields. */
 type DealRef = Pick<SolanaDeal, "client" | "provider" | "mint"> & { address: Address };
 
-async function payout(kind: "release" | "claim", a: { signer: Who; deal: DealRef; tokenProgram?: Address; programId?: Address }): Promise<Instruction> {
+async function payout(
+  kind: "release" | "claim",
+  a: { signer: Who; deal: DealRef; tokenProgram?: Address; programId?: Address },
+): Promise<Instruction> {
   const programId = a.programId ?? KIT_ESCROW_PROGRAM_ID;
   const tp = a.tokenProgram ?? TOKEN_PROGRAM_ID;
   const { address: deal, client, provider, mint } = a.deal;
@@ -230,7 +238,12 @@ export const releaseInstruction = (a: Parameters<typeof payout>[1]) => payout("r
 export const claimInstruction = (a: Parameters<typeof payout>[1]) => payout("claim", a);
 
 /** Return the funds to the client (provider / arbiter any time; client after the deadline or an arbiter timeout). */
-export async function refundInstruction(a: { signer: Who; deal: DealRef; tokenProgram?: Address; programId?: Address }): Promise<Instruction> {
+export async function refundInstruction(a: {
+  signer: Who;
+  deal: DealRef;
+  tokenProgram?: Address;
+  programId?: Address;
+}): Promise<Instruction> {
   const programId = a.programId ?? KIT_ESCROW_PROGRAM_ID;
   const tp = a.tokenProgram ?? TOKEN_PROGRAM_ID;
   const { address: deal, client, provider, mint } = a.deal;
@@ -347,7 +360,11 @@ export interface AccountReader {
   ): { send(): Promise<{ value: { data: readonly [string, string] | unknown } | null }> };
 }
 
-async function fetchData(rpc: AccountReader, address: Address, commitment: "processed" | "confirmed" | "finalized"): Promise<Uint8Array | null> {
+async function fetchData(
+  rpc: AccountReader,
+  address: Address,
+  commitment: "processed" | "confirmed" | "finalized",
+): Promise<Uint8Array | null> {
   const { value } = await rpc.getAccountInfo(address, { encoding: "base64", commitment }).send();
   if (!value) return null;
   const [b64] = value.data as [string, string];
@@ -374,7 +391,13 @@ export async function fetchReputation(
  * Policy `Action` for funding a Solana escrow, so `engine.authorize()` /
  * `execute()` can gate it like any other spend. `amount` is in base units.
  */
-export function solanaEscrowCreateAction(d: { mint: Address; provider: Address; amount: bigint; cluster?: string; programId?: Address }): Action {
+export function solanaEscrowCreateAction(d: {
+  mint: Address;
+  provider: Address;
+  amount: bigint;
+  cluster?: string;
+  programId?: Address;
+}): Action {
   return {
     chain: `solana:${d.cluster ?? "devnet"}`,
     kind: "escrow_fund",

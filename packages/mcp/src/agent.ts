@@ -31,7 +31,11 @@ export interface ProviderPreset {
 /** Presets, in auto-detect order (most generous free tier with solid tool calling first). */
 export const PROVIDERS = {
   groq: { baseUrl: "https://api.groq.com/openai/v1", keyEnv: "GROQ_API_KEY", model: "openai/gpt-oss-120b" },
-  gemini: { baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai", keyEnv: "GEMINI_API_KEY", model: "gemini-3.5-flash,gemini-flash-lite-latest" },
+  gemini: {
+    baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai",
+    keyEnv: "GEMINI_API_KEY",
+    model: "gemini-3.5-flash,gemini-flash-lite-latest",
+  },
   nvidia: { baseUrl: "https://integrate.api.nvidia.com/v1", keyEnv: "NVIDIA_API_KEY", model: "openai/gpt-oss-120b" },
   openrouter: {
     baseUrl: "https://openrouter.ai/api/v1",
@@ -60,7 +64,9 @@ export type ProviderName = keyof typeof PROVIDERS;
  */
 export function providersFromEnv(env: Record<string, string | undefined> = process.env): LlmProvider[] {
   const names = env.LLM_PROVIDER
-    ? env.LLM_PROVIDER.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean)
+    ? env.LLM_PROVIDER.split(",")
+        .map((s) => s.trim().toLowerCase())
+        .filter(Boolean)
     : (Object.keys(PROVIDERS) as ProviderName[]).filter((n) => env[PROVIDERS[n].keyEnv]);
   return names.flatMap((name, i): LlmProvider[] => {
     const m = env[`${name.toUpperCase()}_MODEL`] || (i === 0 ? env.LLM_MODEL : undefined);
@@ -78,7 +84,11 @@ export function providersFromEnv(env: Record<string, string | undefined> = proce
   });
 }
 
-const models = (s: string | undefined) => (s ?? "").split(",").map((x) => x.trim()).filter(Boolean);
+const models = (s: string | undefined) =>
+  (s ?? "")
+    .split(",")
+    .map((x) => x.trim())
+    .filter(Boolean);
 
 // ------------------------------------------------------------ wire types
 
@@ -95,7 +105,10 @@ export type ChatMessage =
 
 interface ChatResponse {
   model?: string;
-  choices?: { finish_reason?: string | null; message?: { content?: string | null; tool_calls?: ToolCall[]; reasoning?: string; reasoning_content?: string } }[];
+  choices?: {
+    finish_reason?: string | null;
+    message?: { content?: string | null; tool_calls?: ToolCall[]; reasoning?: string; reasoning_content?: string };
+  }[];
   usage?: { prompt_tokens?: number; completion_tokens?: number };
   error?: { message?: string } | string;
 }
@@ -179,7 +192,11 @@ export async function runAgent(opts: RunAgentOptions): Promise<RunAgentResult> {
   if (!opts.messages && !opts.prompt) throw new Error("runAgent: pass prompt or messages");
   const providers = [opts.providers ?? providersFromEnv()].flat();
   if (!providers.length) {
-    throw new Error(`runAgent: no LLM provider configured — set one of ${Object.values(PROVIDERS).map((p) => p.keyEnv).join(", ")}`);
+    throw new Error(
+      `runAgent: no LLM provider configured — set one of ${Object.values(PROVIDERS)
+        .map((p) => p.keyEnv)
+        .join(", ")}`,
+    );
   }
   const fetchFn = opts.fetch ?? globalThis.fetch;
   const byName = new Map(opts.tools.map((t) => [t.name, t]));

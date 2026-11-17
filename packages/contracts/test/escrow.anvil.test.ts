@@ -2,15 +2,7 @@ import { createPolicyEngine, usdc } from "@codkit/policy";
 import { createEvmGuard, type EvmGuard } from "@codkit/policy/evm";
 import type { Address, PublicClient } from "viem";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import {
-  dealIdFromLogs,
-  deployData,
-  escrowAbi,
-  escrowTxs,
-  hashText,
-  readDeal,
-  readReputation,
-} from "../src/index.js";
+import { dealIdFromLogs, deployData, escrowAbi, escrowTxs, hashText, readDeal, readReputation } from "../src/index.js";
 import { artifact, deployed, KEYS, startAnvil, wallet } from "./anvil.js";
 
 let stop: () => void;
@@ -35,7 +27,12 @@ beforeAll(async () => {
   const mock = artifact("Mocks.sol", "MockERC20");
   token = await deployed(pc, await deployer.deployContract({ abi: mock.abi, bytecode: mock.bytecode }));
   await pc.waitForTransactionReceipt({
-    hash: await deployer.writeContract({ address: token, abi: mock.abi, functionName: "mint", args: [w.client.account.address, usdc(1000)] }),
+    hash: await deployer.writeContract({
+      address: token,
+      abi: mock.abi,
+      functionName: "mint",
+      args: [w.client.account.address, usdc(1000)],
+    }),
   });
 
   // The client is an AI agent: every tx it sends goes through policy + simulation.
@@ -51,7 +48,12 @@ beforeAll(async () => {
 afterAll(() => stop?.());
 
 const balanceOf = (who: Address) =>
-  pc.readContract({ address: token, abi: artifact("Mocks.sol", "MockERC20").abi, functionName: "balanceOf", args: [who] }) as Promise<bigint>;
+  pc.readContract({
+    address: token,
+    abi: artifact("Mocks.sol", "MockERC20").abi,
+    functionName: "balanceOf",
+    args: [who],
+  }) as Promise<bigint>;
 
 describe("escrow on anvil, driven by a policy-guarded agent", () => {
   it("runs create → fund → deliver → release and updates reputation", async () => {
@@ -63,7 +65,14 @@ describe("escrow on anvil, driven by a policy-guarded agent", () => {
 
     const deadline = new Date(Date.now() + 3 * 86_400_000);
     const created = await guard.send(
-      tx.createAndFund({ provider, token, amount: usdc(25), deadline, arbiter: w.arbiter.account.address, termsHash: hashText("market report") }),
+      tx.createAndFund({
+        provider,
+        token,
+        amount: usdc(25),
+        deadline,
+        arbiter: w.arbiter.account.address,
+        termsHash: hashText("market report"),
+      }),
     );
     expect(guard.toAction(tx.createAndFund({ provider, token, amount: 1n, deadline })).method).toBe("createAndFund");
     const id = dealIdFromLogs((await pc.waitForTransactionReceipt({ hash: created.result })).logs)!;

@@ -93,9 +93,7 @@ export class ReceiptLog {
   async publish(opts: { anchorer?: Anchorer; uploader?: Uploader }): Promise<PublishResult> {
     const checkpoint = await this.checkpoint();
     const upload = opts.uploader ? await opts.uploader.upload(await this.toJsonl()) : undefined;
-    const anchor = opts.anchorer
-      ? await opts.anchorer.anchor({ ...checkpoint, ...(upload && { uri: upload.uri }) })
-      : undefined;
+    const anchor = opts.anchorer ? await opts.anchorer.anchor({ ...checkpoint, ...(upload && { uri: upload.uri }) }) : undefined;
     const receipt = await this.append("anchor", { checkpoint, upload, anchor });
     return { checkpoint, ...(upload && { upload }), ...(anchor && { anchor }), receipt };
   }

@@ -6,7 +6,15 @@ export type FeedEventBody =
   | { kind: "policy"; verdict: "allow" | "deny" | "require_approval"; summary: string; reasons: string[]; action: Json }
   | { kind: "approval_request"; requestId: string; summary: string; reasons: string[]; expiresAt: number }
   | { kind: "approval"; approved: boolean; summary: string; by?: string; note?: string; requestId?: string }
-  | { kind: "tx"; chain: string; hash: string; url: string | null; label: string; status: "sent" | "settled" | "failed"; simulated?: boolean }
+  | {
+      kind: "tx";
+      chain: string;
+      hash: string;
+      url: string | null;
+      label: string;
+      status: "sent" | "settled" | "failed";
+      simulated?: boolean;
+    }
   | { kind: "thinking"; text: string }
   | { kind: "message"; text: string }
   | { kind: "tool_call"; callId: string; name: string; input: Json }
@@ -159,7 +167,9 @@ export function agentEventToFeed(feed: Feed, e: { type: string; text?: string })
 /** Map tool events (`instrument` onEvent in `@codkit/mcp`). */
 export function toolEventToFeed(
   feed: Feed,
-  e: { type: "tool_call"; id: string; name: string; input: unknown } | { type: "tool_result"; id: string; name: string; ok: boolean; output: string; ms: number },
+  e:
+    | { type: "tool_call"; id: string; name: string; input: unknown }
+    | { type: "tool_result"; id: string; name: string; ok: boolean; output: string; ms: number },
 ): void {
   if (e.type === "tool_call") feed.push({ kind: "tool_call", callId: e.id, name: e.name, input: normalize(e.input) });
   else feed.push({ kind: "tool_result", callId: e.id, name: e.name, ok: e.ok, output: e.output, ms: e.ms });

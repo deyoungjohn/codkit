@@ -11,7 +11,10 @@ export function proxy(req: NextRequest) {
   const ok = mode === "password" && verifySession(req.cookies.get(SESSION_COOKIE)?.value);
   if (ok) return NextResponse.next();
   if (req.nextUrl.pathname.startsWith("/api/")) {
-    return NextResponse.json({ error: mode === "locked" ? "dashboard is locked: set DASHBOARD_PASSWORD" : "sign in required" }, { status: mode === "locked" ? 503 : 401 });
+    return NextResponse.json(
+      { error: mode === "locked" ? "dashboard is locked: set DASHBOARD_PASSWORD" : "sign in required" },
+      { status: mode === "locked" ? 503 : 401 },
+    );
   }
   const login = new URL("/login", req.url);
   if (req.nextUrl.pathname !== "/") login.searchParams.set("next", req.nextUrl.pathname);

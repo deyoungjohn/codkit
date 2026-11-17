@@ -17,7 +17,9 @@ describe("webhooks", () => {
     const body = JSON.stringify({ id: "evt_1", type: "payment.settled", created: 1, data: { amount: "10000" } });
     const signature = await signWebhook(body, SECRET, 1_000);
     await expect(verifyWebhook({ body, signature, secret: SECRET, now: 1_100 })).resolves.toMatchObject({ type: "payment.settled" });
-    await expect(verifyWebhook({ body: body.replace("10000", "99999"), signature, secret: SECRET, now: 1_100 })).rejects.toThrow(/mismatch/);
+    await expect(verifyWebhook({ body: body.replace("10000", "99999"), signature, secret: SECRET, now: 1_100 })).rejects.toThrow(
+      /mismatch/,
+    );
     await expect(verifyWebhook({ body, signature, secret: "another_secret_value", now: 1_100 })).rejects.toThrow(/mismatch/);
     await expect(verifyWebhook({ body, signature, secret: SECRET, now: 2_000 })).rejects.toThrow(/tolerance/);
     await expect(verifyWebhook({ body, signature: null, secret: SECRET })).rejects.toThrow(/malformed/);

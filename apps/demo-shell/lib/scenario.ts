@@ -52,9 +52,14 @@ export async function runScenario(rt: Runtime, opts: { stepMs?: number } = {}) {
     to: "0x2222222222222222222222222222222222222222",
     spends: [{ asset: "0x036CbD53842c5426634e7929541eC2318f3dCF7e", amount: "2000000" }],
   });
-  await think("Denied: $2.00 exceeds the 0.50 USDC per-payment cap. To show the guardrail holds, I'll attempt it anyway — the payment must be refused before anything is signed.");
+  await think(
+    "Denied: $2.00 exceeds the 0.50 USDC per-payment cap. To show the guardrail holds, I'll attempt it anyway — the payment must be refused before anything is signed.",
+  );
   await call("pay_fetch", { url: `${base}/report/full` });
-  await call("receipts_note", { note: "Declined full report ($2.00): over per-payment cap. Bought ETH + SOL quotes and the summary instead.", tags: ["budget"] });
+  await call("receipts_note", {
+    note: "Declined full report ($2.00): over per-payment cap. Bought ETH + SOL quotes and the summary instead.",
+    tags: ["budget"],
+  });
 
   const verify = await call("receipts_verify", {});
   await say(

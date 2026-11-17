@@ -7,16 +7,7 @@
  * - no contract: a 0-value tx to yourself whose calldata is `KIT_RECEIPTS_TAG ‖ head ‖ seq`.
  *   Zero deployment; look it up by tx hash.
  */
-import {
-  bytesToHex,
-  concat,
-  encodeFunctionData,
-  numberToHex,
-  parseAbi,
-  recoverMessageAddress,
-  type Address,
-  type Hex,
-} from "viem";
+import { bytesToHex, concat, encodeFunctionData, numberToHex, parseAbi, recoverMessageAddress, type Address, type Hex } from "viem";
 import { explorerTxUrl } from "../explorer.js";
 import type { Anchorer, Signer, Verifier } from "../types.js";
 

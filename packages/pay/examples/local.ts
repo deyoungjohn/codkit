@@ -26,10 +26,18 @@ app.get("/quote", (c) => c.json({ quote: "Ship the demo, not the roadmap." }));
 
 const engine = createPolicyEngine({
   policy: {
-    limits: [{ asset: "0x036CbD53842c5426634e7929541eC2318f3dCF7e", label: "USDC", perTx: usdc("0.05"), perPeriod: { amount: usdc("0.03"), seconds: 3600 } }],
+    limits: [
+      {
+        asset: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+        label: "USDC",
+        perTx: usdc("0.05"),
+        perPeriod: { amount: usdc("0.03"), seconds: 3600 },
+      },
+    ],
   },
   onEvent: (e) => {
-    if (e.type === "decision") console.log(`  policy: ${e.decision.verdict}${e.decision.reasons.length ? ` (${e.decision.reasons.join("; ")})` : ""}`);
+    if (e.type === "decision")
+      console.log(`  policy: ${e.decision.verdict}${e.decision.reasons.length ? ` (${e.decision.reasons.join("; ")})` : ""}`);
   },
 });
 const client = new x402Client();

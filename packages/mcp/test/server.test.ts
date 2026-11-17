@@ -16,7 +16,7 @@ async function connect(tools: Parameters<typeof createMcpServer>[0], extra: Part
   return client;
 }
 
-const text = (r: unknown) => ((r as { content: { text: string }[] }).content[0]!.text);
+const text = (r: unknown) => (r as { content: { text: string }[] }).content[0]!.text;
 
 describe("MCP server", () => {
   it("lists tools with JSON schemas and annotations", async () => {
@@ -33,7 +33,9 @@ describe("MCP server", () => {
 
   it("calls tools and reports errors with isError", async () => {
     const client = await connect([echo, boom]);
-    expect(JSON.parse(text(await client.callTool({ name: "echo", arguments: { message: "yo", times: 2 } })))).toMatchObject({ echoed: ["yo", "yo"] });
+    expect(JSON.parse(text(await client.callTool({ name: "echo", arguments: { message: "yo", times: 2 } })))).toMatchObject({
+      echoed: ["yo", "yo"],
+    });
     const failed = await client.callTool({ name: "boom", arguments: {} });
     expect(failed.isError).toBe(true);
     expect(text(failed)).toBe("Error: kaboom");
@@ -43,7 +45,11 @@ describe("MCP server", () => {
     const facilitator = {
       verify: vi.fn(),
       settle: vi.fn(),
-      getSupported: vi.fn(async () => ({ kinds: [{ x402Version: 2, scheme: "exact", network: CHAIN as `${string}:${string}` }], extensions: [], signers: {} })),
+      getSupported: vi.fn(async () => ({
+        kinds: [{ x402Version: 2, scheme: "exact", network: CHAIN as `${string}:${string}` }],
+        extensions: [],
+        signers: {},
+      })),
     };
     const paywall = mcpPaywall({ payTo: "0x2222222222222222222222222222222222222222", facilitator, tools: { echo: "$0.01" } });
     const client = await connect([echo, boom], { wrapHandler: paywall.wrap });
@@ -61,7 +67,12 @@ describe("MCP server", () => {
     const check = (amount: bigint) =>
       client.callTool({
         name: "policy_check",
-        arguments: { chain: CHAIN, kind: "x402_payment", to: "0x1111111111111111111111111111111111111111", spends: [{ asset: USDC, amount: amount.toString() }] },
+        arguments: {
+          chain: CHAIN,
+          kind: "x402_payment",
+          to: "0x1111111111111111111111111111111111111111",
+          spends: [{ asset: USDC, amount: amount.toString() }],
+        },
       });
     expect(JSON.parse(text(await check(usdc(1))))).toEqual({ verdict: "allow", reasons: [] });
     expect(JSON.parse(text(await check(usdc(9)))).verdict).toBe("deny");
@@ -85,7 +96,11 @@ describe("MCP over HTTP (stateless, web-standard)", () => {
       const res = await handler(
         new Request("http://localhost/mcp", {
           method: "POST",
-          headers: { "content-type": "application/json", accept: "application/json, text/event-stream", "mcp-protocol-version": "2025-06-18" },
+          headers: {
+            "content-type": "application/json",
+            accept: "application/json, text/event-stream",
+            "mcp-protocol-version": "2025-06-18",
+          },
           body: JSON.stringify({ jsonrpc: "2.0", id: 1, ...body }),
         }),
       );
@@ -109,7 +124,12 @@ describe("MCP over HTTP: auth", () => {
   const req = (headers: Record<string, string> = {}) =>
     new Request("http://localhost/mcp", {
       method: "POST",
-      headers: { "content-type": "application/json", accept: "application/json, text/event-stream", "mcp-protocol-version": "2025-06-18", ...headers },
+      headers: {
+        "content-type": "application/json",
+        accept: "application/json, text/event-stream",
+        "mcp-protocol-version": "2025-06-18",
+        ...headers,
+      },
       body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list", params: {} }),
     });
 
@@ -150,7 +170,9 @@ describe("MCP over HTTP: auth", () => {
     });
     const denied = await handler(req({ authorization: "Bearer forged" }));
     expect(denied.status).toBe(401);
-    expect(denied.headers.get("www-authenticate")).toContain('resource_metadata="https://agent.example/.well-known/oauth-protected-resource"');
+    expect(denied.headers.get("www-authenticate")).toContain(
+      'resource_metadata="https://agent.example/.well-known/oauth-protected-resource"',
+    );
     expect((await handler(req({ authorization: "Bearer jwt-issued-by-my-auth-server" }))).status).toBe(200);
     expect(seen).toEqual(["/mcp", "/mcp"]);
   });

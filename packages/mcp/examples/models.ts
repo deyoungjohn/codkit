@@ -10,7 +10,12 @@ import { PROVIDERS, type ProviderName } from "../src/agent.js";
 
 const filter = process.argv[2]?.toLowerCase();
 const configured = (Object.keys(PROVIDERS) as ProviderName[]).filter((n) => process.env[PROVIDERS[n].keyEnv]);
-if (!configured.length) console.log(`No keys set. Set any of: ${Object.values(PROVIDERS).map((p) => p.keyEnv).join(", ")}`);
+if (!configured.length)
+  console.log(
+    `No keys set. Set any of: ${Object.values(PROVIDERS)
+      .map((p) => p.keyEnv)
+      .join(", ")}`,
+  );
 
 for (const name of configured) {
   const p = PROVIDERS[name];

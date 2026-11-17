@@ -19,7 +19,7 @@ import { JsonlFileStore } from "@codkit/receipts/node";
 
 const log = new ReceiptLog({ signer: ed25519Signer(process.env.RECEIPT_KEY), store: new JsonlFileStore("receipts.jsonl") });
 
-recordPolicyEvents(engine, log);                       // every policy decision/execution → receipt
+recordPolicyEvents(engine, log); // every policy decision/execution → receipt
 await log.append("x402.settled", { tx, amount: 10_000n }); // or record anything yourself
 
 const { anchor, upload } = await log.publish({ anchorer, uploader }); // upload log, anchor head, record it
@@ -30,20 +30,20 @@ A receipt has this shape: `{ v, seq, prev, ts, type, actor, data, hash, sig }`. 
 
 ## Signers
 
-| Scheme | Signer | Verifier |
-| --- | --- | --- |
-| `ed25519` | `ed25519Signer(secretKey?)` | built in |
-| `eip191` | `eip191Signer(viemAccount)` from `/evm` | pass `{ verifiers: { eip191: eip191Verifier } }` |
+| Scheme    | Signer                                  | Verifier                                         |
+| --------- | --------------------------------------- | ------------------------------------------------ |
+| `ed25519` | `ed25519Signer(secretKey?)`             | built in                                         |
+| `eip191`  | `eip191Signer(viemAccount)` from `/evm` | pass `{ verifiers: { eip191: eip191Verifier } }` |
 
 ## Anchors and storage
 
-| Where | Import | Notes |
-| --- | --- | --- |
-| EVM event | `evmAnchorer({ chainId, wallet, contract })` from `/evm` | Uses `ReceiptAnchor.sol` from `@codkit/contracts`. Query with `readEvmAnchors`. |
-| EVM calldata | `evmAnchorer({ chainId, wallet })` | Needs no deployment. The anchor is a 0-value self-tx tagged `kitrcpt1` (`parseCalldataAnchor`). |
-| Solana memo | `anchorMemoInstruction(checkpoint, signer)` from `/solana` | Returns a `@solana/kit`-shaped instruction to add to your tx. |
-| Sui event | `suiAnchorer({ packageId, network, execute })` from `/sui` | Uses `kit_escrow::anchor` from `@codkit/contracts`. |
-| Walrus | `walrusUploader()` from `/walrus` | Uses the HTTP publisher API with testnet defaults. URIs look like `walrus://<blobId>`. Read logs back with `readWalrusUri`. |
+| Where        | Import                                                     | Notes                                                                                                                       |
+| ------------ | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| EVM event    | `evmAnchorer({ chainId, wallet, contract })` from `/evm`   | Uses `ReceiptAnchor.sol` from `@codkit/contracts`. Query with `readEvmAnchors`.                                             |
+| EVM calldata | `evmAnchorer({ chainId, wallet })`                         | Needs no deployment. The anchor is a 0-value self-tx tagged `kitrcpt1` (`parseCalldataAnchor`).                             |
+| Solana memo  | `anchorMemoInstruction(checkpoint, signer)` from `/solana` | Returns a `@solana/kit`-shaped instruction to add to your tx.                                                               |
+| Sui event    | `suiAnchorer({ packageId, network, execute })` from `/sui` | Uses `kit_escrow::anchor` from `@codkit/contracts`.                                                                         |
+| Walrus       | `walrusUploader()` from `/walrus`                          | Uses the HTTP publisher API with testnet defaults. URIs look like `walrus://<blobId>`. Read logs back with `readWalrusUri`. |
 
 You can write your own anchorer or uploader for anything else (IPFS pinning, S3, …). Each is a single-method interface.
 

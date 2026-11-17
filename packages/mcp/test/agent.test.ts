@@ -5,7 +5,11 @@ import { policyTools } from "../src/tools/policy.js";
 import { CHAIN, fixtures, USDC } from "./helpers.js";
 
 /** The bits of a Chat Completions request body the assertions read. */
-type Body = { tools: { function: { name: string } }[]; messages: { role: string; tool_call_id?: string; content?: string }[]; [k: string]: unknown };
+type Body = {
+  tools: { function: { name: string } }[];
+  messages: { role: string; tool_call_id?: string; content?: string }[];
+  [k: string]: unknown;
+};
 
 type Reply = { status?: number; body: unknown; headers?: Record<string, string> };
 
@@ -16,15 +20,26 @@ function scripted(replies: Reply[]) {
     requests.push({ url: String(url), headers: new Headers(init?.headers), body: JSON.parse(String(init?.body)) });
     const reply = replies[requests.length - 1];
     if (!reply) throw new Error("unexpected extra request");
-    return new Response(JSON.stringify(reply.body), { status: reply.status ?? 200, headers: { "content-type": "application/json", ...reply.headers } });
+    return new Response(JSON.stringify(reply.body), {
+      status: reply.status ?? 200,
+      headers: { "content-type": "application/json", ...reply.headers },
+    });
   }) as typeof globalThis.fetch;
   return { fetch, requests };
 }
 
 const completion = (message: Record<string, unknown>, finish_reason = "stop") => ({
-  body: { model: "m", choices: [{ index: 0, finish_reason, message: { role: "assistant", content: null, ...message } }], usage: { prompt_tokens: 100, completion_tokens: 20 } },
+  body: {
+    model: "m",
+    choices: [{ index: 0, finish_reason, message: { role: "assistant", content: null, ...message } }],
+    usage: { prompt_tokens: 100, completion_tokens: 20 },
+  },
 });
-const call = (id: string, name: string, args: unknown) => ({ id, type: "function", function: { name, arguments: typeof args === "string" ? args : JSON.stringify(args) } });
+const call = (id: string, name: string, args: unknown) => ({
+  id,
+  type: "function",
+  function: { name, arguments: typeof args === "string" ? args : JSON.stringify(args) },
+});
 
 const checkArgs = (amount: bigint) => ({
   chain: CHAIN,
@@ -40,11 +55,21 @@ describe("runAgent (OpenAI-compatible loop)", () => {
   it("runs tools the model calls, feeds results back, and returns the final answer", async () => {
     const { engine } = fixtures();
     const { fetch, requests } = scripted([
-      completion({ reasoning: "Check the budget before paying.", tool_calls: [call("c1", "policy_check", checkArgs(usdc(9)))] }, "tool_calls"),
+      completion(
+        { reasoning: "Check the budget before paying.", tool_calls: [call("c1", "policy_check", checkArgs(usdc(9)))] },
+        "tool_calls",
+      ),
       completion({ content: "9 USDC is over the 5 USDC per-payment cap, so I didn't pay." }),
     ]);
     const events: AgentEvent[] = [];
-    const res = await runAgent({ fetch, providers: groq, tools: policyTools(engine), prompt: "Pay 9 USDC", system: "Be careful.", onEvent: (e) => events.push(e) });
+    const res = await runAgent({
+      fetch,
+      providers: groq,
+      tools: policyTools(engine),
+      prompt: "Pay 9 USDC",
+      system: "Be careful.",
+      onEvent: (e) => events.push(e),
+    });
 
     expect(res).toMatchObject({ stopReason: "stop", turns: 2, provider: "groq", model: "m" });
     expect(res.text).toMatch(/over the 5 USDC/);
@@ -54,7 +79,14 @@ describe("runAgent (OpenAI-compatible loop)", () => {
     const first = requests[0]!;
     expect(first.url).toBe("https://api.groq.test/openai/v1/chat/completions");
     expect(first.headers.get("authorization")).toBe("Bearer k1");
-    expect(first.body).toMatchObject({ model: "gpt-oss", tool_choice: "auto", messages: [{ role: "system", content: "Be careful." }, { role: "user", content: "Pay 9 USDC" }] });
+    expect(first.body).toMatchObject({
+      model: "gpt-oss",
+      tool_choice: "auto",
+      messages: [
+        { role: "system", content: "Be careful." },
+        { role: "user", content: "Pay 9 USDC" },
+      ],
+    });
     expect(first.body.tools.map((t) => t.function.name)).toEqual(["policy_check", "policy_status", "policy_halt"]);
     expect(JSON.stringify(first.body)).not.toContain("null"); // some relays reject null fields
 
@@ -91,9 +123,21 @@ describe("runAgent (OpenAI-compatible loop)", () => {
       completion({ content: "done" }),
     ]);
     const events: AgentEvent[] = [];
-    const res = await runAgent({ fetch, providers: [groq, gemini], retries: 1, maxBackoffMs: 1, tools: policyTools(engine), prompt: "go", onEvent: (e) => events.push(e) });
+    const res = await runAgent({
+      fetch,
+      providers: [groq, gemini],
+      retries: 1,
+      maxBackoffMs: 1,
+      tools: policyTools(engine),
+      prompt: "go",
+      onEvent: (e) => events.push(e),
+    });
     expect(requests.map((r) => new URL(r.url).host)).toEqual(["api.groq.test", "api.groq.test", "gemini.test", "gemini.test"]);
-    expect(events.find((e) => e.type === "failover")).toMatchObject({ from: "groq/gpt-oss", to: "gemini/flash", error: expect.stringContaining("429") });
+    expect(events.find((e) => e.type === "failover")).toMatchObject({
+      from: "groq/gpt-oss",
+      to: "gemini/flash",
+      error: expect.stringContaining("429"),
+    });
     expect(res.provider).toBe("gemini");
   });
 
@@ -118,9 +162,19 @@ describe("runAgent (OpenAI-compatible loop)", () => {
       return new Response(JSON.stringify(completion({ content: "hi" }).body), { status: 200 });
     }) as typeof globalThis.fetch;
     const events: AgentEvent[] = [];
-    const res = await runAgent({ fetch, providers: [gemini, groq], requestTimeoutMs: 50, tools: [], prompt: "hi", onEvent: (e) => events.push(e) });
+    const res = await runAgent({
+      fetch,
+      providers: [gemini, groq],
+      requestTimeoutMs: 50,
+      tools: [],
+      prompt: "hi",
+      onEvent: (e) => events.push(e),
+    });
     expect(hosts).toEqual(["gemini.test", "api.groq.test"]);
-    expect(events.find((e) => e.type === "failover")).toMatchObject({ from: "gemini/flash", error: expect.stringMatching(/no response within/) });
+    expect(events.find((e) => e.type === "failover")).toMatchObject({
+      from: "gemini/flash",
+      error: expect.stringMatching(/no response within/),
+    });
     expect(res).toMatchObject({ text: "hi", provider: "groq" });
   });
 

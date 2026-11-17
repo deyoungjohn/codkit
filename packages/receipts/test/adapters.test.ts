@@ -14,10 +14,20 @@ describe("recordPolicyEvents", () => {
     const engine = createPolicyEngine({ policy: { limits: [{ asset: USDC, perTx: usdc(5) }] } });
     const log = new ReceiptLog({ signer: ed25519Signer() });
     const rec = recordPolicyEvents(engine, log);
-    const action = { chain: "eip155:84532", kind: "transfer", to: "0x1111111111111111111111111111111111111111", spends: [{ asset: USDC, amount: usdc(1) }] };
+    const action = {
+      chain: "eip155:84532",
+      kind: "transfer",
+      to: "0x1111111111111111111111111111111111111111",
+      spends: [{ asset: USDC, amount: usdc(1) }],
+    };
 
     await engine.execute(action, { simulate: async () => ({ ok: true }), execute: async () => "0xtx", ref: (h) => h });
-    await engine.execute({ ...action, spends: [{ asset: USDC, amount: usdc(9) }] }, { simulate: async () => ({ ok: true }), execute: async () => "0x" }).catch(() => {});
+    await engine
+      .execute(
+        { ...action, spends: [{ asset: USDC, amount: usdc(9) }] },
+        { simulate: async () => ({ ok: true }), execute: async () => "0x" },
+      )
+      .catch(() => {});
     engine.kill("demo");
     await rec.flush();
 

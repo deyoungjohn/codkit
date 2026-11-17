@@ -14,9 +14,7 @@ const engine = createPolicyEngine({
   policy: {
     chains: ["eip155:84532"],
     deny: { addresses: [SCAMMER] },
-    limits: [
-      { asset: USDC, label: "USDC", perTx: usdc(5), perPeriod: { amount: usdc(8), seconds: 86_400 }, approvalAbove: usdc(3) },
-    ],
+    limits: [{ asset: USDC, label: "USDC", perTx: usdc(5), perPeriod: { amount: usdc(8), seconds: 86_400 }, approvalAbove: usdc(3) }],
   },
   // Swap for a Telegram button / dashboard click in a real project.
   approver: async ({ action, decision }) => {
@@ -24,7 +22,8 @@ const engine = createPolicyEngine({
     return { approved: true, by: "demo-human" };
   },
   onEvent: (e) => {
-    if (e.type === "decision") console.log(`  [policy] ${e.decision.verdict}${e.decision.reasons.length ? ` — ${e.decision.reasons.join("; ")}` : ""}`);
+    if (e.type === "decision")
+      console.log(`  [policy] ${e.decision.verdict}${e.decision.reasons.length ? ` — ${e.decision.reasons.join("; ")}` : ""}`);
   },
 });
 

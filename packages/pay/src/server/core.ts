@@ -79,11 +79,13 @@ export function createPaywall(opts: PaywallOptions): Paywall {
 
   const server = new x402ResourceServer(facilitator);
   const schemes = [...(opts.schemes ?? [])];
-  const covered = (n: Network) => schemes.some((s) => s.network === n || (s.network.endsWith(":*") && n.startsWith(s.network.slice(0, -1))));
+  const covered = (n: Network) =>
+    schemes.some((s) => s.network === n || (s.network.endsWith(":*") && n.startsWith(s.network.slice(0, -1))));
   for (const n of networks) {
     if (covered(n)) continue;
     if (n.startsWith("eip155:")) schemes.push({ network: n, server: new ExactEvmScheme() });
-    else if (n.startsWith("solana:")) throw new Error(`paywall: no x402 scheme for ${n}; pass \`schemes: svmSchemes("${n}")\` from "@codkit/pay/svm"`);
+    else if (n.startsWith("solana:"))
+      throw new Error(`paywall: no x402 scheme for ${n}; pass \`schemes: svmSchemes("${n}")\` from "@codkit/pay/svm"`);
     else throw new Error(`paywall: no x402 scheme for ${n}; pass one in \`schemes\``);
   }
   for (const s of schemes) server.register(s.network, s.server);

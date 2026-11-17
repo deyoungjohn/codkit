@@ -30,9 +30,8 @@ async function run(signer: Ed25519Keypair, tx: Transaction, label: string) {
 }
 
 const created = (t: Awaited<ReturnType<typeof run>>, typeIncludes: string) =>
-  t.effects!.changedObjects.find(
-    (o) => o.idOperation === "Created" && (t.objectTypes?.[o.objectId] ?? "").includes(typeIncludes),
-  )?.objectId;
+  t.effects!.changedObjects.find((o) => o.idOperation === "Created" && (t.objectTypes?.[o.objectId] ?? "").includes(typeIncludes))
+    ?.objectId;
 
 const [client_, provider] = [Ed25519Keypair.generate(), Ed25519Keypair.generate()];
 for (const k of [client_, provider]) {
@@ -43,7 +42,10 @@ console.log(`client   ${client_.toSuiAddress()}\nprovider ${provider.toSuiAddres
 // 1. publish
 const pkgDir = join(dirname(fileURLToPath(import.meta.url)), "../sui");
 const { modules, dependencies } = JSON.parse(
-  execFileSync("sui", ["move", "build", "--dump-bytecode-as-base64", "--path", pkgDir], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }),
+  execFileSync("sui", ["move", "build", "--dump-bytecode-as-base64", "--path", pkgDir], {
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "ignore"],
+  }),
 ) as { modules: string[]; dependencies: string[] };
 const pubTx = new Transaction();
 pubTx.transferObjects([pubTx.publish({ modules, dependencies })], client_.toSuiAddress());

@@ -25,7 +25,9 @@ function secret(): Buffer {
   const s = process.env.SESSION_SECRET;
   if (s && s.length >= 32) return Buffer.from(s);
   // deterministic, so the proxy and every route bundle agree without shared state
-  return createHmac("sha256", "codkit-dashboard-session-v1").update(process.env.DASHBOARD_PASSWORD ?? "").digest();
+  return createHmac("sha256", "codkit-dashboard-session-v1")
+    .update(process.env.DASHBOARD_PASSWORD ?? "")
+    .digest();
 }
 
 const sign = (payload: string) => createHmac("sha256", secret()).update(payload).digest("base64url");
@@ -43,7 +45,8 @@ export function verifySession(value: string | undefined, now = Date.now()): bool
   const payload = value.slice(0, i);
   const [v, exp] = payload.split(".");
   if (v !== "v1" || !(Number(exp) > now)) return false;
-  const a = Buffer.from(value.slice(i + 1)), b = Buffer.from(sign(payload));
+  const a = Buffer.from(value.slice(i + 1)),
+    b = Buffer.from(sign(payload));
   return a.length === b.length && timingSafeEqual(a, b);
 }
 
@@ -84,7 +87,8 @@ export function sameOrigin(req: Request): boolean {
 export function requireSession(req: Request): Response | null {
   const mode = authMode();
   if (mode === "locked") return Response.json({ error: "dashboard is locked: set DASHBOARD_PASSWORD" }, { status: 503 });
-  if (req.method !== "GET" && req.method !== "HEAD" && !sameOrigin(req)) return Response.json({ error: "cross-origin request refused" }, { status: 403 });
+  if (req.method !== "GET" && req.method !== "HEAD" && !sameOrigin(req))
+    return Response.json({ error: "cross-origin request refused" }, { status: 403 });
   if (mode === "open") return null;
   return verifySession(readCookie(req)) ? null : Response.json({ error: "sign in required" }, { status: 401 });
 }

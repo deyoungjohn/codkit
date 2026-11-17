@@ -66,7 +66,8 @@ describe("simulateEvmTx", () => {
 
   it("reports reverts without throwing", async () => {
     const reader: EvmReader = {
-      call: async () => Promise.reject(Object.assign(new Error("long"), { shortMessage: "execution reverted: ERC20: transfer amount exceeds balance" })),
+      call: async () =>
+        Promise.reject(Object.assign(new Error("long"), { shortMessage: "execution reverted: ERC20: transfer amount exceeds balance" })),
       estimateGas: async () => 0n,
     };
     expect(await simulateEvmTx(reader, AGENT, { to: USDC })).toEqual({

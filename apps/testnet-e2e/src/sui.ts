@@ -24,7 +24,6 @@ import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { Transaction } from "@mysten/sui/transactions";
 import { arg, Report } from "./report.js";
 
-
 /** The JSON the deploy script just wrote (no rebuild of @codkit/contracts needed), else the built registry. */
 const recorded = (name: string): unknown => {
   const file = new URL(`../../../packages/contracts/deployments/${name}.json`, import.meta.url);
@@ -43,10 +42,10 @@ const explorer = (digest: string) => (["testnet", "devnet"].includes(network) ? 
 type Dep = { packageId: string; reputationId: string };
 const dep: Dep = arg("deployments")
   ? JSON.parse(readFileSync(arg("deployments")!, "utf8"))
-  : ((recorded(`sui-${network}`) ?? (deployments as Record<string, unknown>)[`sui-${network}`]) as Dep | undefined) ??
+  : (((recorded(`sui-${network}`) ?? (deployments as Record<string, unknown>)[`sui-${network}`]) as Dep | undefined) ??
     (() => {
       throw new Error(`no Sui deployment recorded for ${network} — run deploy-sui first`);
-    })();
+    })());
 
 /** Signer from SUI_PRIVATE_KEY or the Sui CLI keystore's active address (ed25519 only). */
 function loadSigner(): Ed25519Keypair {
@@ -73,7 +72,11 @@ const escrow = suiEscrow(dep);
 const report = new Report(`sui-${network}`, { agent: agent.toSuiAddress(), provider: provider.toSuiAddress(), packageId: dep.packageId });
 
 async function exec(signer: Ed25519Keypair, tx: Transaction) {
-  const r = await client.signAndExecuteTransaction({ transaction: tx, signer, include: { effects: true, events: true, objectTypes: true } });
+  const r = await client.signAndExecuteTransaction({
+    transaction: tx,
+    signer,
+    include: { effects: true, events: true, objectTypes: true },
+  });
   const t = r.Transaction ?? r.FailedTransaction;
   if (!r.Transaction || !t.effects?.status.success) throw new Error(`tx failed: ${JSON.stringify(t.effects?.status)}`);
   await client.waitForTransaction({ digest: t.digest });
@@ -83,7 +86,12 @@ const balance = async (owner: string) => BigInt((await client.getBalance({ owner
 
 const AMOUNT = MIST / 100n; // 0.01 SUI
 const engine = createPolicyEngine({
-  policy: { chains: [`sui:${network}`], allow: { programs: [dep.packageId] }, limits: [{ asset: SUI, label: "SUI", decimals: 9, perTx: MIST / 10n }], requireSimulation: false },
+  policy: {
+    chains: [`sui:${network}`],
+    allow: { programs: [dep.packageId] },
+    limits: [{ asset: SUI, label: "SUI", decimals: 9, perTx: MIST / 10n }],
+    requireSimulation: false,
+  },
 });
 const receipts = new ReceiptLog({ signer: ed25519Signer() });
 recordPolicyEvents(engine, receipts);
@@ -101,9 +109,13 @@ try {
   );
 
   await report.step("policy: authorize escrow funding (0.01 SUI ≤ 0.1 cap)", async () => {
-    const auth = await engine.authorize(suiEscrowCreateAction(dep, { coinType: SUI, provider: provider.toSuiAddress(), amount: AMOUNT, network }));
+    const auth = await engine.authorize(
+      suiEscrowCreateAction(dep, { coinType: SUI, provider: provider.toSuiAddress(), amount: AMOUNT, network }),
+    );
     await auth.commit();
-    const denied = await engine.evaluate(suiEscrowCreateAction(dep, { coinType: SUI, provider: provider.toSuiAddress(), amount: MIST, network }));
+    const denied = await engine.evaluate(
+      suiEscrowCreateAction(dep, { coinType: SUI, provider: provider.toSuiAddress(), amount: MIST, network }),
+    );
     if (denied.verdict !== "deny") throw new Error("1 SUI should be over the cap");
     return { detail: `1 SUI denied: ${denied.reasons[0]}` };
   });
@@ -125,9 +137,18 @@ try {
     async () => {
       const tx = new Transaction();
       const [coin] = tx.splitCoins(tx.gas, [AMOUNT]);
-      escrow.create(tx, { coinType: SUI, payment: coin!, provider: provider.toSuiAddress(), deadline: Date.now() + 3_600_000, terms: "codkit e2e" });
+      escrow.create(tx, {
+        coinType: SUI,
+        payment: coin!,
+        provider: provider.toSuiAddress(),
+        deadline: Date.now() + 3_600_000,
+        terms: "codkit e2e",
+      });
       const t = await exec(agent, tx);
-      escrowId = t.effects!.changedObjects.find((o) => o.idOperation === "Created" && (t.objectTypes?.[o.objectId] ?? "").includes("::escrow::Escrow<"))?.objectId ?? "";
+      escrowId =
+        t.effects!.changedObjects.find(
+          (o) => o.idOperation === "Created" && (t.objectTypes?.[o.objectId] ?? "").includes("::escrow::Escrow<"),
+        )?.objectId ?? "";
       if (!escrowId) throw new Error("escrow object not found");
       return { detail: escrowId, links: [explorer(t.digest)] };
     },

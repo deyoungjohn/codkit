@@ -24,14 +24,16 @@ import { Hono } from "hono";
 import { paywall } from "@codkit/pay/hono"; // or "@codkit/pay/express"
 
 const app = new Hono();
-app.use(paywall({
-  payTo: "0xYourAddress",
-  routes: {
-    "GET /weather": "$0.001",
-    "GET /report": { price: "$0.05", description: "Deep research report" },
-  },
-  onSettled: (p) => feed.push(p), // { network, transaction, payer, amount, asset, payTo, resource }
-}));
+app.use(
+  paywall({
+    payTo: "0xYourAddress",
+    routes: {
+      "GET /weather": "$0.001",
+      "GET /report": { price: "$0.05", description: "Deep research report" },
+    },
+    onSettled: (p) => feed.push(p), // { network, transaction, payer, amount, asset, payTo, resource }
+  }),
+);
 ```
 
 Options: `network` (default `eip155:84532`), `facilitator` (URL or `FacilitatorClient`), `schemes` (see Solana below), and full x402 route configs, which are passed through unchanged.
@@ -57,7 +59,9 @@ To use your own RPC, register `new ExactSvmScheme(signer, { rpcUrl })` instead. 
 import { createPolicyEngine, usdc } from "@codkit/policy";
 import { createBudgetedFetch, registerExactEvmScheme, x402Client } from "@codkit/pay";
 
-const engine = createPolicyEngine({ policy: { limits: [{ asset: USDC, perTx: usdc("0.05"), perPeriod: { amount: usdc(1), seconds: 86_400 } }] } });
+const engine = createPolicyEngine({
+  policy: { limits: [{ asset: USDC, perTx: usdc("0.05"), perPeriod: { amount: usdc(1), seconds: 86_400 } }] },
+});
 const client = new x402Client();
 registerExactEvmScheme(client, { signer: account }); // viem account
 
@@ -80,7 +84,7 @@ import { createMcpServer } from "@codkit/mcp/server";
 const paywall = mcpPaywall({
   payTo: "0xYourAddress",
   tools: { premium_report: { price: "$0.05", description: "Deep research report" } }, // unlisted tools stay free
-  onSettled: (p) => receipts.append("payment.settled", p),                         // resource: "mcp://tool/premium_report"
+  onSettled: (p) => receipts.append("payment.settled", p), // resource: "mcp://tool/premium_report"
 });
 createMcpServer(tools, { name: "data-shop", wrapHandler: paywall.wrap });
 // or with a plain McpServer: server.registerTool("premium_report", config, paywall.wrap("premium_report", handler))
@@ -128,7 +132,7 @@ import { webhookSender, verifyWebhook, SIGNATURE_HEADER } from "@codkit/pay/webh
 
 const hooks = webhookSender({ url: "https://shop.example/hooks", secret: process.env.WEBHOOK_SECRET! });
 app.use(paywall({ payTo, routes, onSettled: hooks.onSettled })); // payment.settled, sent without delaying the response
-await hooks.send("order.paid", { orderId: 42 });                // any event
+await hooks.send("order.paid", { orderId: 42 }); // any event
 
 // receiver
 const event = await verifyWebhook({ body: await req.text(), signature: req.headers.get(SIGNATURE_HEADER), secret });

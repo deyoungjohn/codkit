@@ -29,14 +29,15 @@ pnpm --filter demo-shell dev                      # the dashboard switches to "L
 
 **Base Sepolia contracts are deployed and verified (2026-10-15).** The addresses are in the root README. `pnpm e2e:evm --network base-sepolia` passes 12/12 (2026-10-15; reports committed). The Sui package is published to testnet and `pnpm e2e:sui --network testnet` passes with a dedicated agent key, `SUI_PRIVATE_KEY` (2026-10-15). Testnet deployment is complete. The full runbook is in [docs/TESTNET.md](docs/TESTNET.md). In short: `pnpm deploy:evm --network base-sepolia --account deployer --verify`, then `pnpm deploy:sui --network testnet`, then `pnpm e2e:evm --network base-sepolia` and `pnpm e2e:sui --network testnet`, and commit the deployments and reports. The steps below are the older manual equivalents.
 
-
 - **Base Sepolia:** get ETH for gas and USDC from https://faucet.circle.com, using a throwaway key.
+
   ```bash
   cast wallet import dev --interactive
   cd packages/contracts/evm && forge script script/Deploy.s.sol --rpc-url base_sepolia --account dev --broadcast
   pnpm --filter @codkit/contracts deployments   # markdown table for READMEs
   ```
 - **x402 on a real testnet** (only tested against an in-process facilitator so far):
+
   ```bash
   PAY_TO=0x... pnpm --filter @codkit/pay example:server
   EVM_PRIVATE_KEY=0x... pnpm --filter @codkit/pay example:client -- http://localhost:4021/weather

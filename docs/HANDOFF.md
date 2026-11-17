@@ -30,12 +30,12 @@ Ship hackathon projects faster by owning the glue code that gets rewritten every
 
 Each language uses its own native mechanism:
 
-| Layer | How a project installs it |
-|---|---|
-| TypeScript packages | Publish to npm under one scope (`@SCOPE/*`). `pnpm add @SCOPE/wallet`. Versioned with Changesets. |
-| Solidity library | `forge install OWNER/REPO`, with a remapping pointing into `contracts/evm/src`. |
-| Anchor / Rust crates | Cargo git dependency: `SCOPE-solana = { git = "...", package = "..." }`. |
-| Sui Move package | `Move.toml` git dependency with `subdir = "contracts/sui"`. |
+| Layer                | How a project installs it                                                                                 |
+| -------------------- | --------------------------------------------------------------------------------------------------------- |
+| TypeScript packages  | Publish to npm under one scope (`@SCOPE/*`). `pnpm add @SCOPE/wallet`. Versioned with Changesets.         |
+| Solidity library     | `forge install OWNER/REPO`, with a remapping pointing into `contracts/evm/src`.                           |
+| Anchor / Rust crates | Cargo git dependency: `SCOPE-solana = { git = "...", package = "..." }`.                                  |
+| Sui Move package     | `Move.toml` git dependency with `subdir = "contracts/sui"`.                                               |
 | New-project scaffold | `pnpm create @SCOPE/app my-project` generates a fresh standalone repo that depends on the packages above. |
 
 Prefer npm over git dependencies for TypeScript. Git-subdirectory installs are fragile across package managers, and npm gives semver plus fast installs on hackathon wifi.
@@ -74,6 +74,7 @@ Prefer npm over git dependencies for TypeScript. Git-subdirectory installs are f
 ## Build plan
 
 ### Phase 0: Spikes (decide before building)
+
 1. **Wallet kit evaluation.** Build the same connect flow in `examples/` with each candidate and score them on chain coverage (EVM, Solana, Sui), bundle size, headless/custom UI support, SSR/Next.js behaviour, licence, and recent commit activity:
    - TrustConnect SDK (Trust Wallet): free and open source; EVM, Solana, Bitcoin. No Sui seen in docs.
    - `@dzapio/wallet`: EVM, Solana, Bitcoin, Sui behind one provider.
@@ -86,6 +87,7 @@ Prefer npm over git dependencies for TypeScript. Git-subdirectory installs are f
 **Done when:** a written decision in `docs/decisions/0001-wallet-kit.md` and a `VERSIONS.md`.
 
 ### Phase 1: Foundation
+
 - Monorepo, Turborepo, tsup, Biome, Vitest, Changesets, CI.
 - `@SCOPE/config`: chain registry (id, name, ecosystem, RPC URLs, explorer, native token), env schema with zod, `getRpcUrl(chain)` with fallback order.
 - First publish of `@SCOPE/config@0.1.0`.
@@ -93,12 +95,14 @@ Prefer npm over git dependencies for TypeScript. Git-subdirectory installs are f
 **Done when:** an `examples/` app installs `@SCOPE/config` from npm and resolves an RPC for one EVM chain, Solana devnet and Sui testnet.
 
 ### Phase 2: Wallet + UI
+
 - `@SCOPE/wallet`: one interface, `useWallet()` returning `{ ecosystem, address, connect, disconnect, signMessage, sendTransaction, switchChain }`, with an adapter for the kit chosen in Phase 0. WalletConnect is an opt-in connector.
 - `@SCOPE/ui`: shadcn-style components that copy into a project or import directly: ConnectButton, TokenAmountInput, TxStatusToast, AddressPill, ChainSwitcher.
 
 **Done when:** one example app connects an EVM, Solana and Sui wallet, signs a message on each, and sends a testnet transfer on each.
 
 ### Phase 3: Contracts
+
 - `contracts/evm`: Foundry lib on OpenZeppelin v5; deploy scripts that write addresses to a JSON file that `@SCOPE/config` can read.
 - `contracts/solana`: Anchor workspace, Codama client generation.
 - `contracts/sui`: Move package plus TS client generation.
@@ -107,6 +111,7 @@ Prefer npm over git dependencies for TypeScript. Git-subdirectory installs are f
 **Done when:** a fresh external repo runs `forge install`, a cargo git dependency and a Move git dependency, and builds against each.
 
 ### Phase 4: Agents + payments
+
 - `@SCOPE/agent-tools`: zod-typed tools `getBalance`, `transfer`, `quoteSwap`, `swap`. Providers: AgentKit for EVM, LI.FI for EVM swaps/bridging, Jupiter for Solana swaps. Exports for both the Vercel AI SDK and an MCP server.
 - `@SCOPE/payments`: x402 server middleware (Hono/Next route) and client `fetch` wrapper.
 - Every tool that moves funds needs a dry-run mode and a per-call spend cap.
@@ -114,11 +119,13 @@ Prefer npm over git dependencies for TypeScript. Git-subdirectory installs are f
 **Done when:** an agent example quotes and executes a testnet swap through the Vercel AI SDK, and the same tools run from the MCP server; a paid endpoint example settles via x402 on testnet.
 
 ### Phase 5: Scaffolder
+
 - `create-app`: prompts for ecosystem(s), agent yes/no and payments yes/no, copies a template from `templates/`, installs only the matching `@SCOPE/*` packages, and writes `.env.example`.
 
 **Done when:** `pnpm create @SCOPE/app demo` produces a standalone repo that runs `pnpm dev` with a working connect button in under 5 minutes.
 
 ### Later
+
 - More chains as sponsors require (add an adapter to `wallet`, entries to `config`).
 - The toolkit itself, polished and documented, can be entered as a dev-tools hackathon project.
 

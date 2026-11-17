@@ -24,7 +24,11 @@ const config = arg("client-config");
 const base = [...(config ? ["--client.config", config] : []), "--client.env", network];
 
 const sui = (args) => {
-  const r = spawnSync("sui", ["client", ...base, ...args], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], maxBuffer: 64 * 1024 * 1024 });
+  const r = spawnSync("sui", ["client", ...base, ...args], {
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+    maxBuffer: 64 * 1024 * 1024,
+  });
   if (r.status !== 0) {
     // the CLI prints build progress on stderr and the actual error on stdout
     console.error([r.stderr, r.stdout].filter(Boolean).join("\n").trim());
@@ -40,7 +44,8 @@ if (expected && expected.toLowerCase() !== sender.toLowerCase()) {
   console.error(`active Sui address is ${sender}, not ${expected}; run \`sui client switch --address ${expected}\``);
   process.exit(1);
 }
-if (!expected && !network.includes("local")) console.warn(`! publishing from ${sender}; pass --expect-address to check it's the intended wallet`);
+if (!expected && !network.includes("local"))
+  console.warn(`! publishing from ${sender}; pass --expect-address to check it's the intended wallet`);
 // testnet / mainnet are declared by the package (real publish, recorded in the package's lock).
 // Local networks use an ephemeral publication file outside the repo.
 const ephemeral = !["testnet", "mainnet"].includes(network);
@@ -70,11 +75,24 @@ if (!ephemeral && existsSync(pubfile)) {
     }
     console.log(`> --fresh: replacing the ${network} publication ${at}`);
     pubfileOriginal = text;
-    writeFileSync(pubfile, `${text.replace(block, "").replace(/\n{3,}/g, "\n\n").trimEnd()}\n`);
+    writeFileSync(
+      pubfile,
+      `${text
+        .replace(block, "")
+        .replace(/\n{3,}/g, "\n\n")
+        .trimEnd()}\n`,
+    );
   }
 }
 console.log(`> publishing ${join(root, "sui")} to ${network} from ${sender}${dryRun ? " (dry run)" : ""}`);
-const out = sui([...publishCmd, join(root, "sui"), "--json", "--gas-budget", arg("gas-budget") ?? "300000000", ...(dryRun ? ["--dry-run"] : [])]);
+const out = sui([
+  ...publishCmd,
+  join(root, "sui"),
+  "--json",
+  "--gas-budget",
+  arg("gas-budget") ?? "300000000",
+  ...(dryRun ? ["--dry-run"] : []),
+]);
 const res = JSON.parse(out.slice(out.indexOf("{")));
 const status = res.effects?.status?.status ?? res.effects?.V2?.status ?? "unknown";
 if (status !== "success" && status !== "unknown") {

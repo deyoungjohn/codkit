@@ -91,9 +91,7 @@ describe("evaluate", () => {
       policy: { ...basePolicy, unknownAssets: "allow", allow: { programs: [USDC], methods: ["transfer"] } },
     });
     expect((await engine.evaluate(pay(1n))).verdict).toBe("allow");
-    expect((await engine.evaluate(pay(1n, ALICE, { method: "approve" }))).reasons).toEqual([
-      "method approve not in allow list",
-    ]);
+    expect((await engine.evaluate(pay(1n, ALICE, { method: "approve" }))).reasons).toEqual(["method approve not in allow list"]);
     const native: Action = { chain: CHAIN, kind: "transfer", to: ALICE, spends: [{ asset: "native", amount: 1n }] };
     expect((await engine.evaluate(native)).verdict).toBe("allow");
   });
@@ -125,7 +123,9 @@ describe("evaluate", () => {
   });
 
   it("scopes limits to a chain when one is given", async () => {
-    const engine = createPolicyEngine({ policy: { limits: [{ asset: "native", chain: "eip155:1", perTx: 1n }], requireSimulation: false } });
+    const engine = createPolicyEngine({
+      policy: { limits: [{ asset: "native", chain: "eip155:1", perTx: 1n }], requireSimulation: false },
+    });
     const native = (chain: string): Action => ({ chain, kind: "transfer", to: ALICE, spends: [{ asset: "native", amount: 5n }] });
     expect((await engine.evaluate(native("eip155:1"))).verdict).toBe("deny");
     // no limit on this chain → unknown asset → deny by default, but for a different reason
@@ -271,10 +271,7 @@ describe("execute", () => {
       "simulation_failed",
     );
     expect(err.simulation?.error).toMatch(/insufficient balance/);
-    await expectCode(
-      engine.execute(pay(1n), { simulate: () => Promise.reject(new Error("rpc down")), execute }),
-      "simulation_failed",
-    );
+    await expectCode(engine.execute(pay(1n), { simulate: () => Promise.reject(new Error("rpc down")), execute }), "simulation_failed");
     expect(execute).not.toHaveBeenCalled();
     expect(await engine.spendStore.list()).toEqual([]);
   });
@@ -312,7 +309,10 @@ describe("execute", () => {
 describe("human-readable reasons", () => {
   it("formats amounts with the limit's decimals", async () => {
     const engine = createPolicyEngine({
-      policy: { limits: [{ asset: USDC, label: "USDC", decimals: 6, perTx: usdc("0.5"), approvalAbove: usdc("0.1") }], requireSimulation: false },
+      policy: {
+        limits: [{ asset: USDC, label: "USDC", decimals: 6, perTx: usdc("0.5"), approvalAbove: usdc("0.1") }],
+        requireSimulation: false,
+      },
     });
     expect((await engine.evaluate(pay(usdc("2.25")))).reasons).toEqual([
       "USDC: 2.25 exceeds per-tx cap 0.5",

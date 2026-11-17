@@ -29,11 +29,11 @@ pnpm --filter demo-shell dev        # http://localhost:3000
 
 ## Auth
 
-| Variable | |
-| --- | --- |
+| Variable             |                                                                                                                                                                                                                    |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `DASHBOARD_PASSWORD` | The operator password. **Required in production**: without it the dashboard stays locked and the sign-in page explains why. In `next dev` it's optional, and the top bar shows **Auth off (dev)** when it's unset. |
-| `SESSION_SECRET` | Optional, at least 32 characters. It signs session cookies. If unset, a key derived from the password is used, so changing the password signs everyone out. |
-| `MCP_TOKEN` | Enables `/api/mcp` (at least 16 characters, e.g. `openssl rand -hex 32`). Leave it unset to keep the endpoint off. |
+| `SESSION_SECRET`     | Optional, at least 32 characters. It signs session cookies. If unset, a key derived from the password is used, so changing the password signs everyone out.                                                        |
+| `MCP_TOKEN`          | Enables `/api/mcp` (at least 16 characters, e.g. `openssl rand -hex 32`). Leave it unset to keep the endpoint off.                                                                                                 |
 
 - **Sign-in:** creates a 12-hour session cookie, signed (HMAC-SHA256), `HttpOnly` and `SameSite=Strict`, and `Secure` over HTTPS.
 - **Two checks:** `proxy.ts` redirects signed-out visitors to `/login`, and every API route checks the session again on its own.
@@ -58,16 +58,16 @@ Everything specific to the demo lives in [`lib/runtime.ts`](lib/runtime.ts):
 
 ## API
 
-| Route | |
-| --- | --- |
-| `GET /api/feed` | Server-Sent Events (history, then live; resumes with `Last-Event-ID`) |
-| `GET /api/state` | Budget, spend, payments, receipts head and verification, pending approvals |
-| `POST /api/run` `{ prompt? }` | Start the agent (409 if it's already running) |
-| `POST /api/approve` `{ requestId, approved }` | Answer an approval request |
-| `POST /api/kill` `{ engaged }` | Engage or release the kill switch |
-| `POST /api/reset` | Fresh runtime |
-| `POST /api/login` `{ password }` / `POST /api/logout` | Start or end an operator session |
-| `GET/POST /api/mcp` | MCP (Streamable HTTP) for external agents, with `Authorization: Bearer $MCP_TOKEN` |
+| Route                                                 |                                                                                    |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `GET /api/feed`                                       | Server-Sent Events (history, then live; resumes with `Last-Event-ID`)              |
+| `GET /api/state`                                      | Budget, spend, payments, receipts head and verification, pending approvals         |
+| `POST /api/run` `{ prompt? }`                         | Start the agent (409 if it's already running)                                      |
+| `POST /api/approve` `{ requestId, approved }`         | Answer an approval request                                                         |
+| `POST /api/kill` `{ engaged }`                        | Engage or release the kill switch                                                  |
+| `POST /api/reset`                                     | Fresh runtime                                                                      |
+| `POST /api/login` `{ password }` / `POST /api/logout` | Start or end an operator session                                                   |
+| `GET/POST /api/mcp`                                   | MCP (Streamable HTTP) for external agents, with `Authorization: Bearer $MCP_TOKEN` |
 
 All routes except login, logout and MCP need an operator session.
 

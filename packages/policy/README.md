@@ -22,11 +22,16 @@ const engine = createPolicyEngine({
     chains: ["eip155:84532"],
     deny: { addresses: ["0xBad…"] },
     allow: { programs: ["0x036CbD53842c5426634e7929541eC2318f3dCF7e"] },
-    limits: [{
-      asset: "0x036CbD53842c5426634e7929541eC2318f3dCF7e", label: "USDC",
-      perTx: usdc(5), perPeriod: { amount: usdc(20), seconds: 86_400 }, total: usdc(100),
-      approvalAbove: usdc(2),
-    }],
+    limits: [
+      {
+        asset: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+        label: "USDC",
+        perTx: usdc(5),
+        perPeriod: { amount: usdc(20), seconds: 86_400 },
+        total: usdc(100),
+        approvalAbove: usdc(2),
+      },
+    ],
     // unknownAssets: "deny" (default) | "require_approval" | "allow"
     // requireSimulation: true (default)
   },
@@ -38,9 +43,9 @@ const engine = createPolicyEngine({
 await engine.execute(action, { simulate, execute, ref: (r) => r.hash });
 
 // Or just check (read-only), or authorize when something else performs the action:
-const decision = await engine.evaluate(action);       // { verdict, reasons, checks }
-const auth = await engine.authorize(action);          // throws PolicyError if denied/rejected
-await auth.commit(txHash);                            // or auth.release()
+const decision = await engine.evaluate(action); // { verdict, reasons, checks }
+const auth = await engine.authorize(action); // throws PolicyError if denied/rejected
+await auth.commit(txHash); // or auth.release()
 ```
 
 An `Action` is the chain-agnostic shape every adapter produces:

@@ -70,10 +70,27 @@ describe("solana instructions (layout from idl/kit_escrow.json)", () => {
   });
 
   it("encodes None as a single zero byte and rejects oversized hashes", async () => {
-    const ix = await createDealInstruction({ client: CLIENT, dealId: 1n, provider: PROVIDER, mint: MINT, amount: 1n, deadline: new Date(1_800_000_000_000) });
+    const ix = await createDealInstruction({
+      client: CLIENT,
+      dealId: 1n,
+      provider: PROVIDER,
+      mint: MINT,
+      amount: 1n,
+      deadline: new Date(1_800_000_000_000),
+    });
     expect(ix.data![48]).toBe(0);
     expect(ix.data!.length).toBe(8 + 8 + 32 + 1 + 8 + 8 + 8 + 32);
-    await expect(createDealInstruction({ client: CLIENT, dealId: 1n, provider: PROVIDER, mint: MINT, amount: 1n, deadline: 1, termsHash: new Uint8Array(33) })).rejects.toThrow(/32 bytes/);
+    await expect(
+      createDealInstruction({
+        client: CLIENT,
+        dealId: 1n,
+        provider: PROVIDER,
+        mint: MINT,
+        amount: 1n,
+        deadline: 1,
+        termsHash: new Uint8Array(33),
+      }),
+    ).rejects.toThrow(/32 bytes/);
   });
 
   it("orders settlement accounts like the Anchor structs", async () => {
@@ -96,8 +113,20 @@ describe("solana instructions (layout from idl/kit_escrow.json)", () => {
 
 describe("solana account decoding", () => {
   const pk = (seed: number) => new Uint8Array(32).fill(seed);
-  const u64 = (v: bigint) => { const b = new Uint8Array(8); new DataView(b.buffer).setBigUint64(0, v, true); return b; };
-  const cat = (...p: Uint8Array[]) => { const o = new Uint8Array(p.reduce((n, x) => n + x.length, 0)); let i = 0; for (const x of p) { o.set(x, i); i += x.length; } return o; };
+  const u64 = (v: bigint) => {
+    const b = new Uint8Array(8);
+    new DataView(b.buffer).setBigUint64(0, v, true);
+    return b;
+  };
+  const cat = (...p: Uint8Array[]) => {
+    const o = new Uint8Array(p.reduce((n, x) => n + x.length, 0));
+    let i = 0;
+    for (const x of p) {
+      o.set(x, i);
+      i += x.length;
+    }
+    return o;
+  };
 
   it("decodes a Deal with and without an arbiter", () => {
     const disc = new Uint8Array([125, 223, 160, 234, 71, 162, 182, 219]);

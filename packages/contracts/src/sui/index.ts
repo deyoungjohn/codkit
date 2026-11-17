@@ -92,8 +92,7 @@ export function suiEscrow(ids: SuiEscrowIds) {
       });
     },
     /** Event type to filter `DealCreated` events by (e.g. to find the new escrow id). */
-    eventType: (name: "DealCreated" | "Delivered" | "Disputed" | "Released" | "Refunded") =>
-      `${ids.packageId}::escrow::${name}`,
+    eventType: (name: "DealCreated" | "Delivered" | "Disputed" | "Released" | "Refunded") => `${ids.packageId}::escrow::${name}`,
   };
 }
 

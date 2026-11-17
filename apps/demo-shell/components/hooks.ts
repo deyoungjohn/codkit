@@ -70,7 +70,9 @@ export function useWallet() {
     window.dispatchEvent(new Event("eip6963:requestProvider"));
     const legacy = (window as unknown as { ethereum?: Eip6963Provider["provider"] }).ethereum;
     if (legacy) {
-      setProviders((p) => (p.length ? p : [{ info: { uuid: "legacy", name: "Browser wallet", icon: "", rdns: "legacy" }, provider: legacy }]));
+      setProviders((p) =>
+        p.length ? p : [{ info: { uuid: "legacy", name: "Browser wallet", icon: "", rdns: "legacy" }, provider: legacy }],
+      );
     }
     return () => window.removeEventListener("eip6963:announceProvider", onAnnounce);
   }, []);

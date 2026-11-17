@@ -11,9 +11,7 @@ export function redact(text: string): string {
   for (const [k, v] of Object.entries(process.env)) {
     if (v && /_RPC_URL$|_URL$/.test(k) && /^https?:\/\//.test(v) && v.length > 12) out = out.split(v).join(`<${k}>`);
   }
-  return out
-    .replace(/(\/v\d+\/)[A-Za-z0-9_-]{16,}/g, "$1<redacted>")
-    .replace(/([?&](?:api[-_]?key|key|token)=)[^&\s"]+/gi, "$1<redacted>");
+  return out.replace(/(\/v\d+\/)[A-Za-z0-9_-]{16,}/g, "$1<redacted>").replace(/([?&](?:api[-_]?key|key|token)=)[^&\s"]+/gi, "$1<redacted>");
 }
 
 export interface Step {
@@ -29,10 +27,17 @@ export class Report {
   readonly steps: Step[] = [];
   private readonly started = new Date();
 
-  constructor(readonly network: string, readonly meta: Record<string, unknown> = {}) {}
+  constructor(
+    readonly network: string,
+    readonly meta: Record<string, unknown> = {},
+  ) {}
 
   /** Run a step; failures are recorded (and rethrown when `critical`). */
-  async step<T>(name: string, fn: () => Promise<T | { detail?: string; links?: (string | null | undefined)[]; value?: T }>, opts: { critical?: boolean } = {}) {
+  async step<T>(
+    name: string,
+    fn: () => Promise<T | { detail?: string; links?: (string | null | undefined)[]; value?: T }>,
+    opts: { critical?: boolean } = {},
+  ) {
     const t0 = Date.now();
     process.stdout.write(`• ${name} … `);
     try {
@@ -61,7 +66,15 @@ export class Report {
     const stamp = this.started.toISOString().replace(/[:.]/g, "-");
     const base = join(dir, `${this.network}-${stamp}`);
     const passed = this.steps.filter((s) => s.ok).length;
-    const json = { network: this.network, startedAt: this.started.toISOString(), ok: this.ok, passed, total: this.steps.length, meta: this.meta, steps: this.steps };
+    const json = {
+      network: this.network,
+      startedAt: this.started.toISOString(),
+      ok: this.ok,
+      passed,
+      total: this.steps.length,
+      meta: this.meta,
+      steps: this.steps,
+    };
     writeFileSync(`${base}.json`, `${JSON.stringify(json, null, 2)}\n`);
     const md = [
       `# codkit e2e — ${this.network}`,
@@ -72,7 +85,10 @@ export class Report {
       "",
       "| Step | Result | Detail |",
       "| --- | --- | --- |",
-      ...this.steps.map((s) => `| ${s.name} | ${s.ok ? "✅" : "❌"} | ${(s.detail ?? "").replace(/\|/g, "\\|")}${s.links?.length ? ` ${s.links.map((l, i) => `[link${s.links!.length > 1 ? i + 1 : ""}](${l})`).join(" ")}` : ""} |`),
+      ...this.steps.map(
+        (s) =>
+          `| ${s.name} | ${s.ok ? "✅" : "❌"} | ${(s.detail ?? "").replace(/\|/g, "\\|")}${s.links?.length ? ` ${s.links.map((l, i) => `[link${s.links!.length > 1 ? i + 1 : ""}](${l})`).join(" ")}` : ""} |`,
+      ),
       "",
     ].join("\n");
     writeFileSync(`${base}.md`, md);

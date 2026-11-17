@@ -23,11 +23,21 @@ import { evmAnchorer, readEvmAnchors } from "@codkit/receipts/evm";
 import { readWalrusUri, walrusUploader } from "@codkit/receipts/walrus";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
-import { createPublicClient, createWalletClient, encodeFunctionData, erc20Abi, http, nonceManager, parseEther, type Address, type Chain, type Hex } from "viem";
+import {
+  createPublicClient,
+  createWalletClient,
+  encodeFunctionData,
+  erc20Abi,
+  http,
+  nonceManager,
+  parseEther,
+  type Address,
+  type Chain,
+  type Hex,
+} from "viem";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { baseSepolia, foundry } from "viem/chains";
 import { arg, flag, Report } from "./report.js";
-
 
 /** The JSON the deploy script just wrote (no rebuild of @codkit/contracts needed), else the built registry. */
 const recorded = (name: string): unknown => {
@@ -35,7 +45,12 @@ const recorded = (name: string): unknown => {
   return existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : undefined;
 };
 const NETWORKS: Record<string, { chain: Chain; rpc: string; usdc?: Address; x402: boolean }> = {
-  "base-sepolia": { chain: baseSepolia, rpc: process.env.BASE_SEPOLIA_RPC_URL ?? "https://sepolia.base.org", usdc: "0x036CbD53842c5426634e7929541eC2318f3dCF7e", x402: true },
+  "base-sepolia": {
+    chain: baseSepolia,
+    rpc: process.env.BASE_SEPOLIA_RPC_URL ?? "https://sepolia.base.org",
+    usdc: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+    x402: true,
+  },
   local: { chain: foundry, rpc: process.env.LOCAL_RPC_URL ?? "http://127.0.0.1:8545", x402: false },
 };
 
@@ -48,10 +63,10 @@ if (!agentKey) throw new Error("set AGENT_PRIVATE_KEY (a funded testnet-only key
 type Dep = { contracts: Record<"Escrow" | "Reputation" | "ReceiptAnchor", { address: Address }> };
 const dep: Dep = arg("deployments")
   ? JSON.parse(readFileSync(arg("deployments")!, "utf8"))
-  : ((recorded(network) ?? (deployments as Record<string, unknown>)[network]) as Dep | undefined) ??
+  : (((recorded(network) ?? (deployments as Record<string, unknown>)[network]) as Dep | undefined) ??
     (() => {
       throw new Error(`no deployment recorded for ${network} — run the deploy script first`);
-    })();
+    })());
 const USDC = (arg("usdc") as Address | undefined) ?? net.usdc;
 if (!USDC) throw new Error("pass --usdc <token address> on this network");
 const ESCROW = dep.contracts.Escrow.address;
@@ -77,7 +92,10 @@ const providerWallet = createWalletClient({ account: provider, chain: net.chain,
 const wait = async (hash: Hex) => {
   const r = await pc.waitForTransactionReceipt({ hash });
   if (r.status !== "success") throw new Error(`tx reverted: ${hash}`);
-  await eventually(() => pc.getBlockNumber({ cacheTime: 0 }), (n) => n >= r.blockNumber);
+  await eventually(
+    () => pc.getBlockNumber({ cacheTime: 0 }),
+    (n) => n >= r.blockNumber,
+  );
   return r;
 };
 /**
@@ -102,7 +120,14 @@ async function eventually<T>(read: () => Promise<T>, ok: (v: T) => boolean, time
 const json = (v: unknown) => JSON.stringify(v, (_k, x) => (typeof x === "bigint" ? x.toString() : x));
 const usdcBalance = (who: Address) => pc.readContract({ address: USDC, abi: erc20Abi, functionName: "balanceOf", args: [who] });
 
-const report = new Report(network, { agent: agent.address, provider: provider.address, escrow: ESCROW, reputation: REPUTATION, anchor: ANCHOR, usdc: USDC });
+const report = new Report(network, {
+  agent: agent.address,
+  provider: provider.address,
+  escrow: ESCROW,
+  reputation: REPUTATION,
+  anchor: ANCHOR,
+  usdc: USDC,
+});
 
 // The agent's guardrails — every agent tx below goes through these.
 const engine = createPolicyEngine({
@@ -111,7 +136,13 @@ const engine = createPolicyEngine({
     allow: { programs: [USDC, ESCROW, ANCHOR] },
     limits: [
       { asset: USDC, label: "USDC", decimals: 6, perTx: usdc("0.50"), perPeriod: { amount: usdc("1"), seconds: 86_400 } },
-      { asset: "native", label: "ETH", decimals: 18, perTx: parseEther("0.001"), perPeriod: { amount: parseEther("0.003"), seconds: 86_400 } },
+      {
+        asset: "native",
+        label: "ETH",
+        decimals: 18,
+        perTx: parseEther("0.001"),
+        perPeriod: { amount: parseEther("0.003"), seconds: 86_400 },
+      },
     ],
   },
 });
@@ -157,7 +188,13 @@ try {
         (v) => v >= AMOUNT,
       );
       const c = await guard.send(
-        tx.createAndFund({ provider: provider.address, token: USDC, amount: AMOUNT, deadline: new Date(Date.now() + 3_600_000), termsHash: hashText("codkit e2e: deliver a hash") }),
+        tx.createAndFund({
+          provider: provider.address,
+          token: USDC,
+          amount: AMOUNT,
+          deadline: new Date(Date.now() + 3_600_000),
+          termsHash: hashText("codkit e2e: deliver a hash"),
+        }),
       );
       const r = await wait(c.result);
       const id = dealIdFromLogs(r.logs);
@@ -170,7 +207,10 @@ try {
   await report.step("escrow: provider delivers", async () => {
     const h = await providerWallet.sendTransaction(tx.deliver(dealId!, hashText("ipfs://codkit-e2e-result")));
     await wait(h);
-    const d = await eventually(() => readDeal(pc, ESCROW, dealId!), (d) => d.status === "Delivered");
+    const d = await eventually(
+      () => readDeal(pc, ESCROW, dealId!),
+      (d) => d.status === "Delivered",
+    );
     if (d.status !== "Delivered") throw new Error(`status ${d.status}`);
     return { links: [link(h)] };
   });
@@ -179,32 +219,51 @@ try {
     const r = await guard.send(tx.release(dealId!));
     providerPaid = true;
     await wait(r.result);
-    const d = await eventually(() => readDeal(pc, ESCROW, dealId!), (d) => d.status === "Released");
-    const gained = (await eventually(() => usdcBalance(provider.address), (b) => b - before >= AMOUNT)) - before;
+    const d = await eventually(
+      () => readDeal(pc, ESCROW, dealId!),
+      (d) => d.status === "Released",
+    );
+    const gained =
+      (await eventually(
+        () => usdcBalance(provider.address),
+        (b) => b - before >= AMOUNT,
+      )) - before;
     if (d.status !== "Released" || gained !== AMOUNT) throw new Error(`status ${d.status}, provider +${gained}`);
     return { detail: "provider received 0.10 USDC", links: [link(r.result)] };
   });
 
   await report.step("reputation recorded", async () => {
-    const rep = await eventually(() => readReputation(pc, REPUTATION, provider.address), (r) => r.completed >= 1);
+    const rep = await eventually(
+      () => readReputation(pc, REPUTATION, provider.address),
+      (r) => r.completed >= 1,
+    );
     if (rep.completed < 1) throw new Error(json(rep));
     return { detail: `completed ${rep.completed}, score ${rep.score}` };
   });
 
   await report.step("guardrail: over-cap approval is refused before signing", async () => {
-    const err = await guard.send(tx.approve(USDC, usdc("5"))).then(() => null, (e: unknown) => e);
+    const err = await guard.send(tx.approve(USDC, usdc("5"))).then(
+      () => null,
+      (e: unknown) => e,
+    );
     if (!isPolicyError(err) || err.code !== "denied") throw new Error(`expected denial, got ${String(err)}`);
     return { detail: err.message };
   });
 
   await report.step("guardrail: non-allow-listed contract is refused", async () => {
-    const err = await guard.send(escrowTxs(REPUTATION).release(1n)).then(() => null, (e: unknown) => e);
+    const err = await guard.send(escrowTxs(REPUTATION).release(1n)).then(
+      () => null,
+      (e: unknown) => e,
+    );
     if (!isPolicyError(err) || err.code !== "denied") throw new Error(`expected denial, got ${String(err)}`);
     return { detail: err.message };
   });
 
   await report.step("guardrail: simulation catches a revert (release twice)", async () => {
-    const err = await guard.send(tx.release(dealId!)).then(() => null, (e: unknown) => e);
+    const err = await guard.send(tx.release(dealId!)).then(
+      () => null,
+      (e: unknown) => e,
+    );
     if (!isPolicyError(err) || err.code !== "simulation_failed") throw new Error(`expected simulation_failed, got ${String(err)}`);
     return { detail: err.message.slice(0, 120) };
   });
@@ -263,7 +322,12 @@ try {
   // critical step failed; fall through to cleanup + report
 } finally {
   await report.step("cleanup: provider returns USDC to agent", async () => {
-    const bal = providerPaid ? await eventually(() => usdcBalance(provider.address), (b) => b > 0n) : await usdcBalance(provider.address);
+    const bal = providerPaid
+      ? await eventually(
+          () => usdcBalance(provider.address),
+          (b) => b > 0n,
+        )
+      : await usdcBalance(provider.address);
     if (bal === 0n) return { detail: providerPaid ? "provider balance still reads 0 — check the explorer" : "nothing to return" };
     const h = await providerWallet.sendTransaction({
       to: USDC,

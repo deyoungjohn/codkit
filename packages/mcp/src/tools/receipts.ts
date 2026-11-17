@@ -22,7 +22,9 @@ export function receiptTools(log: ReceiptLog, publish?: { anchorer?: Anchorer; u
       input: z.object({ limit: z.number().int().min(1).max(50).default(10) }),
       annotations: { readOnlyHint: true },
       run: async ({ limit }) =>
-        (await log.list()).slice(-limit).map((r) => ({ seq: r.seq, type: r.type, ts: new Date(r.ts).toISOString(), data: r.data, hash: r.hash })),
+        (await log.list())
+          .slice(-limit)
+          .map((r) => ({ seq: r.seq, type: r.type, ts: new Date(r.ts).toISOString(), data: r.data, hash: r.hash })),
     }),
     defineTool({
       name: "receipts_verify",

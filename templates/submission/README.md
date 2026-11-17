@@ -10,7 +10,7 @@
 
 [▶ Demo video (3 min)](<link>) · [Live app](<link>) · [Pitch deck](<link>)
 
-![screenshot](<path/to/screenshot.png>)
+![screenshot](path/to/screenshot.png)
 
 ## The problem
 
@@ -27,10 +27,10 @@
 
 <The judging criterion most teams under-explain. Say exactly which sponsor APIs or contracts you call, what would break without them, and link the code.>
 
-| Sponsor tech | Where | What it does in our product |
-| --- | --- | --- |
+| Sponsor tech        | Where              | What it does in our product          |
+| ------------------- | ------------------ | ------------------------------------ |
 | <e.g. x402 on Base> | [`<file>`](<link>) | <pays for each API call per request> |
-| <…> | | |
+| <…>                 |                    |                                      |
 
 ## Architecture
 
@@ -45,8 +45,8 @@ See [ARCHITECTURE.md](ARCHITECTURE.md).
 <!-- generate with: pnpm --filter @codkit/contracts deployments -->
 
 | Contract | Network | Address | Deploy tx |
-| --- | --- | --- | --- |
-| <…> | | | |
+| -------- | ------- | ------- | --------- |
+| <…>      |         |         |           |
 
 ## Run it
 

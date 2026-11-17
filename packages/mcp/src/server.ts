@@ -139,7 +139,11 @@ function equal(a: Uint8Array, b: Uint8Array): boolean {
 
 function unauthorized(reason: "missing" | "invalid", resourceMetadataUrl?: string): Response {
   // RFC 6750 §3: no error code when credentials are simply absent
-  const params = ['realm="mcp"', ...(reason === "invalid" ? ['error="invalid_token"'] : []), ...(resourceMetadataUrl ? [`resource_metadata="${resourceMetadataUrl}"`] : [])];
+  const params = [
+    'realm="mcp"',
+    ...(reason === "invalid" ? ['error="invalid_token"'] : []),
+    ...(resourceMetadataUrl ? [`resource_metadata="${resourceMetadataUrl}"`] : []),
+  ];
   return new Response(JSON.stringify({ jsonrpc: "2.0", error: { code: -32001, message: "Unauthorized" }, id: null }), {
     status: 401,
     headers: { "content-type": "application/json", "www-authenticate": `Bearer ${params.join(", ")}` },

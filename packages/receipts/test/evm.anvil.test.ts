@@ -5,14 +5,7 @@ import { createPublicClient, createWalletClient, http, type Address, type Hex } 
 import { privateKeyToAccount } from "viem/accounts";
 import { foundry } from "viem/chains";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import {
-  calldataAnchor,
-  eip191Signer,
-  eip191Verifier,
-  evmAnchorer,
-  parseCalldataAnchor,
-  readEvmAnchors,
-} from "../src/anchors/evm.js";
+import { calldataAnchor, eip191Signer, eip191Verifier, evmAnchorer, parseCalldataAnchor, readEvmAnchors } from "../src/anchors/evm.js";
 import { ed25519Signer, ReceiptLog, verifyLog } from "../src/index.js";
 
 // anvil dev key #0 — public, local chain only

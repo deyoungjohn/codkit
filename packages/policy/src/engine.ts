@@ -2,16 +2,7 @@ import { PolicyError } from "./errors.js";
 import { fromAtomic } from "./units.js";
 import { parsePolicy, type Limit, type Policy, type PolicyInput } from "./schema.js";
 import { MemorySpendStore, type SpendStore } from "./store.js";
-import type {
-  Action,
-  Approver,
-  Check,
-  Decision,
-  PolicyEvent,
-  SimulationResult,
-  Spend,
-  Verdict,
-} from "./types.js";
+import type { Action, Approver, Check, Decision, PolicyEvent, SimulationResult, Spend, Verdict } from "./types.js";
 
 export interface PolicyEngineOptions {
   policy: PolicyInput;
@@ -254,11 +245,7 @@ export class PolicyEngine {
     const r = typeof res === "boolean" ? { approved: res } : res;
     this.emit({ type: "approval", action, ...r });
     if (!r.approved) {
-      throw new PolicyError(
-        "approval_rejected",
-        `approval rejected${r.note ? `: ${r.note}` : ""}`,
-        decision,
-      );
+      throw new PolicyError("approval_rejected", `approval rejected${r.note ? `: ${r.note}` : ""}`, decision);
     }
     if (r.by !== undefined) auth.approvedBy = r.by;
   }
@@ -283,8 +270,7 @@ export class PolicyEngine {
     // deny list
     const denyHits: string[] = [];
     if (p.deny?.addresses?.some((a) => n(a) === n(action.to))) denyHits.push(`address ${action.to} is denied`);
-    if (action.program && p.deny?.programs?.some((a) => n(a) === n(action.program!)))
-      denyHits.push(`program ${action.program} is denied`);
+    if (action.program && p.deny?.programs?.some((a) => n(a) === n(action.program!))) denyHits.push(`program ${action.program} is denied`);
     if (action.method && p.deny?.methods?.includes(action.method)) denyHits.push(`method ${action.method} is denied`);
     if (denyHits.length) add("deny_list", "deny", denyHits.join("; "));
     else add("deny_list", "allow");
@@ -308,11 +294,7 @@ export class PolicyEngine {
       if (amount === 0n) continue;
       const limits = p.limits.filter((l) => n(l.asset) === asset && (l.chain === undefined || l.chain === chain));
       if (limits.length === 0) {
-        add(
-          "known_asset",
-          p.unknownAssets,
-          p.unknownAssets === "allow" ? undefined : `no limit configured for asset ${asset} on ${chain}`,
-        );
+        add("known_asset", p.unknownAssets, p.unknownAssets === "allow" ? undefined : `no limit configured for asset ${asset} on ${chain}`);
         continue;
       }
       for (const limit of limits) {

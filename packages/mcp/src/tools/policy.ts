@@ -9,7 +9,9 @@ const actionInput = z.object({
   program: z.string().optional().describe("Contract or program being called, if any"),
   method: z.string().optional().describe("Function being called, if any"),
   spends: z
-    .array(z.object({ asset: z.string().describe("'native' or token address"), amount: z.string().regex(/^\d+$/).describe("Atomic units") }))
+    .array(
+      z.object({ asset: z.string().describe("'native' or token address"), amount: z.string().regex(/^\d+$/).describe("Atomic units") }),
+    )
     .default([]),
 });
 

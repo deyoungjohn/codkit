@@ -12,7 +12,9 @@ describe("payment links", () => {
     expect(paymentLink({ chain: "eip155:84532", to: EVM_TO, amount: usdc("1.5") })).toBe(
       `ethereum:0x036CbD53842c5426634e7929541eC2318f3dCF7e@84532/transfer?address=${EVM_TO}&uint256=1500000`,
     );
-    expect(paymentLink({ chain: "eip155:1", to: EVM_TO, amount: 10n ** 18n, asset: "native" })).toBe(`ethereum:${EVM_TO}@1?value=1000000000000000000`);
+    expect(paymentLink({ chain: "eip155:1", to: EVM_TO, amount: 10n ** 18n, asset: "native" })).toBe(
+      `ethereum:${EVM_TO}@1?value=1000000000000000000`,
+    );
   });
 
   it("builds Solana Pay transfer requests with decimal amounts", () => {

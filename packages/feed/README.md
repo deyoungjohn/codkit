@@ -6,13 +6,13 @@ A live event stream for agent demos. It merges policy decisions, approvals, tool
 import { createFeed, connectPolicy, createApprovalBroker, feedReceiptStore, sseHandler, toolEventToFeed } from "@codkit/feed";
 
 const feed = createFeed();
-const approvals = createApprovalBroker(feed);                 // human-in-the-loop via the dashboard
+const approvals = createApprovalBroker(feed); // human-in-the-loop via the dashboard
 const engine = createPolicyEngine({ policy, approver: approvals.approver });
 connectPolicy(feed, engine, { assets: { [USDC]: { symbol: "USDC", decimals: 6 } } });
 const log = new ReceiptLog({ signer, store: feedReceiptStore(new MemoryReceiptStore(), feed) });
 const tools = instrument(kitTools, { onEvent: (e) => toolEventToFeed(feed, e) });
 
-export const GET = (req: Request) => sseHandler(feed)(req);  // Next.js route / Hono / Workers
+export const GET = (req: Request) => sseHandler(feed)(req); // Next.js route / Hono / Workers
 // on a button click: approvals.resolve(requestId, true, "alice")
 ```
 

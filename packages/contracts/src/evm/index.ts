@@ -5,17 +5,7 @@
  * `createEvmGuard(...).send(tx)` from `@codkit/policy/evm` so every
  * escrow action goes through policy + simulation, or send them with any wallet client.
  */
-import {
-  encodeDeployData,
-  encodeFunctionData,
-  erc20Abi,
-  keccak256,
-  parseEventLogs,
-  toHex,
-  type Address,
-  type Hex,
-  type Log,
-} from "viem";
+import { encodeDeployData, encodeFunctionData, erc20Abi, keccak256, parseEventLogs, toHex, type Address, type Hex, type Log } from "viem";
 import { escrowAbi, escrowBytecode, receiptAnchorAbi, receiptAnchorBytecode, reputationAbi, reputationBytecode } from "./abi.js";
 
 export { escrowAbi, escrowBytecode, receiptAnchorAbi, receiptAnchorBytecode, reputationAbi, reputationBytecode };
@@ -95,8 +85,7 @@ export function escrowTxs(escrow: Address) {
       data: encodeFunctionData({ abi: erc20Abi, functionName: "approve", args: [escrow, amount] }),
     }),
     createDeal: (d: NewDeal) => call(encodeFunctionData({ abi: escrowAbi, functionName: "createDeal", args: dealArgs(d) })),
-    createAndFund: (d: NewDeal) =>
-      call(encodeFunctionData({ abi: escrowAbi, functionName: "createAndFund", args: dealArgs(d) })),
+    createAndFund: (d: NewDeal) => call(encodeFunctionData({ abi: escrowAbi, functionName: "createAndFund", args: dealArgs(d) })),
     fund: (id: bigint) => call(encodeFunctionData({ abi: escrowAbi, functionName: "fund", args: [id] })),
     cancel: (id: bigint) => call(encodeFunctionData({ abi: escrowAbi, functionName: "cancel", args: [id] })),
     deliver: (id: bigint, deliveryHash: Hex) =>
@@ -185,11 +174,9 @@ export function dealIdFromLogs(logs: Log[]): bigint | undefined {
 /** Deploy data for a viem `sendTransaction({ data })` — deployments are run by a human, on testnets. */
 export const deployData = {
   reputation: (owner: Address): Hex => encodeDeployData({ abi: reputationAbi, bytecode: reputationBytecode, args: [owner] }),
-  escrow: (reputation: Address | null): Hex =>
-    encodeDeployData({ abi: escrowAbi, bytecode: escrowBytecode, args: [reputation ?? ZERO] }),
+  escrow: (reputation: Address | null): Hex => encodeDeployData({ abi: escrowAbi, bytecode: escrowBytecode, args: [reputation ?? ZERO] }),
   setWriter: (reputation: Address, writer: Address, allowed = true): EvmTx => ({
     to: reputation,
     data: encodeFunctionData({ abi: reputationAbi, functionName: "setWriter", args: [writer, allowed] }),
   }),
 };
-

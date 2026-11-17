@@ -101,11 +101,19 @@ async function waitForBalance(account: Address, atLeast: bigint, timeoutMs = 60_
 
 const [agentAta] = await findAssociatedTokenPda({ owner: agent.address, mint: MINT, tokenProgram: TOKEN_PROGRAM_ADDRESS });
 const [merchantAta] = await findAssociatedTokenPda({ owner: merchant.address, mint: MINT, tokenProgram: TOKEN_PROGRAM_ADDRESS });
-const report = new Report("x402-solana-devnet", { agent: agent.address, merchant: merchant.address, facilitator: FACILITATOR, asset: MINT });
+const report = new Report("x402-solana-devnet", {
+  agent: agent.address,
+  merchant: merchant.address,
+  facilitator: FACILITATOR,
+  asset: MINT,
+});
 
 // Guardrails: $0.10 per payment, $0.05 per hour.
 const engine = createPolicyEngine({
-  policy: { chains: [SOLANA_DEVNET], limits: [{ asset: MINT, label: "USDC", perTx: usdc("0.10"), perPeriod: { amount: usdc("0.05"), seconds: 3600 } }] },
+  policy: {
+    chains: [SOLANA_DEVNET],
+    limits: [{ asset: MINT, label: "USDC", perTx: usdc("0.10"), perPeriod: { amount: usdc("0.05"), seconds: 3600 } }],
+  },
 });
 const receipts = new ReceiptLog({ signer: ed25519Signer() });
 recordPolicyEvents(engine, receipts, { include: ["decision", "committed"] });
@@ -114,7 +122,15 @@ const newClient = () => registerExactSvmScheme(new x402Client(), { signer: agent
 
 // The merchant: an HTTP paywall and a paid MCP tool, both settling through the public facilitator.
 const app = new Hono();
-app.use(paywall({ network: SOLANA_DEVNET, payTo: merchant.address, schemes: svmSchemes(), facilitator: FACILITATOR, routes: { "GET /price": "$0.01", "GET /report": "$0.50" } }));
+app.use(
+  paywall({
+    network: SOLANA_DEVNET,
+    payTo: merchant.address,
+    schemes: svmSchemes(),
+    facilitator: FACILITATOR,
+    routes: { "GET /price": "$0.01", "GET /report": "$0.50" },
+  }),
+);
 app.get("/price", (c) => c.json({ asset: "SOL", usd: 182.1 }));
 app.get("/report", (c) => c.json({ report: "…" }));
 const fetchPaid = createBudgetedFetch({
@@ -132,7 +148,8 @@ try {
       const { value: lamports } = await rpc.getBalance(agent.address, { commitment: "confirmed" }).send();
       const usdcBal = (await tokenBalance(agentAta)) ?? 0n;
       if (lamports < 5_000_000n) throw new Error(`agent has ${Number(lamports) / 1e9} SOL; needs ≥ 0.005 for the merchant's token account`);
-      if (usdcBal < usdc("0.05")) throw new Error(`agent has ${Number(usdcBal) / 1e6} USDC; get devnet USDC from https://faucet.circle.com`);
+      if (usdcBal < usdc("0.05"))
+        throw new Error(`agent has ${Number(usdcBal) / 1e6} USDC; get devnet USDC from https://faucet.circle.com`);
       return { detail: `${Number(lamports) / 1e9} SOL, ${Number(usdcBal) / 1e6} USDC` };
     },
     { critical: true },
@@ -170,7 +187,13 @@ try {
   });
 
   await report.step("paid MCP tool call pays $0.01 (x402 over MCP)", async () => {
-    const tools = mcpPaywall({ network: SOLANA_DEVNET, payTo: merchant.address, schemes: svmSchemes(), facilitator: FACILITATOR, tools: { premium_quote: "$0.01" } });
+    const tools = mcpPaywall({
+      network: SOLANA_DEVNET,
+      payTo: merchant.address,
+      schemes: svmSchemes(),
+      facilitator: FACILITATOR,
+      tools: { premium_quote: "$0.01" },
+    });
     const server = new McpServer({ name: "merchant", version: "1.0.0" });
     server.registerTool(
       "premium_quote",
@@ -179,14 +202,21 @@ try {
     );
     const [a, b] = InMemoryTransport.createLinkedPair();
     await server.connect(a);
-    const mcp = withPaidTools(new Client({ name: "agent", version: "1.0.0" }), { engine, client: newClient(), onPayment: (o) => outcomes.push(o) });
+    const mcp = withPaidTools(new Client({ name: "agent", version: "1.0.0" }), {
+      engine,
+      client: newClient(),
+      onPayment: (o) => outcomes.push(o),
+    });
     await mcp.connect(b);
     const res = await mcp.callTool("premium_quote", { asset: "SOL" });
     await mcp.close();
     if (res.isError || !res.paymentResponse?.success) throw new Error(`tool result ${JSON.stringify(res).slice(0, 300)}`);
     const bal = await waitForBalance(merchantAta, usdc("0.02"));
     if (bal < usdc("0.02")) throw new Error(`merchant balance ${bal} after settlement`);
-    return { detail: `"${(res.content[0] as unknown as { text: string }).text}"; merchant holds ${Number(bal) / 1e6} USDC`, links: [explorer(res.paymentResponse.transaction)] };
+    return {
+      detail: `"${(res.content[0] as unknown as { text: string }).text}"; merchant holds ${Number(bal) / 1e6} USDC`,
+      links: [explorer(res.paymentResponse.transaction)],
+    };
   });
 
   await report.step("$0.50 report blocked by policy before signing", async () => {
@@ -203,7 +233,8 @@ try {
 
   await report.step("spend ledger and receipts", async () => {
     const spends = await engine.spendStore.list();
-    if (spends.length !== 2 || spends.some((s) => s.status !== "committed")) throw new Error(`ledger ${JSON.stringify(spends, (_k, v) => (typeof v === "bigint" ? v.toString() : v))}`);
+    if (spends.length !== 2 || spends.some((s) => s.status !== "committed"))
+      throw new Error(`ledger ${JSON.stringify(spends, (_k, v) => (typeof v === "bigint" ? v.toString() : v))}`);
     const log = await receipts.list();
     const v = await verifyLog(log);
     if (!v.ok) throw new Error(`receipt log does not verify: ${JSON.stringify(v)}`);
@@ -215,7 +246,16 @@ try {
       const bal = (await tokenBalance(merchantAta)) ?? 0n;
       const ixs: Instruction[] = [];
       if (bal > 0n) {
-        ixs.push(getTransferCheckedInstruction({ source: merchantAta, mint: MINT, destination: agentAta, authority: merchant, amount: bal, decimals: DECIMALS }));
+        ixs.push(
+          getTransferCheckedInstruction({
+            source: merchantAta,
+            mint: MINT,
+            destination: agentAta,
+            authority: merchant,
+            amount: bal,
+            decimals: DECIMALS,
+          }),
+        );
       }
       ixs.push(getCloseAccountInstruction({ account: merchantAta, destination: agent.address, owner: merchant }));
       const sig = await send(ixs);

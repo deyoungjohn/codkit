@@ -42,7 +42,12 @@ export function evmTools(opts: EvmToolOptions) {
       run: async () => {
         const balances: Record<string, string> = { native: fromAtomic(await opts.reader.getBalance({ address: opts.account }), 18) };
         for (const [sym, t] of Object.entries(opts.tokens)) {
-          const raw = await opts.reader.readContract({ address: t.address, abi: erc20Abi, functionName: "balanceOf", args: [opts.account] });
+          const raw = await opts.reader.readContract({
+            address: t.address,
+            abi: erc20Abi,
+            functionName: "balanceOf",
+            args: [opts.account],
+          });
           balances[sym] = fromAtomic(raw, t.decimals);
         }
         return { chain: `eip155:${opts.chainId}`, address: opts.account, balances };
@@ -54,7 +59,10 @@ export function evmTools(opts: EvmToolOptions) {
       input: z.object({
         token: z.enum(symbols as [string, ...string[]]),
         to: addressSchema,
-        amount: z.string().regex(/^\d+(\.\d+)?$/).describe("Human units, e.g. '1.5'"),
+        amount: z
+          .string()
+          .regex(/^\d+(\.\d+)?$/)
+          .describe("Human units, e.g. '1.5'"),
         memo: z.string().optional().describe("Why — recorded with the decision"),
       }),
       run: async ({ token: sym, to, amount }) => {

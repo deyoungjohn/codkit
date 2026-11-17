@@ -29,7 +29,11 @@ export function Dashboard() {
 
   const by = useMemo(() => {
     const pick = <K extends FeedEvent["kind"]>(...kinds: K[]) => events.filter((e): e is Of<K> => (kinds as string[]).includes(e.kind));
-    const answered = new Set(pick("approval").map((a) => a.requestId).filter(Boolean));
+    const answered = new Set(
+      pick("approval")
+        .map((a) => a.requestId)
+        .filter(Boolean),
+    );
     const decisions = pick("policy", "approval");
     const txs = pick("tx");
     return {
@@ -37,10 +41,14 @@ export function Dashboard() {
       decisions,
       txs,
       receipts: pick("receipt"),
-      pending: pick("approval_request").filter((r) => !answered.has(r.requestId) && snap?.pendingApprovals.some((p) => p.requestId === r.requestId)),
+      pending: pick("approval_request").filter(
+        (r) => !answered.has(r.requestId) && snap?.pendingApprovals.some((p) => p.requestId === r.requestId),
+      ),
       spendSeries: cumulative(txs.map((t) => usdc(t.label))),
       paySeries: cumulative(txs.map(() => 1)),
-      blockSeries: cumulative(decisions.filter((d) => d.kind === "policy").map((d) => (d.kind === "policy" && d.verdict === "deny" ? 1 : 0))),
+      blockSeries: cumulative(
+        decisions.filter((d) => d.kind === "policy").map((d) => (d.kind === "policy" && d.verdict === "deny" ? 1 : 0)),
+      ),
     };
   }, [events, snap]);
 
@@ -74,7 +82,15 @@ export function Dashboard() {
       <Sidebar mode={snap?.mode} txs={by.txs} killed={snap?.killed ?? false} onKill={toggleKill} tab={tab} onNav={goto} />
 
       <main className="min-w-0 flex-1">
-        <TopBar mode={snap?.mode} auth={snap?.auth} running={running} killed={snap?.killed ?? false} onRun={run} connected={connected} pending={by.pending.length} />
+        <TopBar
+          mode={snap?.mode}
+          auth={snap?.auth}
+          running={running}
+          killed={snap?.killed ?? false}
+          onRun={run}
+          connected={connected}
+          pending={by.pending.length}
+        />
 
         <div className="flex flex-col gap-6 px-5 pb-10 pt-6 sm:px-8">
           {by.pending.length > 0 && <Approvals items={by.pending} onDone={refresh} />}
@@ -176,7 +192,12 @@ export function Dashboard() {
                     <span className="grid h-9 w-9 place-items-center rounded-lg bg-violet-400 text-[#1b1530]">
                       <Icon.Bolt className="h-5 w-5" />
                     </span>
-                    <a href={REPO} target="_blank" rel="noreferrer" className="ml-1 inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3.5 py-1.5 text-[13px] text-white/80 transition hover:bg-white/5">
+                    <a
+                      href={REPO}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="ml-1 inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3.5 py-1.5 text-[13px] text-white/80 transition hover:bg-white/5"
+                    >
                       View source <Icon.ArrowUpRight className="h-3.5 w-3.5" />
                     </a>
                   </div>
@@ -193,14 +214,16 @@ export function Dashboard() {
                   <div className="mt-1 flex flex-wrap items-center gap-4">
                     <BigNumber value={spent.toFixed(5)} />
                     <div className="flex gap-3">
-                      <button type="button"
+                      <button
+                        type="button"
                         disabled={running || snap?.killed}
                         onClick={run}
                         className="rounded-xl bg-violet-300 px-6 py-3 text-[15px] font-medium text-[#17112b] shadow-[0_0_24px_rgba(167,139,250,0.35)] transition hover:bg-violet-200 disabled:cursor-not-allowed disabled:opacity-40"
                       >
                         {running ? "Running…" : "Run agent"}
                       </button>
-                      <button type="button"
+                      <button
+                        type="button"
                         disabled={running}
                         onClick={reset}
                         className="rounded-xl border border-white/12 px-6 py-3 text-[15px] text-white/85 transition hover:bg-white/5 disabled:opacity-40"
@@ -223,7 +246,8 @@ export function Dashboard() {
                     ["receipts", "Receipts", `${snap?.receipts.count ?? 0} signed`],
                   ] as const
                 ).map(([key, title, sub]) => (
-                  <button type="button"
+                  <button
+                    type="button"
                     key={key}
                     onClick={() => setTab(key)}
                     className={`flex items-center justify-between gap-3 border-b-2 px-1 py-3 text-left transition ${tab === key ? "border-violet-300" : "border-transparent hover:border-white/15"}`}
@@ -242,13 +266,23 @@ export function Dashboard() {
                 {tab === "decisions" && <Decisions items={by.decisions} />}
                 {tab === "payments" && <Txs items={by.txs} />}
                 {tab === "receipts" && (
-                  <Receipts items={by.receipts} head={snap?.receipts.head ?? null} signer={snap?.receipts.signer ?? ""} ok={snap?.receipts.ok ?? true} />
+                  <Receipts
+                    items={by.receipts}
+                    head={snap?.receipts.head ?? null}
+                    signer={snap?.receipts.signer ?? ""}
+                    ok={snap?.receipts.ok ?? true}
+                  />
                 )}
               </div>
 
               <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <MiniStat label="Per-payment cap" pill="x402" value={snap ? fmt(Number(snap.budget.perTx ?? 0)) : "–"} unit="USDC" />
-                <MiniStat label="Approval above" pill="Human" value={snap ? fmt(Number(snap.budget.approvalAbove ?? 0)) : "–"} unit="USDC" />
+                <MiniStat
+                  label="Approval above"
+                  pill="Human"
+                  value={snap ? fmt(Number(snap.budget.approvalAbove ?? 0)) : "–"}
+                  unit="USDC"
+                />
                 <MiniStat
                   label="Receipt log"
                   pill={snap?.receipts.ok === false ? "Invalid" : "Verified"}
@@ -256,7 +290,12 @@ export function Dashboard() {
                   unit="entries"
                   hint={snap?.receipts.head ? short(snap.receipts.head, 8) : undefined}
                 />
-                <RatesCard spent={spent} perDay={perDay} perTx={Number(snap?.budget.perTx ?? 0)} approval={Number(snap?.budget.approvalAbove ?? 0)} />
+                <RatesCard
+                  spent={spent}
+                  perDay={perDay}
+                  perTx={Number(snap?.budget.perTx ?? 0)}
+                  approval={Number(snap?.budget.approvalAbove ?? 0)}
+                />
               </div>
             </div>
           </section>
@@ -305,8 +344,16 @@ function Sidebar({
 
       <div className="px-5 pt-5">
         <div className="grid grid-cols-2 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-1 text-[14px]">
-          <span className={`rounded-xl py-2 text-center ${mode !== "live" ? "bg-white/[0.07] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]" : "text-white/45"}`}>Demo</span>
-          <span className={`rounded-xl py-2 text-center ${mode === "live" ? "bg-white/[0.07] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]" : "text-white/45"}`}>Live LLM</span>
+          <span
+            className={`rounded-xl py-2 text-center ${mode !== "live" ? "bg-white/[0.07] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]" : "text-white/45"}`}
+          >
+            Demo
+          </span>
+          <span
+            className={`rounded-xl py-2 text-center ${mode === "live" ? "bg-white/[0.07] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]" : "text-white/45"}`}
+          >
+            Live LLM
+          </span>
         </div>
       </div>
 
@@ -314,11 +361,16 @@ function Sidebar({
         {nav.map(([key, label, Ico]) => {
           const active = key === null ? false : tab === key;
           return (
-            <button type="button"
+            <button
+              type="button"
               key={label}
               onClick={() => (key ? onNav(key) : window.scrollTo({ top: 0, behavior: "smooth" }))}
               className={`mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[15px] transition ${
-                key === null ? "bg-white/[0.06] text-white" : active ? "text-white" : "text-white/55 hover:bg-white/[0.03] hover:text-white/80"
+                key === null
+                  ? "bg-white/[0.06] text-white"
+                  : active
+                    ? "text-white"
+                    : "text-white/55 hover:bg-white/[0.03] hover:text-white/80"
               }`}
             >
               <Ico className="h-[18px] w-[18px]" />
@@ -326,14 +378,29 @@ function Sidebar({
             </button>
           );
         })}
-        <a href={`${REPO}#readme`} target="_blank" rel="noreferrer" className="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] text-white/55 transition hover:bg-white/[0.03] hover:text-white/80">
+        <a
+          href={`${REPO}#readme`}
+          target="_blank"
+          rel="noreferrer"
+          className="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] text-white/55 transition hover:bg-white/[0.03] hover:text-white/80"
+        >
           <Icon.Cube className="h-[18px] w-[18px]" /> Docs <Icon.ArrowUpRight className="h-3.5 w-3.5" />
         </a>
-        <a href={`${REPO}/tree/main/packages/mcp`} target="_blank" rel="noreferrer" className="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] text-white/55 transition hover:bg-white/[0.03] hover:text-white/80">
-          <Icon.Plug className="h-[18px] w-[18px]" /> MCP server <span className="rounded-md bg-violet-300 px-2 py-0.5 text-[11px] font-medium text-[#1b1530]">Beta</span>
+        <a
+          href={`${REPO}/tree/main/packages/mcp`}
+          target="_blank"
+          rel="noreferrer"
+          className="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] text-white/55 transition hover:bg-white/[0.03] hover:text-white/80"
+        >
+          <Icon.Plug className="h-[18px] w-[18px]" /> MCP server{" "}
+          <span className="rounded-md bg-violet-300 px-2 py-0.5 text-[11px] font-medium text-[#1b1530]">Beta</span>
         </a>
 
-        <button type="button" onClick={() => setOpen((o) => !o)} className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[15px] text-white">
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[15px] text-white"
+        >
           <Icon.Stack className="h-[18px] w-[18px]" /> Recent payments
           <span className="rounded-md bg-violet-300/90 px-2 py-0.5 text-[11px] font-medium text-[#1b1530]">{txs.length}</span>
           <Icon.Caret className={`ml-auto h-3 w-3 text-white/60 transition ${open ? "" : "rotate-180"}`} />
@@ -343,7 +410,9 @@ function Sidebar({
             {recent.length === 0 && <li className="text-[13px] text-white/35">No payments yet. Run the agent.</li>}
             {recent.map((t, i) => (
               <li key={t.id} className={`flex items-center gap-3 ${i === 3 ? "opacity-35" : ""}`}>
-                <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${["bg-violet-400/90 text-[#1b1530]", "bg-rose-500 text-white", "bg-fuchsia-500 text-white", "bg-sky-500 text-white"][i % 4]}`}>
+                <span
+                  className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${["bg-violet-400/90 text-[#1b1530]", "bg-rose-500 text-white", "bg-fuchsia-500 text-white", "bg-sky-500 text-white"][i % 4]}`}
+                >
                   <Icon.Coin className="h-4 w-4" />
                 </span>
                 <span className="min-w-0 text-[13px] leading-tight">
@@ -357,10 +426,13 @@ function Sidebar({
       </nav>
 
       <div className="mt-auto border-t border-white/[0.06] p-5">
-        <button type="button"
+        <button
+          type="button"
           onClick={onKill}
           className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition ${
-            killed ? "border-emerald-300/30 bg-emerald-300/[0.06] hover:bg-emerald-300/10" : "border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.05]"
+            killed
+              ? "border-emerald-300/30 bg-emerald-300/[0.06] hover:bg-emerald-300/10"
+              : "border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.05]"
           }`}
         >
           <Icon.Bolt className={`h-5 w-5 ${killed ? "text-emerald-300" : "text-white"}`} />
@@ -404,13 +476,17 @@ function TopBar({
         </span>
         <div className="leading-tight">
           <p className="flex items-center gap-1.5 text-xs text-white/45">
-            @research-agent <span className="rounded bg-white/10 px-1.5 py-px text-[10px] font-medium text-white/80">{mode === "live" ? "LIVE" : "DEMO"}</span>
+            @research-agent{" "}
+            <span className="rounded bg-white/10 px-1.5 py-px text-[10px] font-medium text-white/80">
+              {mode === "live" ? "LIVE" : "DEMO"}
+            </span>
           </p>
           <p className="text-[16px] text-white">Research Agent</p>
         </div>
       </div>
       <span className="mx-2 hidden h-10 w-px bg-white/[0.08] sm:block" />
-      <button type="button"
+      <button
+        type="button"
         onClick={onRun}
         disabled={running || killed}
         className="flex items-center gap-2 rounded-xl bg-violet-300 px-4 py-2.5 text-[15px] font-medium text-[#17112b] transition hover:bg-violet-200 disabled:cursor-not-allowed disabled:opacity-40"
@@ -419,9 +495,16 @@ function TopBar({
       </button>
 
       <div className="ml-auto flex items-center gap-2.5">
-        <span className="relative grid h-10 w-10 place-items-center rounded-full border border-white/10 text-white/80" title={`${pending} approval(s) pending`}>
+        <span
+          className="relative grid h-10 w-10 place-items-center rounded-full border border-white/10 text-white/80"
+          title={`${pending} approval(s) pending`}
+        >
           <Icon.Bell className="h-[18px] w-[18px]" />
-          {pending > 0 && <span className="absolute -right-1 -top-1 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-violet-300 px-1 text-[11px] font-semibold text-[#1b1530]">{pending}</span>}
+          {pending > 0 && (
+            <span className="absolute -right-1 -top-1 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-violet-300 px-1 text-[11px] font-semibold text-[#1b1530]">
+              {pending}
+            </span>
+          )}
         </span>
         <span className="flex items-center gap-2 rounded-xl border border-white/10 px-3.5 py-2.5 text-[13px] text-white/75">
           <span className={`h-2 w-2 rounded-full ${connected ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" : "bg-rose-400"}`} />
@@ -429,12 +512,16 @@ function TopBar({
         </span>
         <WalletButton />
         {auth === "open" && (
-          <span className="rounded-xl border border-amber-300/30 px-3 py-2.5 text-[13px] text-amber-200" title="Set DASHBOARD_PASSWORD to require sign-in">
+          <span
+            className="rounded-xl border border-amber-300/30 px-3 py-2.5 text-[13px] text-amber-200"
+            title="Set DASHBOARD_PASSWORD to require sign-in"
+          >
             Auth off (dev)
           </span>
         )}
         {auth === "password" && (
-          <button type="button"
+          <button
+            type="button"
             onClick={async () => {
               await fetch("/api/logout", { method: "POST" });
               window.location.href = "/login";
@@ -472,7 +559,8 @@ function WalletButton({ variant = "outline" }: { variant?: "outline" | "solid" }
         <div className="absolute right-0 z-20 mt-2 w-60 rounded-2xl border border-white/10 bg-[#141220] p-1.5 shadow-2xl">
           {w.providers.length === 0 && <p className="p-2.5 text-xs text-white/50">No browser wallet detected.</p>}
           {w.providers.map((p) => (
-            <button type="button"
+            <button
+              type="button"
               key={p.info.uuid}
               onClick={() => {
                 setOpen(false);
@@ -517,7 +605,12 @@ function MetricCard(p: {
           <p className="truncate text-[13px] text-white/50">{p.kicker}</p>
           <p className="truncate text-[16px] text-white">{p.title}</p>
         </div>
-        <button type="button" onClick={p.onOpen} aria-label={`Open ${p.title}`} className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-white/80 transition hover:bg-white/5">
+        <button
+          type="button"
+          onClick={p.onOpen}
+          aria-label={`Open ${p.title}`}
+          className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-white/80 transition hover:bg-white/5"
+        >
           <Icon.ArrowUpRight className="h-4 w-4" />
         </button>
       </div>
@@ -527,7 +620,9 @@ function MetricCard(p: {
         {p.unit && <span className="ml-1 text-[20px] text-white/80">{p.unit}</span>}
       </p>
       <p className={`mt-3 flex items-center gap-1.5 px-5 text-[13px] ${p.deltaTone === "up" ? "text-emerald-400" : "text-rose-400"}`}>
-        <span className={`grid h-4 w-4 place-items-center rounded-full ${p.deltaTone === "up" ? "bg-emerald-400" : "bg-rose-400"} text-[#0d0d12]`}>
+        <span
+          className={`grid h-4 w-4 place-items-center rounded-full ${p.deltaTone === "up" ? "bg-emerald-400" : "bg-rose-400"} text-[#0d0d12]`}
+        >
           {p.deltaTone === "up" ? <Icon.Up className="h-2.5 w-2.5" /> : <Icon.X className="h-2.5 w-2.5" />}
         </span>
         {p.delta}
@@ -539,26 +634,38 @@ function MetricCard(p: {
 
 /** Smooth line with a glow, a dashed baseline, dots on the last points and a value tag. */
 function Sparkline({ values, tone, tag }: { values: number[]; tone: "violet" | "red"; tag?: string }) {
-  const W = 320, H = 96, pad = 10;
+  const W = 320,
+    H = 96,
+    pad = 10;
   const flat = values.length > 1 && Math.max(...values) === Math.min(...values);
   const pts = values.length > 1 && !flat ? values : [0, 0.15, 0.05, 0.2, 0.1];
-  const max = Math.max(...pts), min = Math.min(...pts);
+  const max = Math.max(...pts),
+    min = Math.min(...pts);
   const xy = flat
     ? values.map((_, i) => [(i / (values.length - 1)) * W, H * 0.62] as const) // nothing happened yet: rest on the baseline
     : pts.map((v, i) => [(i / (pts.length - 1)) * W, H - pad - ((v - min) / (max - min || 1)) * (H - pad * 3)] as const);
   // Catmull-Rom → cubic Bézier for a soft curve
   let d = `M ${xy[0]![0]} ${xy[0]![1]}`;
   for (let i = 0; i < xy.length - 1; i++) {
-    const p0 = xy[i - 1] ?? xy[i]!, p1 = xy[i]!, p2 = xy[i + 1]!, p3 = xy[i + 2] ?? p2;
+    const p0 = xy[i - 1] ?? xy[i]!,
+      p1 = xy[i]!,
+      p2 = xy[i + 1]!,
+      p3 = xy[i + 2] ?? p2;
     d += ` C ${p1[0] + (p2[0] - p0[0]) / 6} ${p1[1] + (p2[1] - p0[1]) / 6}, ${p2[0] - (p3[0] - p1[0]) / 6} ${p2[1] - (p3[1] - p1[1]) / 6}, ${p2[0]} ${p2[1]}`;
   }
   const c = tone === "red" ? ["#ef4444", "#f87171"] : ["#7c3aed", "#c4b5fd"];
   const id = `g${tone}${values.length}`;
-  const last = xy.at(-1)!, prev = xy.at(-2)!;
+  const last = xy.at(-1)!,
+    prev = xy.at(-2)!;
   const empty = values.length <= 1 || flat;
   return (
     <div className="relative mt-3 h-[96px]">
-      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        preserveAspectRatio="none"
+        className="absolute inset-0 h-full w-full overflow-visible"
+        aria-hidden="true"
+      >
         <defs>
           <linearGradient id={`${id}s`} x1="0" x2="1">
             <stop offset="0" stopColor={c[0]} stopOpacity="0.55" />
@@ -619,28 +726,36 @@ function PolicyCard({ snap, killed, onKill }: { snap: ReturnType<typeof useSnaps
       <div className="relative flex items-center gap-3">
         <Logo small />
         <span className="text-[17px] text-white">codkit</span>
-        <span className="ml-auto rounded-lg bg-violet-300 px-2.5 py-1 text-xs font-medium text-[#1b1530]">{killed ? "Halted" : "Active"}</span>
+        <span className="ml-auto rounded-lg bg-violet-300 px-2.5 py-1 text-xs font-medium text-[#1b1530]">
+          {killed ? "Halted" : "Active"}
+        </span>
       </div>
       <div className="relative md:grid md:grid-cols-[minmax(0,1fr)_minmax(260px,340px)] md:items-end md:gap-10 2xl:block">
-      <div>
-      <h2 className="relative mt-7 text-[30px] font-medium leading-tight tracking-tight text-white">Spending Policy</h2>
-      <p className="relative mt-3 max-w-[290px] text-[15px] leading-snug text-white/55 md:max-w-[460px] 2xl:max-w-[290px]">
-        Every payment is checked before anything is signed: at most {snap?.budget.perTx ?? "–"} USDC each, {snap?.budget.perDay ?? "–"} USDC a day, and a human approves anything
-        above {snap?.budget.approvalAbove ?? "–"}.
-      </p>
-      </div>
-      <svg className="pointer-events-none absolute -right-2 top-[42%] hidden h-20 w-20 text-white/20 2xl:block" viewBox="0 0 100 100" fill="none" aria-hidden="true">
-        <path d="M5 95 L95 5" stroke="currentColor" strokeWidth="1" />
-      </svg>
-      <div className="relative mt-10 flex flex-col gap-3 md:mt-0 2xl:mt-10">
-        <WalletButton variant="solid" />
-        <button type="button"
-          onClick={onKill}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/[0.04] px-4 py-3.5 text-[16px] text-white backdrop-blur transition hover:bg-white/[0.08]"
+        <div>
+          <h2 className="relative mt-7 text-[30px] font-medium leading-tight tracking-tight text-white">Spending Policy</h2>
+          <p className="relative mt-3 max-w-[290px] text-[15px] leading-snug text-white/55 md:max-w-[460px] 2xl:max-w-[290px]">
+            Every payment is checked before anything is signed: at most {snap?.budget.perTx ?? "–"} USDC each, {snap?.budget.perDay ?? "–"}{" "}
+            USDC a day, and a human approves anything above {snap?.budget.approvalAbove ?? "–"}.
+          </p>
+        </div>
+        <svg
+          className="pointer-events-none absolute -right-2 top-[42%] hidden h-20 w-20 text-white/20 2xl:block"
+          viewBox="0 0 100 100"
+          fill="none"
+          aria-hidden="true"
         >
-          {killed ? "Release kill switch" : "Engage kill switch"} <Icon.Lock className="h-[18px] w-[18px]" />
-        </button>
-      </div>
+          <path d="M5 95 L95 5" stroke="currentColor" strokeWidth="1" />
+        </svg>
+        <div className="relative mt-10 flex flex-col gap-3 md:mt-0 2xl:mt-10">
+          <WalletButton variant="solid" />
+          <button
+            type="button"
+            onClick={onKill}
+            className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/[0.04] px-4 py-3.5 text-[16px] text-white backdrop-blur transition hover:bg-white/[0.08]"
+          >
+            {killed ? "Release kill switch" : "Engage kill switch"} <Icon.Lock className="h-[18px] w-[18px]" />
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -648,7 +763,16 @@ function PolicyCard({ snap, killed, onKill }: { snap: ReturnType<typeof useSnaps
 
 function Stars() {
   const dots = [
-    [12, 30], [78, 22], [64, 48], [30, 62], [88, 58], [45, 40], [20, 78], [70, 70], [55, 15], [92, 35],
+    [12, 30],
+    [78, 22],
+    [64, 48],
+    [30, 62],
+    [88, 58],
+    [45, 40],
+    [20, 78],
+    [70, 70],
+    [55, 15],
+    [92, 35],
   ];
   return (
     <div className="pointer-events-none absolute inset-0">
@@ -667,7 +791,9 @@ function BigNumber({ value }: { value: string }) {
   return (
     <p className="text-[64px] font-medium leading-none tracking-[-0.04em] tabular-nums sm:text-[76px]">
       <span className="text-white">{int}.</span>
-      <span className="bg-[linear-gradient(90deg,#ffffff_0%,#ffffff_25%,rgba(255,255,255,0.35)_100%)] bg-clip-text text-transparent">{frac}</span>
+      <span className="bg-[linear-gradient(90deg,#ffffff_0%,#ffffff_25%,rgba(255,255,255,0.35)_100%)] bg-clip-text text-transparent">
+        {frac}
+      </span>
     </p>
   );
 }
@@ -693,7 +819,11 @@ function BudgetSlider({ spent, perDay, approvalAbove }: { spent: number; perDay:
         <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-white/15" />
         <div className="absolute left-0 top-1/2 h-[2px] -translate-y-1/2 bg-violet-300/80" style={{ width: `${pct * 100}%` }} />
         {perDay > 0 && approvalAbove > 0 && (
-          <span className="absolute top-1/2 h-6 w-px -translate-y-1/2 bg-amber-300/70" style={{ left: `${(approvalAbove / perDay) * 100}%` }} title="approval threshold" />
+          <span
+            className="absolute top-1/2 h-6 w-px -translate-y-1/2 bg-amber-300/70"
+            style={{ left: `${(approvalAbove / perDay) * 100}%` }}
+            title="approval threshold"
+          />
         )}
         <span className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2" style={{ left: `${pct * 100}%` }}>
           <span className="absolute bottom-[calc(100%+10px)] left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-white/10 bg-[#1b1925] px-2.5 py-1 text-[12px] text-white/90">
@@ -745,7 +875,10 @@ function RatesCard({ spent, perDay, perTx, approval }: { spent: number; perDay: 
           <div key={name} className="flex items-center gap-3">
             <div className="relative h-px flex-1 bg-white/15">
               <span className="absolute top-1/2 h-px bg-violet-300/70" style={{ width: `${Math.min(1, f) * 100}%` }} />
-              <span className="absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-violet-200 bg-[#0f0f15]" style={{ left: `${Math.min(1, f) * 100}%` }} />
+              <span
+                className="absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-violet-200 bg-[#0f0f15]"
+                style={{ left: `${Math.min(1, f) * 100}%` }}
+              />
             </div>
             <span className="whitespace-nowrap text-right text-[13px] text-white/85 tabular-nums">
               {v} <span className="text-[10px] text-white/40">{name}</span>
@@ -772,14 +905,20 @@ function Trace({ items }: { items: Of<"thinking" | "message" | "tool_call" | "to
       {items.map((e) => (
         <li key={e.id} className="enter">
           {e.kind === "thinking" && <p className="border-l-2 border-violet-300/40 pl-3 text-sm italic text-white/60">{e.text}</p>}
-          {e.kind === "message" && <p className="whitespace-pre-wrap rounded-2xl border border-violet-300/15 bg-violet-300/[0.06] p-4 text-sm text-violet-50">{e.text}</p>}
+          {e.kind === "message" && (
+            <p className="whitespace-pre-wrap rounded-2xl border border-violet-300/15 bg-violet-300/[0.06] p-4 text-sm text-violet-50">
+              {e.text}
+            </p>
+          )}
           {e.kind === "tool_call" && (
             <div className="rounded-xl border border-white/[0.07] bg-white/[0.02] px-3 py-2 font-mono text-xs">
               <span className="text-violet-200">→ {e.name}</span> <span className="break-all text-white/45">{JSON.stringify(e.input)}</span>
             </div>
           )}
           {e.kind === "tool_result" && (
-            <details className={`rounded-xl border px-3 py-2 font-mono text-xs ${e.ok ? "border-white/[0.07]" : "border-rose-400/30 bg-rose-500/[0.05]"}`}>
+            <details
+              className={`rounded-xl border px-3 py-2 font-mono text-xs ${e.ok ? "border-white/[0.07]" : "border-rose-400/30 bg-rose-500/[0.05]"}`}
+            >
               <summary className="cursor-pointer select-none">
                 <span className={e.ok ? "text-emerald-300" : "text-rose-300"}>
                   ← {e.name} {e.ok ? "ok" : "error"}
@@ -814,7 +953,8 @@ function Approvals({ items, onDone }: { items: Of<"approval_request">[]; onDone:
             <p className="font-mono text-sm text-white">{r.summary}</p>
             <p className="text-xs text-white/50">{r.reasons.join("; ")}</p>
           </div>
-          <button type="button"
+          <button
+            type="button"
             onClick={async () => {
               await post("/api/approve", { requestId: r.requestId, approved: true, by: "dashboard" });
               onDone();
@@ -823,7 +963,8 @@ function Approvals({ items, onDone }: { items: Of<"approval_request">[]; onDone:
           >
             Approve
           </button>
-          <button type="button"
+          <button
+            type="button"
             onClick={async () => {
               await post("/api/approve", { requestId: r.requestId, approved: false, by: "dashboard" });
               onDone();
@@ -877,7 +1018,12 @@ function Txs({ items }: { items: Of<"tx">[] }) {
           <Badge tone="allow">{t.status}</Badge>
           <span className="min-w-0 flex-1 truncate font-mono text-white/85">{t.label}</span>
           {t.url ? (
-            <a href={t.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-mono text-violet-200 hover:underline">
+            <a
+              href={t.url}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 font-mono text-violet-200 hover:underline"
+            >
               {short(t.hash)} <Icon.ArrowUpRight className="h-3 w-3" />
             </a>
           ) : (
@@ -943,9 +1089,26 @@ function Chip({ children }: { children: React.ReactNode }) {
   );
 }
 
-function IconButton({ label, onClick, disabled, children }: { label: string; onClick: () => void; disabled?: boolean; children: React.ReactNode }) {
+function IconButton({
+  label,
+  onClick,
+  disabled,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+  children: React.ReactNode;
+}) {
   return (
-    <button type="button" aria-label={label} title={label} onClick={onClick} disabled={disabled} className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-white/5 hover:text-white disabled:opacity-30">
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      onClick={onClick}
+      disabled={disabled}
+      className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-white/5 hover:text-white disabled:opacity-30"
+    >
       {children}
     </button>
   );

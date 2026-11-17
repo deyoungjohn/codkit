@@ -65,16 +65,20 @@ const cluster = arg("cluster") ?? "devnet";
 const RPC_URL = process.env.SOLANA_RPC_URL || `https://api.${cluster}.solana.com`;
 const WS_URL = process.env.SOLANA_WS_URL || RPC_URL.replace(/^http/, "ws");
 const explorer = (sig: string) =>
-  cluster === "localnet" ? `https://explorer.solana.com/tx/${sig}?cluster=custom` : `https://explorer.solana.com/tx/${sig}?cluster=${cluster}`;
+  cluster === "localnet"
+    ? `https://explorer.solana.com/tx/${sig}?cluster=custom`
+    : `https://explorer.solana.com/tx/${sig}?cluster=${cluster}`;
 
 /** The JSON the deploy step recorded (no rebuild of @codkit/contracts needed), else the built registry. */
 const recorded = (name: string): unknown => {
   const file = new URL(`../../../packages/contracts/deployments/${name}.json`, import.meta.url);
   return existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : undefined;
 };
-const dep = (arg("program") ? { programId: arg("program") } : (recorded(`solana-${cluster}`) ?? (deployments as Record<string, unknown>)[`solana-${cluster}`])) as
-  | { programId: string; upgradeAuthority?: string }
-  | undefined;
+const dep = (
+  arg("program")
+    ? { programId: arg("program") }
+    : (recorded(`solana-${cluster}`) ?? (deployments as Record<string, unknown>)[`solana-${cluster}`])
+) as { programId: string; upgradeAuthority?: string } | undefined;
 if (!dep) throw new Error(`no Solana deployment recorded for ${cluster}`);
 const PROGRAM = address(dep.programId);
 
@@ -191,14 +195,17 @@ try {
         termsHash: "codkit e2e: deliver a hash",
         programId: PROGRAM,
       });
-      const { result: sig } = await engine!.execute(solanaEscrowCreateAction({ mint: mint!, provider: provider.address, amount: AMOUNT, cluster, programId: PROGRAM }), {
-        simulate: async () => {
-          const s = await simulate([ix]);
-          return { ok: s.ok, details: { logs: s.logs.slice(-3) }, ...(!s.ok && { reason: JSON.stringify(s.err) }) };
+      const { result: sig } = await engine!.execute(
+        solanaEscrowCreateAction({ mint: mint!, provider: provider.address, amount: AMOUNT, cluster, programId: PROGRAM }),
+        {
+          simulate: async () => {
+            const s = await simulate([ix]);
+            return { ok: s.ok, details: { logs: s.logs.slice(-3) }, ...(!s.ok && { reason: JSON.stringify(s.err) }) };
+          },
+          execute: () => send([ix]),
+          ref: (s) => s,
         },
-        execute: () => send([ix]),
-        ref: (s) => s,
-      });
+      );
       deal = await fetchDeal(rpc, ix.deal);
       if (deal?.status !== "Funded") throw new Error(`deal status ${deal?.status}`);
       const held = await tokenBalance(await findAssociatedTokenAddress(ix.deal, mint!));
@@ -216,13 +223,18 @@ try {
           throw new Error("must not get here");
         },
       })
-      .then(() => null, (e: unknown) => e);
+      .then(
+        () => null,
+        (e: unknown) => e,
+      );
     if (!isPolicyError(err) || err.code !== "denied") throw new Error(`expected denial, got ${String(err)}`);
     return { detail: err.message };
   });
 
   await report.step("escrow: provider delivers (agent pays the fee)", async () => {
-    const sig = await send([deliverInstruction({ provider, deal: deal!.address, deliveryHash: "ipfs://codkit-e2e-result", programId: PROGRAM })]);
+    const sig = await send([
+      deliverInstruction({ provider, deal: deal!.address, deliveryHash: "ipfs://codkit-e2e-result", programId: PROGRAM }),
+    ]);
     deal = await fetchDeal(rpc, deal!.address);
     if (deal?.status !== "Delivered") throw new Error(`deal status ${deal?.status}`);
     return { links: [explorer(sig)] };
@@ -263,10 +275,13 @@ try {
       },
     });
     // read the memo back from the chain rather than trusting what we sent
-    const tx = await rpc.getTransaction(sig as never, { commitment: "confirmed", maxSupportedTransactionVersion: 0, encoding: "json" }).send();
+    const tx = await rpc
+      .getTransaction(sig as never, { commitment: "confirmed", maxSupportedTransactionVersion: 0, encoding: "json" })
+      .send();
     const memoLog = tx?.meta?.logMessages?.find((l) => l.includes("kit-receipts:v1:")) ?? "";
     const onchain = parseAnchorMemo(memoLog.slice(memoLog.indexOf("kit-receipts:v1:")).replace(/"$/, ""));
-    if (!onchain || onchain.head !== pub.checkpoint.head || onchain.seq !== pub.checkpoint.seq) throw new Error(`memo mismatch: ${memoLog}`);
+    if (!onchain || onchain.head !== pub.checkpoint.head || onchain.seq !== pub.checkpoint.seq)
+      throw new Error(`memo mismatch: ${memoLog}`);
     const v = await verifyLog(await receipts.list(), { anchor: { ...pub.checkpoint, ...onchain } });
     if (!v.ok) throw new Error(JSON.stringify(v.errors));
     return { detail: `${pub.checkpoint.count} receipts verified against the head in the memo`, links: [explorer(sig)] };

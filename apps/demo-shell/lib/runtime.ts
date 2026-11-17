@@ -161,7 +161,11 @@ export function startRun(prompt: string): { started: boolean; mode: Runtime["mod
   const rt = runtime();
   if (rt.running) return { started: false, mode: rt.mode, reason: "already running" };
   rt.running = true;
-  rt.feed.push({ kind: "status", state: "running", detail: rt.mode === "live" ? `${rt.providers[0]!.name} (${rt.providers[0]!.model}) is working` : "scripted demo agent" });
+  rt.feed.push({
+    kind: "status",
+    state: "running",
+    detail: rt.mode === "live" ? `${rt.providers[0]!.name} (${rt.providers[0]!.model}) is working` : "scripted demo agent",
+  });
   void (async () => {
     try {
       if (rt.mode === "live") {
@@ -176,7 +180,11 @@ export function startRun(prompt: string): { started: boolean; mode: Runtime["mod
             else agentEventToFeed(rt.feed, e);
           },
         });
-        rt.feed.push({ kind: "status", state: "done", detail: `${res.provider}/${res.model}: ${res.turns} turns, stop: ${res.stopReason}` });
+        rt.feed.push({
+          kind: "status",
+          state: "done",
+          detail: `${res.provider}/${res.model}: ${res.turns} turns, stop: ${res.stopReason}`,
+        });
       } else {
         const { runScenario } = await import("./scenario");
         await runScenario(rt);

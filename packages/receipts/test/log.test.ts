@@ -30,8 +30,21 @@ describe("canonical JSON", () => {
   it("is independent of key order and normalises app values", () => {
     expect(canonicalize(normalize({ b: 1, a: { d: [1, 2], c: "x" } }))).toBe(canonicalize(normalize({ a: { c: "x", d: [1, 2] }, b: 1 })));
     expect(
-      normalize({ big: 2n ** 70n, when: new Date(0), bytes: new Uint8Array([1, 255]), skip: undefined, arr: [undefined], err: new Error("boom") }),
-    ).toEqual({ big: "1180591620717411303424", when: "1970-01-01T00:00:00.000Z", bytes: "0x01ff", arr: [null], err: { name: "Error", message: "boom" } });
+      normalize({
+        big: 2n ** 70n,
+        when: new Date(0),
+        bytes: new Uint8Array([1, 255]),
+        skip: undefined,
+        arr: [undefined],
+        err: new Error("boom"),
+      }),
+    ).toEqual({
+      big: "1180591620717411303424",
+      when: "1970-01-01T00:00:00.000Z",
+      bytes: "0x01ff",
+      arr: [null],
+      err: { name: "Error", message: "boom" },
+    });
   });
 
   it("rejects values that cannot round-trip", () => {

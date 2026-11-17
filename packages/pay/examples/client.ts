@@ -32,7 +32,8 @@ registerExactEvmScheme(client, { signer: privateKeyToAccount(key) });
 const fetchPaid = createBudgetedFetch({
   engine,
   client,
-  onPayment: (o) => console.log(`[payment] ${o.status}`, o.status === "settled" ? o.transaction : o.status === "failed" ? o.reason : o.error.message),
+  onPayment: (o) =>
+    console.log(`[payment] ${o.status}`, o.status === "settled" ? o.transaction : o.status === "failed" ? o.reason : o.error.message),
 });
 
 const res = await fetchPaid(url);

@@ -26,7 +26,8 @@ try {
   // anvil dev key #0 — public, local only
   const account = privateKeyToAccount("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80");
   const wallet = createWalletClient({ account, chain: foundry, transport, pollingInterval: 50 });
-  const contract = (await pc.waitForTransactionReceipt({ hash: await wallet.sendTransaction({ data: receiptAnchorBytecode }) })).contractAddress!;
+  const contract = (await pc.waitForTransactionReceipt({ hash: await wallet.sendTransaction({ data: receiptAnchorBytecode }) }))
+    .contractAddress!;
 
   // 1. the agent: policy engine + receipt log recording every policy event
   const USDC = "0x036CbD53842c5426634e7929541eC2318f3dCF7e";
@@ -38,7 +39,12 @@ try {
   const pay = (amount: bigint) =>
     engine
       .execute(
-        { chain: "eip155:84532", kind: "token_transfer", to: "0x1111111111111111111111111111111111111111", spends: [{ asset: USDC, amount }] },
+        {
+          chain: "eip155:84532",
+          kind: "token_transfer",
+          to: "0x1111111111111111111111111111111111111111",
+          spends: [{ asset: USDC, amount }],
+        },
         { simulate: async () => ({ ok: true }), execute: async () => `0x${"ab".repeat(32)}`, ref: (h) => h },
       )
       .catch(() => undefined);

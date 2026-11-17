@@ -32,25 +32,41 @@ function fakeRpc(): Promise<{ url: string; server: Server }> {
           : method === "getAccountInfo"
             ? {
                 context,
-                value: { data: [Buffer.from(mint).toString("base64"), "base64"], executable: false, lamports: 1_461_600, owner: TOKEN_PROGRAM, rentEpoch: 0, space: 82 },
+                value: {
+                  data: [Buffer.from(mint).toString("base64"), "base64"],
+                  executable: false,
+                  lamports: 1_461_600,
+                  owner: TOKEN_PROGRAM,
+                  rentEpoch: 0,
+                  space: 82,
+                },
               }
             : undefined;
       res.setHeader("content-type", "application/json");
       res.end(JSON.stringify(result ? { jsonrpc: "2.0", id, result } : { jsonrpc: "2.0", id, error: { code: -32601, message: method } }));
     });
   });
-  return new Promise((resolve) => server.listen(0, "127.0.0.1", () => resolve({ url: `http://127.0.0.1:${(server.address() as AddressInfo).port}`, server })));
+  return new Promise((resolve) =>
+    server.listen(0, "127.0.0.1", () => resolve({ url: `http://127.0.0.1:${(server.address() as AddressInfo).port}`, server })),
+  );
 }
 
 function fakeFacilitator() {
   let n = 0;
   return {
     verify: vi.fn(async (p: PaymentPayload, r: PaymentRequirements) =>
-      p.accepted.amount === r.amount && p.accepted.payTo === r.payTo && typeof (p.payload as { transaction?: unknown }).transaction === "string"
+      p.accepted.amount === r.amount &&
+      p.accepted.payTo === r.payTo &&
+      typeof (p.payload as { transaction?: unknown }).transaction === "string"
         ? { isValid: true, payer: "payer" }
         : { isValid: false, invalidReason: "mismatch" },
     ),
-    settle: vi.fn(async (_p: PaymentPayload, r: PaymentRequirements) => ({ success: true, transaction: `sig${++n}`, network: r.network, payer: "payer" })),
+    settle: vi.fn(async (_p: PaymentPayload, r: PaymentRequirements) => ({
+      success: true,
+      transaction: `sig${++n}`,
+      network: r.network,
+      payer: "payer",
+    })),
     getSupported: vi.fn(async () => ({
       kinds: [{ x402Version: 2, scheme: "exact", network: SOLANA_DEVNET, extra: { feePayer: FEE_PAYER } }],
       extensions: [],

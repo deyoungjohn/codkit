@@ -2,15 +2,16 @@
 
 Escrow and reputation primitives for agent commerce: **create → fund → deliver → release / refund**, plus an onchain track record.
 
-| Chain | Status | Location |
-| --- | --- | --- |
-| EVM (Solidity, Foundry) | ✅ tested: unit, invariant fuzzing, 100% coverage, testnet end to end | [`evm/`](evm) |
-| Sui (Move) | ✅ tested: unit, 100% coverage, testnet end to end | [`sui/`](sui) |
-| Solana (Anchor) | ✅ tested: LiteSVM unit + random-walk invariants on the SBPF v3 binary; not deployed yet | [`solana/`](solana) |
+| Chain                   | Status                                                                                   | Location            |
+| ----------------------- | ---------------------------------------------------------------------------------------- | ------------------- |
+| EVM (Solidity, Foundry) | ✅ tested: unit, invariant fuzzing, 100% coverage, testnet end to end                    | [`evm/`](evm)       |
+| Sui (Move)              | ✅ tested: unit, 100% coverage, testnet end to end                                       | [`sui/`](sui)       |
+| Solana (Anchor)         | ✅ tested: LiteSVM unit + random-walk invariants on the SBPF v3 binary; not deployed yet | [`solana/`](solana) |
 
 > Reviewed ([security review](https://github.com/deyoungjohn/codkit/blob/main/docs/security/escrow-review.md)) but **not independently audited**. Use it on testnets and in hackathon demos only.
 
 All three implement the same rules:
+
 - **Review period:** at most 30 days, and above zero when there's an arbiter.
 - **Arbiter timeout:** if a dispute is still unresolved 30 days after the review period ends, the client can refund it.
 - **Fee-charging tokens** are rejected.
@@ -43,7 +44,7 @@ import { createEvmGuard } from "@codkit/policy/evm";
 const agent = createEvmGuard({ engine, chainId, account, reader: publicClient, sender: walletClient, abis: [escrowAbi] });
 const tx = escrowTxs(ESCROW);
 
-await agent.send(tx.approve(USDC, amount));            // the policy counts the approval as spend
+await agent.send(tx.approve(USDC, amount)); // the policy counts the approval as spend
 const { result: hash } = await agent.send(tx.createAndFund({ provider, token: USDC, amount, deadline, termsHash: hashText(spec) }));
 const id = dealIdFromLogs((await publicClient.waitForTransactionReceipt({ hash })).logs);
 // provider: tx.deliver(id, hashText(result)); client: tx.release(id)
@@ -81,6 +82,7 @@ The script deploys `Reputation`, `Escrow`, and `ReceiptAnchor` (used by `@codkit
 ## Solana (Anchor)
 
 The `kit_escrow` program has the same lifecycle as Sui: the deal is funded when it's created.
+
 - **Accounts:**
   - each deal is a PDA at `["deal", client, deal_id]`;
   - its tokens sit in the deal PDA's associated token account, which is closed on settlement so its rent returns to the client;
@@ -96,9 +98,22 @@ cargo test        # LiteSVM: lifecycle, auth, account-substitution attacks, Toke
 TypeScript client (`@codkit/contracts/solana`, needs `@solana/kit`):
 
 ```ts
-import { createDealInstruction, deliverInstruction, releaseInstruction, fetchDeal, solanaEscrowCreateAction } from "@codkit/contracts/solana";
+import {
+  createDealInstruction,
+  deliverInstruction,
+  releaseInstruction,
+  fetchDeal,
+  solanaEscrowCreateAction,
+} from "@codkit/contracts/solana";
 
-const ix = await createDealInstruction({ client: agentSigner, dealId: 1n, provider, mint, amount: 100_000n, deadline: new Date(Date.now() + 3_600_000) });
+const ix = await createDealInstruction({
+  client: agentSigner,
+  dealId: 1n,
+  provider,
+  mint,
+  amount: 100_000n,
+  deadline: new Date(Date.now() + 3_600_000),
+});
 // gate it like any spend: engine.execute(solanaEscrowCreateAction({ mint, provider, amount: 100_000n }), { simulate, execute })
 const deal = await fetchDeal(rpc, ix.deal);
 const release = await releaseInstruction({ signer: agentSigner, deal: deal! });
@@ -109,6 +124,7 @@ The instructions carry their signers, so `signTransactionMessageWithSigners` sig
 Toolchain: Anchor 1.2.1 with Solana 4.1.2 (`avm install 1.2.1`). The host Rust is pinned to 1.99.1 because LiteSVM 0.17 needs at least 1.97. The program itself builds with Solana's platform tools.
 
 **The program ID** comes from `target/deploy/kit_escrow-keypair.json`, which is not committed. Before the first devnet deploy:
+
 1. create or keep that keypair;
 2. run `anchor keys sync`;
 3. deploy with `anchor deploy --provider.cluster devnet` from your own wallet.

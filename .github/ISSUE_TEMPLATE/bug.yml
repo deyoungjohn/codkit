@@ -6,7 +6,8 @@ body:
     id: package
     attributes:
       label: Package
-      options: ["@codkit/policy", "@codkit/pay", "@codkit/contracts", "@codkit/receipts", "@codkit/mcp", "@codkit/feed", "demo-shell", "other"]
+      options:
+        ["@codkit/policy", "@codkit/pay", "@codkit/contracts", "@codkit/receipts", "@codkit/mcp", "@codkit/feed", "demo-shell", "other"]
     validations: { required: true }
   - type: textarea
     id: what

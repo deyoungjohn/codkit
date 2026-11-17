@@ -33,7 +33,11 @@ async function setup(opts: { onBeforeExecution?: () => boolean } = {}) {
   let ran = 0;
   const server = new McpServer({ name: "shop", version: "1.0.0" });
   const text = (t: string) => ({ content: [{ type: "text" as const, text: t }] });
-  server.registerTool("echo", { inputSchema: { msg: z.string() } }, paywall.wrap("echo", async ({ msg }) => text(msg)));
+  server.registerTool(
+    "echo",
+    { inputSchema: { msg: z.string() } },
+    paywall.wrap("echo", async ({ msg }) => text(msg)),
+  );
   server.registerTool(
     "report",
     { inputSchema: { topic: z.string() } },
@@ -42,8 +46,16 @@ async function setup(opts: { onBeforeExecution?: () => boolean } = {}) {
       return text(`report on ${topic}`);
     }),
   );
-  server.registerTool("flaky", { inputSchema: {} }, paywall.wrap("flaky", async () => ({ ...text("upstream down"), isError: true })));
-  server.registerTool("whale", { inputSchema: {} }, paywall.wrap("whale", async () => text("expensive")));
+  server.registerTool(
+    "flaky",
+    { inputSchema: {} },
+    paywall.wrap("flaky", async () => ({ ...text("upstream down"), isError: true })),
+  );
+  server.registerTool(
+    "whale",
+    { inputSchema: {} },
+    paywall.wrap("whale", async () => text("expensive")),
+  );
 
   const [serverSide, clientSide] = InMemoryTransport.createLinkedPair();
   await server.connect(serverSide);

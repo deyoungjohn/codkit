@@ -29,7 +29,11 @@ const ordered = [];
 const visit = (p, seen = new Set()) => {
   if (ordered.includes(p) || seen.has(p)) return;
   seen.add(p);
-  for (const d of deps(p)) visit(pkgs.find((x) => x.json.name === d), seen);
+  for (const d of deps(p))
+    visit(
+      pkgs.find((x) => x.json.name === d),
+      seen,
+    );
   ordered.push(p);
 };
 for (const p of pkgs) visit(p);
@@ -53,7 +57,10 @@ for (const p of ordered) {
   if (!dryRun) {
     console.log(`🦋  New tag:  ${name}@${version}`);
     if (process.env.CHANGESETS_OUTPUT) {
-      appendFileSync(process.env.CHANGESETS_OUTPUT, `${JSON.stringify({ type: "git-tag", tag: `${name}@${version}`, packageName: name })}\n`);
+      appendFileSync(
+        process.env.CHANGESETS_OUTPUT,
+        `${JSON.stringify({ type: "git-tag", tag: `${name}@${version}`, packageName: name })}\n`,
+      );
     }
   }
   count++;

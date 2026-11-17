@@ -1,11 +1,6 @@
 import type { Decision, SimulationResult } from "./types.js";
 
-export type PolicyErrorCode =
-  | "denied"
-  | "approval_rejected"
-  | "simulation_required"
-  | "simulation_failed"
-  | "killed";
+export type PolicyErrorCode = "denied" | "approval_rejected" | "simulation_required" | "simulation_failed" | "killed";
 
 /** Thrown whenever the engine refuses to let an action through. */
 export class PolicyError extends Error {

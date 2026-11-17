@@ -12,10 +12,26 @@ import { join } from "node:path";
 import { root, writeDeployment } from "./registry.mjs";
 
 const NETWORKS = {
-  "base-sepolia": { chainId: 84532, rpc: process.env.BASE_SEPOLIA_RPC_URL ?? "https://sepolia.base.org", explorer: "https://sepolia.basescan.org" },
-  sepolia: { chainId: 11155111, rpc: process.env.SEPOLIA_RPC_URL ?? "https://ethereum-sepolia-rpc.publicnode.com", explorer: "https://sepolia.etherscan.io" },
-  "arbitrum-sepolia": { chainId: 421614, rpc: process.env.ARBITRUM_SEPOLIA_RPC_URL ?? "https://sepolia-rollup.arbitrum.io/rpc", explorer: "https://sepolia.arbiscan.io" },
-  "optimism-sepolia": { chainId: 11155420, rpc: process.env.OPTIMISM_SEPOLIA_RPC_URL ?? "https://sepolia.optimism.io", explorer: "https://sepolia-optimism.etherscan.io" },
+  "base-sepolia": {
+    chainId: 84532,
+    rpc: process.env.BASE_SEPOLIA_RPC_URL ?? "https://sepolia.base.org",
+    explorer: "https://sepolia.basescan.org",
+  },
+  sepolia: {
+    chainId: 11155111,
+    rpc: process.env.SEPOLIA_RPC_URL ?? "https://ethereum-sepolia-rpc.publicnode.com",
+    explorer: "https://sepolia.etherscan.io",
+  },
+  "arbitrum-sepolia": {
+    chainId: 421614,
+    rpc: process.env.ARBITRUM_SEPOLIA_RPC_URL ?? "https://sepolia-rollup.arbitrum.io/rpc",
+    explorer: "https://sepolia.arbiscan.io",
+  },
+  "optimism-sepolia": {
+    chainId: 11155420,
+    rpc: process.env.OPTIMISM_SEPOLIA_RPC_URL ?? "https://sepolia.optimism.io",
+    explorer: "https://sepolia-optimism.etherscan.io",
+  },
   local: { chainId: 31337, rpc: process.env.LOCAL_RPC_URL ?? "http://127.0.0.1:8545", explorer: null },
 };
 

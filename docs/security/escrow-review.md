@@ -14,36 +14,37 @@
 
 The core money flows held up under every method below: random multi-actor fuzzing, static analysis, mutation checks and full coverage. No issue allowed theft, double payout, or a non-party moving funds. The findings are about **liveness**, meaning funds that could get stuck, and **parameter hygiene**. There is also one **design limitation** in how much the reputation counters can be trusted.
 
-| ID | Severity | Finding | Chains | Status |
-| --- | --- | --- | --- | --- |
-| M-01 | Medium | Funds in a dispute are locked forever if the arbiter never acts | EVM, Sui | Fixed |
-| M-02 | Medium (design) | Reputation can be farmed with worthless tokens or sybil counterparties; `volume` mixes token units | all | Acknowledged, documented |
-| L-01 | Low | Unbounded review period: a client can park the provider's payment for years (on Sui, an overflow abort blocks `claim`) | EVM, Sui | Fixed |
-| L-02 | Low | An arbiter with a zero review period makes disputes impossible | EVM, Sui | Fixed |
-| L-03 | Low | A deal can be funded after its deadline, when it can no longer be delivered | EVM | Fixed |
-| L-04 | Low | `Reputation` ownership: single-step transfer, and a zero owner is accepted | EVM | Fixed |
-| I-01 | Info | Events emitted after external calls (log ordering under reentrancy) | EVM | Fixed |
-| I-02 | Info | Slither `reentrancy-balance` on `fund` | EVM | False positive, test added |
-| I-03 | Info | The arbiter is chosen by the client | all | Acknowledged |
-| I-04 | Info | Blacklisting, rebasing and fee-charging tokens | EVM, Solana | Acknowledged / rejected |
-| I-05 | Info | Tokens sent straight to the escrow can't be recovered | EVM | Acknowledged |
-| I-06 | Info | Timestamps come from validators | all | Acknowledged |
-| I-07 | Info | Settled Sui escrows stay as shared objects | Sui | Acknowledged |
+| ID   | Severity        | Finding                                                                                                                | Chains      | Status                     |
+| ---- | --------------- | ---------------------------------------------------------------------------------------------------------------------- | ----------- | -------------------------- |
+| M-01 | Medium          | Funds in a dispute are locked forever if the arbiter never acts                                                        | EVM, Sui    | Fixed                      |
+| M-02 | Medium (design) | Reputation can be farmed with worthless tokens or sybil counterparties; `volume` mixes token units                     | all         | Acknowledged, documented   |
+| L-01 | Low             | Unbounded review period: a client can park the provider's payment for years (on Sui, an overflow abort blocks `claim`) | EVM, Sui    | Fixed                      |
+| L-02 | Low             | An arbiter with a zero review period makes disputes impossible                                                         | EVM, Sui    | Fixed                      |
+| L-03 | Low             | A deal can be funded after its deadline, when it can no longer be delivered                                            | EVM         | Fixed                      |
+| L-04 | Low             | `Reputation` ownership: single-step transfer, and a zero owner is accepted                                             | EVM         | Fixed                      |
+| I-01 | Info            | Events emitted after external calls (log ordering under reentrancy)                                                    | EVM         | Fixed                      |
+| I-02 | Info            | Slither `reentrancy-balance` on `fund`                                                                                 | EVM         | False positive, test added |
+| I-03 | Info            | The arbiter is chosen by the client                                                                                    | all         | Acknowledged               |
+| I-04 | Info            | Blacklisting, rebasing and fee-charging tokens                                                                         | EVM, Solana | Acknowledged / rejected    |
+| I-05 | Info            | Tokens sent straight to the escrow can't be recovered                                                                  | EVM         | Acknowledged               |
+| I-06 | Info            | Timestamps come from validators                                                                                        | all         | Acknowledged               |
+| I-07 | Info            | Settled Sui escrows stay as shared objects                                                                             | Sui         | Acknowledged               |
 
 ## Method
 
-| | EVM | Sui | Solana |
-| --- | --- | --- | --- |
-| Manual review | line by line, against the lifecycle diagram | same | written to the same rules |
-| Static analysis | Slither 0.11.6, `forge lint` (Foundry 1.8.3) | compiler | `cargo clippy -D warnings` |
-| Unit tests | 32 | 41 | 15 |
-| Random / property tests | 6 Foundry invariants, 64 runs × 128 calls from 5 actors (role-aware: 80% the right party, 20% anyone) | n/a | seeded random walk, 4 seeds × 120 steps, checking the same invariants |
-| Coverage | **100%** lines, statements, branches, functions | **100%** (`sui move test --coverage`) | every instruction, error and account constraint exercised |
-| Mutation checks | 2 mutants (double refund, missing auth): both caught | n/a | missing auth on `release`: caught by 2 tests |
+|                         | EVM                                                                                                   | Sui                                   | Solana                                                                |
+| ----------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------- | --------------------------------------------------------------------- |
+| Manual review           | line by line, against the lifecycle diagram                                                           | same                                  | written to the same rules                                             |
+| Static analysis         | Slither 0.11.6, `forge lint` (Foundry 1.8.3)                                                          | compiler                              | `cargo clippy -D warnings`                                            |
+| Unit tests              | 32                                                                                                    | 41                                    | 15                                                                    |
+| Random / property tests | 6 Foundry invariants, 64 runs × 128 calls from 5 actors (role-aware: 80% the right party, 20% anyone) | n/a                                   | seeded random walk, 4 seeds × 120 steps, checking the same invariants |
+| Coverage                | **100%** lines, statements, branches, functions                                                       | **100%** (`sui move test --coverage`) | every instruction, error and account constraint exercised             |
+| Mutation checks         | 2 mutants (double refund, missing auth): both caught                                                  | n/a                                   | missing auth on `release`: caught by 2 tests                          |
 
 The Solana tests run in LiteSVM 0.17 against the **exact SBPF v3 binary** that `anchor build` produces. Devnet has SBPF v1, v2 and v3 enabled, and a pending feature (SIMD-0500) will disable new v0–v2 deployments, so v3 is the right target.
 
 **Invariants**, checked after every random call sequence on EVM and every random walk on Solana:
+
 1. The escrow holds exactly the sum of the amounts of open deals (Funded, Delivered or Disputed).
 2. Tokens are conserved: actors plus the escrow always hold what was minted.
 3. A deal pays out (release, claim or refund) at most once.
@@ -58,11 +59,13 @@ The Solana tests run in LiteSVM 0.17 against the **exact SBPF v3 binary** that `
 Once the client disputes a delivery, only the arbiter can settle it, apart from the provider giving up and refunding. If the arbiter disappears, which is likely enough with a hackathon-grade arbiter key, the funds stay in the contract forever.
 
 **Fix:** if a dispute is still open `ARBITER_TIMEOUT` (30 days) after the review period ends, the **client** can refund it. Refunding restores the state before the deal. The arbiter can still decide at any time before that.
+
 - **EVM:** `refund()`.
 - **Sui:** `refund()` and `arbiter_timeout_ms()`.
 - **Solana:** `refund` and `ARBITER_TIMEOUT`.
 
 **Tests:**
+
 - `test_clientCanRefundUnresolvedDisputeAfterArbiterTimeout` and `test_arbiterCanStillDecideBeforeTimeout` (EVM);
 - `client_refunds_unresolved_dispute_after_arbiter_timeout` and `client_cannot_refund_dispute_before_arbiter_timeout` (Sui);
 - `client_refunds_unresolved_dispute_after_arbiter_timeout` (Solana).

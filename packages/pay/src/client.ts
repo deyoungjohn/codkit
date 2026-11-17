@@ -88,8 +88,7 @@ export function withPolicy(client: x402Client, opts: PolicyHookOptions): x402Cli
       });
       return;
     }
-    const reason =
-      s?.errorReason ?? ctx.paymentRequired?.error ?? ctx.error?.message ?? "payment not accepted by server";
+    const reason = s?.errorReason ?? ctx.paymentRequired?.error ?? ctx.error?.message ?? "payment not accepted by server";
     if (releaseOnFailure) await p.auth.release(reason);
     notify({ status: "failed", action: p.action, reason, authorizationId: p.auth.id });
   });

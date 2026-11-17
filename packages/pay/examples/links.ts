@@ -13,7 +13,13 @@ const evmTo = process.env.PAY_TO ?? "0x2222222222222222222222222222222222222222"
 const solTo = process.env.SOL_PAY_TO ?? "9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin";
 
 const evm = paymentLink({ chain: "eip155:84532", to: evmTo, amount: usdc("1.50") });
-const sol = paymentLink({ chain: "solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1", to: solTo, amount: usdc("1.50"), label: "codkit demo", message: "Order #1" });
+const sol = paymentLink({
+  chain: "solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1",
+  to: solTo,
+  amount: usdc("1.50"),
+  label: "codkit demo",
+  message: "Order #1",
+});
 
 console.log(`Base Sepolia (EIP-681):\n${evm}\n`);
 console.log(renderUnicodeCompact(evm));
