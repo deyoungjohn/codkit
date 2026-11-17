@@ -21,7 +21,7 @@ You choose the version through the bump type, and you can edit the Version Packa
 Trusted Publishing must be enabled for each package. You need npm ≥ 11.15, which runs via `npx`, plus your npm login with 2FA:
 
 ```bash
-for p in policy pay contracts receipts mcp feed; do
+for p in policy pay contracts receipts mcp feed config; do
   npx -y npm@11.21.0 trust github @codkit/$p --repo deyoungjohn/codkit --file ci.yml --allow-publish --yes
   sleep 2
 done
