@@ -16,7 +16,8 @@
       "!packages/contracts/deployments",
       "!packages/contracts/solana/idl",
       "!**/*.json",
-      "!**/*.svg"
+      "!**/*.svg",
+      "!packages/contracts/evm/lib"
     ]
   },
   "formatter": {
