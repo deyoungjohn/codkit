@@ -1,5 +1,13 @@
 # @codkit/contracts changelog
 
+## 0.1.2
+
+### Patch Changes
+
+- a1fc1c2: Builds move from tsc to tsup: every entry point now ships ESM (`.js`) and CommonJS (`.cjs`), each with its own types (`.d.ts` / `.d.cts`), so `require()` and older bundlers work. Package-level `main` / `module` / `types` are added for tools that ignore `exports`.
+- Updated dependencies [a1fc1c2]
+  - @codkit/policy@0.1.1
+
 ## 0.1.1 (2026-10-16)
 
 **Security review fixes**, from [the review](https://github.com/deyoungjohn/codkit/blob/main/docs/security/escrow-review.md). These change behavior, so read them before upgrading a deployment:
