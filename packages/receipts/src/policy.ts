@@ -28,7 +28,10 @@ export function recordPolicyEvents(
   const off = engine.on((event) => {
     if (opts.include && !opts.include.includes(event.type)) return;
     const { type, ...data } = event;
-    const write: Promise<Receipt | void> = log.append(`policy.${type}`, data).catch((e: unknown) => opts.onError?.(e));
+    const write: Promise<Receipt | undefined> = log.append(`policy.${type}`, data).catch((e: unknown) => {
+      opts.onError?.(e);
+      return undefined;
+    });
     pending = pending.then(() => write);
   });
   return {

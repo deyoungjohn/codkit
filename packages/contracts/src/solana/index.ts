@@ -265,7 +265,7 @@ function base58(bytes: Uint8Array): Address {
   }
   for (const b of bytes) {
     if (b !== 0) break;
-    s = "1" + s;
+    s = `1${s}`;
   }
   return s as Address;
 }

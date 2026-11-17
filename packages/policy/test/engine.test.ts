@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   createPolicyEngine,
   isPolicyError,
-  PolicyError,
+  type PolicyError,
   usdc,
   type Action,
   type PolicyEvent,

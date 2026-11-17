@@ -12,6 +12,8 @@
     "build": "turbo run build",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
+    "lint": "biome check .",
+    "format": "biome format --write .",
     "clean": "turbo run clean && rm -rf node_modules",
     "deploy:evm": "pnpm --filter @codkit/contracts run deploy:evm",
     "deploy:sui": "pnpm --filter @codkit/contracts run deploy:sui",
@@ -24,8 +26,10 @@
     "release": "node scripts/release.mjs"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.6.8",
     "@changesets/cli": "3.0.3",
     "@types/node": "^22.13.0",
+    "tsup": "9.0.0",
     "tsx": "^4.21.0",
     "turbo": "^2.11.8",
     "typescript": "^5.9.0",

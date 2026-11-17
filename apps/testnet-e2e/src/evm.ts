@@ -241,7 +241,7 @@ try {
     });
   }
 
-  await report.step("receipts: anchor head on ReceiptAnchor" + (flag("walrus") ? " + upload to Walrus" : ""), async () => {
+  await report.step(`receipts: anchor head on ReceiptAnchor${flag("walrus") ? " + upload to Walrus" : ""}`, async () => {
     const fromBlock = await pc.getBlockNumber();
     const pub = await receipts.publish({
       anchorer: evmAnchorer({ chainId, wallet: agentWallet, contract: ANCHOR, waitFor: pc }),

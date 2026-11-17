@@ -83,7 +83,7 @@ export class ReceiptLog {
 
   /** The log as JSON Lines, one receipt per line — the format `upload` stores. */
   async toJsonl(): Promise<string> {
-    return (await this.store.list()).map((r) => JSON.stringify(r)).join("\n") + "\n";
+    return `${(await this.store.list()).map((r) => JSON.stringify(r)).join("\n")}\n`;
   }
 
   /**

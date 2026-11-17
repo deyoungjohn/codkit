@@ -18,39 +18,91 @@
   },
   "type": "module",
   "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./server": {
-      "types": "./dist/server/core.d.ts",
-      "import": "./dist/server/core.js"
+      "import": {
+        "types": "./dist/server/core.d.ts",
+        "default": "./dist/server/core.js"
+      },
+      "require": {
+        "types": "./dist/server/core.d.cts",
+        "default": "./dist/server/core.cjs"
+      }
     },
     "./hono": {
-      "types": "./dist/server/hono.d.ts",
-      "import": "./dist/server/hono.js"
+      "import": {
+        "types": "./dist/server/hono.d.ts",
+        "default": "./dist/server/hono.js"
+      },
+      "require": {
+        "types": "./dist/server/hono.d.cts",
+        "default": "./dist/server/hono.cjs"
+      }
     },
     "./express": {
-      "types": "./dist/server/express.d.ts",
-      "import": "./dist/server/express.js"
+      "import": {
+        "types": "./dist/server/express.d.ts",
+        "default": "./dist/server/express.js"
+      },
+      "require": {
+        "types": "./dist/server/express.d.cts",
+        "default": "./dist/server/express.cjs"
+      }
     },
     "./mcp": {
-      "types": "./dist/mcp.d.ts",
-      "import": "./dist/mcp.js"
+      "import": {
+        "types": "./dist/mcp.d.ts",
+        "default": "./dist/mcp.js"
+      },
+      "require": {
+        "types": "./dist/mcp.d.cts",
+        "default": "./dist/mcp.cjs"
+      }
     },
     "./svm": {
-      "types": "./dist/svm.d.ts",
-      "import": "./dist/svm.js"
+      "import": {
+        "types": "./dist/svm.d.ts",
+        "default": "./dist/svm.js"
+      },
+      "require": {
+        "types": "./dist/svm.d.cts",
+        "default": "./dist/svm.cjs"
+      }
     },
     "./links": {
-      "types": "./dist/links.d.ts",
-      "import": "./dist/links.js"
+      "import": {
+        "types": "./dist/links.d.ts",
+        "default": "./dist/links.js"
+      },
+      "require": {
+        "types": "./dist/links.d.cts",
+        "default": "./dist/links.cjs"
+      }
     },
     "./webhooks": {
-      "types": "./dist/webhooks.d.ts",
-      "import": "./dist/webhooks.js"
-    }
+      "import": {
+        "types": "./dist/webhooks.d.ts",
+        "default": "./dist/webhooks.js"
+      },
+      "require": {
+        "types": "./dist/webhooks.d.cts",
+        "default": "./dist/webhooks.cjs"
+      }
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",
@@ -58,7 +110,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsup",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "clean": "rm -rf dist .turbo",

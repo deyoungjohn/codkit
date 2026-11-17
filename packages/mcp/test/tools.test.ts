@@ -28,7 +28,12 @@ function guardWith(policyAllowEscrow = true) {
     account: ACCOUNT,
     abis: [escrowAbi],
     reader: { call: async () => ({}), estimateGas: async () => 21_000n },
-    sender: { sendTransaction: async (tx) => (sent.push(tx), `0x${sent.length.toString(16).padStart(64, "0")}` as Hex) },
+    sender: {
+      sendTransaction: async (tx) => {
+        sent.push(tx);
+        return `0x${sent.length.toString(16).padStart(64, "0")}` as Hex;
+      },
+    },
   });
   return { engine, guard, sent };
 }

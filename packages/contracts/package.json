@@ -18,23 +18,51 @@
   },
   "type": "module",
   "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./evm": {
-      "types": "./dist/evm/index.d.ts",
-      "import": "./dist/evm/index.js"
+      "import": {
+        "types": "./dist/evm/index.d.ts",
+        "default": "./dist/evm/index.js"
+      },
+      "require": {
+        "types": "./dist/evm/index.d.cts",
+        "default": "./dist/evm/index.cjs"
+      }
     },
     "./sui": {
-      "types": "./dist/sui/index.d.ts",
-      "import": "./dist/sui/index.js"
+      "import": {
+        "types": "./dist/sui/index.d.ts",
+        "default": "./dist/sui/index.js"
+      },
+      "require": {
+        "types": "./dist/sui/index.d.cts",
+        "default": "./dist/sui/index.cjs"
+      }
     },
     "./solana": {
-      "types": "./dist/solana/index.d.ts",
-      "import": "./dist/solana/index.js"
-    }
+      "import": {
+        "types": "./dist/solana/index.d.ts",
+        "default": "./dist/solana/index.js"
+      },
+      "require": {
+        "types": "./dist/solana/index.d.cts",
+        "default": "./dist/solana/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",
@@ -60,7 +88,7 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsup",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "pnpm run test:sol && pnpm run test:move && vitest run",
     "test:sol": "forge test --root evm",

@@ -38,6 +38,7 @@ export function useSnapshot(trigger: unknown) {
     }
     if (r.ok) setSnap(await r.json());
   }, []);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `trigger` is a deliberate refetch signal
   useEffect(() => {
     void refresh();
   }, [refresh, trigger]);

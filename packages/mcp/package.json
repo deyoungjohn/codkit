@@ -18,43 +18,101 @@
   },
   "type": "module",
   "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./server": {
-      "types": "./dist/server.d.ts",
-      "import": "./dist/server.js"
+      "import": {
+        "types": "./dist/server.d.ts",
+        "default": "./dist/server.js"
+      },
+      "require": {
+        "types": "./dist/server.d.cts",
+        "default": "./dist/server.cjs"
+      }
     },
     "./agent": {
-      "types": "./dist/agent.d.ts",
-      "import": "./dist/agent.js"
+      "import": {
+        "types": "./dist/agent.d.ts",
+        "default": "./dist/agent.js"
+      },
+      "require": {
+        "types": "./dist/agent.d.cts",
+        "default": "./dist/agent.cjs"
+      }
     },
     "./webmcp": {
-      "types": "./dist/webmcp.d.ts",
-      "import": "./dist/webmcp.js"
+      "import": {
+        "types": "./dist/webmcp.d.ts",
+        "default": "./dist/webmcp.js"
+      },
+      "require": {
+        "types": "./dist/webmcp.d.cts",
+        "default": "./dist/webmcp.cjs"
+      }
     },
     "./tools/policy": {
-      "types": "./dist/tools/policy.d.ts",
-      "import": "./dist/tools/policy.js"
+      "import": {
+        "types": "./dist/tools/policy.d.ts",
+        "default": "./dist/tools/policy.js"
+      },
+      "require": {
+        "types": "./dist/tools/policy.d.cts",
+        "default": "./dist/tools/policy.cjs"
+      }
     },
     "./tools/pay": {
-      "types": "./dist/tools/pay.d.ts",
-      "import": "./dist/tools/pay.js"
+      "import": {
+        "types": "./dist/tools/pay.d.ts",
+        "default": "./dist/tools/pay.js"
+      },
+      "require": {
+        "types": "./dist/tools/pay.d.cts",
+        "default": "./dist/tools/pay.cjs"
+      }
     },
     "./tools/receipts": {
-      "types": "./dist/tools/receipts.d.ts",
-      "import": "./dist/tools/receipts.js"
+      "import": {
+        "types": "./dist/tools/receipts.d.ts",
+        "default": "./dist/tools/receipts.js"
+      },
+      "require": {
+        "types": "./dist/tools/receipts.d.cts",
+        "default": "./dist/tools/receipts.cjs"
+      }
     },
     "./tools/evm": {
-      "types": "./dist/tools/evm.d.ts",
-      "import": "./dist/tools/evm.js"
+      "import": {
+        "types": "./dist/tools/evm.d.ts",
+        "default": "./dist/tools/evm.js"
+      },
+      "require": {
+        "types": "./dist/tools/evm.d.cts",
+        "default": "./dist/tools/evm.cjs"
+      }
     },
     "./tools/escrow": {
-      "types": "./dist/tools/escrow.d.ts",
-      "import": "./dist/tools/escrow.js"
-    }
+      "import": {
+        "types": "./dist/tools/escrow.d.ts",
+        "default": "./dist/tools/escrow.js"
+      },
+      "require": {
+        "types": "./dist/tools/escrow.d.cts",
+        "default": "./dist/tools/escrow.cjs"
+      }
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",
@@ -62,7 +120,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsup",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "clean": "rm -rf dist .turbo",

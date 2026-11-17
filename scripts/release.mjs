@@ -32,7 +32,7 @@ const visit = (p, seen = new Set()) => {
   for (const d of deps(p)) visit(pkgs.find((x) => x.json.name === d), seen);
   ordered.push(p);
 };
-pkgs.forEach((p) => visit(p));
+for (const p of pkgs) visit(p);
 
 const published = (name, version) =>
   spawnSync("npm", ["view", `${name}@${version}`, "version"], { encoding: "utf8" }).stdout.trim() === version;

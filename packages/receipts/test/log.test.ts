@@ -104,9 +104,20 @@ describe("ReceiptLog", () => {
   it("publishes: upload, anchor with the uri, then records the anchor", async () => {
     const { log } = await sampleLog(3);
     let uploaded = "";
-    const uploader: Uploader = { upload: async (c) => ((uploaded = c), { id: "blob1", uri: "walrus://blob1" }) };
+    const uploader: Uploader = {
+      upload: async (c) => {
+        uploaded = c;
+        return { id: "blob1", uri: "walrus://blob1" };
+      },
+    };
     const seen: unknown[] = [];
-    const anchorer: Anchorer = { chain: "eip155:31337", anchor: async (cp) => (seen.push(cp), { chain: "eip155:31337", tx: "0xabc" }) };
+    const anchorer: Anchorer = {
+      chain: "eip155:31337",
+      anchor: async (cp) => {
+        seen.push(cp);
+        return { chain: "eip155:31337", tx: "0xabc" };
+      },
+    };
 
     const res = await log.publish({ uploader, anchorer });
     expect(res.checkpoint).toMatchObject({ seq: 2, count: 3 });

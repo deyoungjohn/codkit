@@ -54,6 +54,7 @@ export function LoginForm({ mode, next }: { mode: AuthMode; next: string }) {
               id="password"
               type="password"
               autoComplete="current-password"
+              // biome-ignore lint/a11y/noAutofocus: the page has one field and exists only to fill it
               autoFocus
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -61,6 +62,7 @@ export function LoginForm({ mode, next }: { mode: AuthMode; next: string }) {
             />
             {error && <p className="text-sm text-rose-300">{error}</p>}
             <button
+              type="submit"
               disabled={busy || !password}
               className="mt-2 rounded-2xl bg-violet-300 px-4 py-3.5 text-[16px] font-medium text-[#17112b] shadow-[0_0_30px_rgba(167,139,250,0.35)] transition hover:bg-violet-200 disabled:opacity-40"
             >

@@ -245,7 +245,7 @@ export class PolicyEngine {
         decision,
       );
     }
-    let res;
+    let res: Awaited<ReturnType<Approver>>;
     try {
       res = await this.approver({ action, decision, ...(simulation && { simulation }) });
     } catch (e) {

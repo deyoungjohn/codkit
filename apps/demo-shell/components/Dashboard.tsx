@@ -13,7 +13,11 @@ const DEFAULT_PROMPT =
 const REPO = "https://github.com/deyoungjohn/codkit";
 
 const usdc = (label: string) => Number(/(\d+(?:\.\d+)?)\s*USDC/.exec(label)?.[1] ?? 0);
-const cumulative = (xs: number[]) => xs.reduce<number[]>((acc, x) => [...acc, (acc.at(-1) ?? 0) + x], [0]);
+const cumulative = (xs: number[]) => {
+  const out = [0];
+  for (const x of xs) out.push(out.at(-1)! + x);
+  return out;
+};
 const fmt = (n: number, d = 2) => n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
 
 export function Dashboard() {
@@ -189,14 +193,14 @@ export function Dashboard() {
                   <div className="mt-1 flex flex-wrap items-center gap-4">
                     <BigNumber value={spent.toFixed(5)} />
                     <div className="flex gap-3">
-                      <button
+                      <button type="button"
                         disabled={running || snap?.killed}
                         onClick={run}
                         className="rounded-xl bg-violet-300 px-6 py-3 text-[15px] font-medium text-[#17112b] shadow-[0_0_24px_rgba(167,139,250,0.35)] transition hover:bg-violet-200 disabled:cursor-not-allowed disabled:opacity-40"
                       >
                         {running ? "Running…" : "Run agent"}
                       </button>
-                      <button
+                      <button type="button"
                         disabled={running}
                         onClick={reset}
                         className="rounded-xl border border-white/12 px-6 py-3 text-[15px] text-white/85 transition hover:bg-white/5 disabled:opacity-40"
@@ -219,7 +223,7 @@ export function Dashboard() {
                     ["receipts", "Receipts", `${snap?.receipts.count ?? 0} signed`],
                   ] as const
                 ).map(([key, title, sub]) => (
-                  <button
+                  <button type="button"
                     key={key}
                     onClick={() => setTab(key)}
                     className={`flex items-center justify-between gap-3 border-b-2 px-1 py-3 text-left transition ${tab === key ? "border-violet-300" : "border-transparent hover:border-white/15"}`}
@@ -310,7 +314,7 @@ function Sidebar({
         {nav.map(([key, label, Ico]) => {
           const active = key === null ? false : tab === key;
           return (
-            <button
+            <button type="button"
               key={label}
               onClick={() => (key ? onNav(key) : window.scrollTo({ top: 0, behavior: "smooth" }))}
               className={`mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[15px] transition ${
@@ -329,7 +333,7 @@ function Sidebar({
           <Icon.Plug className="h-[18px] w-[18px]" /> MCP server <span className="rounded-md bg-violet-300 px-2 py-0.5 text-[11px] font-medium text-[#1b1530]">Beta</span>
         </a>
 
-        <button onClick={() => setOpen((o) => !o)} className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[15px] text-white">
+        <button type="button" onClick={() => setOpen((o) => !o)} className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[15px] text-white">
           <Icon.Stack className="h-[18px] w-[18px]" /> Recent payments
           <span className="rounded-md bg-violet-300/90 px-2 py-0.5 text-[11px] font-medium text-[#1b1530]">{txs.length}</span>
           <Icon.Caret className={`ml-auto h-3 w-3 text-white/60 transition ${open ? "" : "rotate-180"}`} />
@@ -353,7 +357,7 @@ function Sidebar({
       </nav>
 
       <div className="mt-auto border-t border-white/[0.06] p-5">
-        <button
+        <button type="button"
           onClick={onKill}
           className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition ${
             killed ? "border-emerald-300/30 bg-emerald-300/[0.06] hover:bg-emerald-300/10" : "border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.05]"
@@ -406,7 +410,7 @@ function TopBar({
         </div>
       </div>
       <span className="mx-2 hidden h-10 w-px bg-white/[0.08] sm:block" />
-      <button
+      <button type="button"
         onClick={onRun}
         disabled={running || killed}
         className="flex items-center gap-2 rounded-xl bg-violet-300 px-4 py-2.5 text-[15px] font-medium text-[#17112b] transition hover:bg-violet-200 disabled:cursor-not-allowed disabled:opacity-40"
@@ -430,7 +434,7 @@ function TopBar({
           </span>
         )}
         {auth === "password" && (
-          <button
+          <button type="button"
             onClick={async () => {
               await fetch("/api/logout", { method: "POST" });
               window.location.href = "/login";
@@ -454,21 +458,21 @@ function WalletButton({ variant = "outline" }: { variant?: "outline" | "solid" }
       : "flex items-center gap-2 rounded-xl border border-white/10 px-3.5 py-2.5 text-[13px] text-white/80 transition hover:bg-white/5";
   if (w.account) {
     return (
-      <button onClick={w.disconnect} className={`${base} font-mono`} title="Disconnect">
+      <button type="button" onClick={w.disconnect} className={`${base} font-mono`} title="Disconnect">
         {short(w.account)} · {w.chainId === 84532 ? "Base Sepolia" : `chain ${w.chainId}`}
       </button>
     );
   }
   return (
     <div className={`relative ${variant === "solid" ? "w-full" : ""}`}>
-      <button onClick={() => setOpen((o) => !o)} className={base}>
+      <button type="button" onClick={() => setOpen((o) => !o)} className={base}>
         {variant === "solid" ? "Connect with Wallet" : "Connect wallet"} <Icon.Wallet className="h-[18px] w-[18px]" />
       </button>
       {open && (
         <div className="absolute right-0 z-20 mt-2 w-60 rounded-2xl border border-white/10 bg-[#141220] p-1.5 shadow-2xl">
           {w.providers.length === 0 && <p className="p-2.5 text-xs text-white/50">No browser wallet detected.</p>}
           {w.providers.map((p) => (
-            <button
+            <button type="button"
               key={p.info.uuid}
               onClick={() => {
                 setOpen(false);
@@ -476,6 +480,7 @@ function WalletButton({ variant = "outline" }: { variant?: "outline" | "solid" }
               }}
               className="flex w-full items-center gap-2 rounded-xl p-2.5 text-left text-sm text-white hover:bg-white/5"
             >
+              {/* biome-ignore lint/performance/noImgElement: EIP-6963 wallet icons are data URIs; next/image adds nothing */}
               {p.info.icon && <img src={p.info.icon} alt="" className="h-5 w-5" />}
               {p.info.name}
             </button>
@@ -512,7 +517,7 @@ function MetricCard(p: {
           <p className="truncate text-[13px] text-white/50">{p.kicker}</p>
           <p className="truncate text-[16px] text-white">{p.title}</p>
         </div>
-        <button onClick={p.onOpen} aria-label={`Open ${p.title}`} className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-white/80 transition hover:bg-white/5">
+        <button type="button" onClick={p.onOpen} aria-label={`Open ${p.title}`} className="grid h-10 w-10 place-items-center rounded-full border border-white/10 text-white/80 transition hover:bg-white/5">
           <Icon.ArrowUpRight className="h-4 w-4" />
         </button>
       </div>
@@ -553,7 +558,7 @@ function Sparkline({ values, tone, tag }: { values: number[]; tone: "violet" | "
   const empty = values.length <= 1 || flat;
   return (
     <div className="relative mt-3 h-[96px]">
-      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="absolute inset-0 h-full w-full overflow-visible">
+      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
         <defs>
           <linearGradient id={`${id}s`} x1="0" x2="1">
             <stop offset="0" stopColor={c[0]} stopOpacity="0.55" />
@@ -624,12 +629,12 @@ function PolicyCard({ snap, killed, onKill }: { snap: ReturnType<typeof useSnaps
         above {snap?.budget.approvalAbove ?? "–"}.
       </p>
       </div>
-      <svg className="pointer-events-none absolute -right-2 top-[42%] hidden h-20 w-20 text-white/20 2xl:block" viewBox="0 0 100 100" fill="none">
+      <svg className="pointer-events-none absolute -right-2 top-[42%] hidden h-20 w-20 text-white/20 2xl:block" viewBox="0 0 100 100" fill="none" aria-hidden="true">
         <path d="M5 95 L95 5" stroke="currentColor" strokeWidth="1" />
       </svg>
       <div className="relative mt-10 flex flex-col gap-3 md:mt-0 2xl:mt-10">
         <WalletButton variant="solid" />
-        <button
+        <button type="button"
           onClick={onKill}
           className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/[0.04] px-4 py-3.5 text-[16px] text-white backdrop-blur transition hover:bg-white/[0.08]"
         >
@@ -648,6 +653,7 @@ function Stars() {
   return (
     <div className="pointer-events-none absolute inset-0">
       {dots.map(([x, y], i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: a fixed, never-reordered decorative pattern
         <span key={i} className="absolute h-[2px] w-[2px] rounded-full bg-white/40" style={{ left: `${x}%`, top: `${y}%` }} />
       ))}
     </div>
@@ -755,6 +761,7 @@ function RatesCard({ spent, perDay, perTx, approval }: { spent: number; perDay: 
 
 function Trace({ items }: { items: Of<"thinking" | "message" | "tool_call" | "tool_result" | "status">[] }) {
   const ref = useRef<HTMLOListElement>(null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-run when items are added, to follow the agent
   useEffect(() => {
     const el = ref.current;
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" }); // follow the agent
@@ -807,7 +814,7 @@ function Approvals({ items, onDone }: { items: Of<"approval_request">[]; onDone:
             <p className="font-mono text-sm text-white">{r.summary}</p>
             <p className="text-xs text-white/50">{r.reasons.join("; ")}</p>
           </div>
-          <button
+          <button type="button"
             onClick={async () => {
               await post("/api/approve", { requestId: r.requestId, approved: true, by: "dashboard" });
               onDone();
@@ -816,7 +823,7 @@ function Approvals({ items, onDone }: { items: Of<"approval_request">[]; onDone:
           >
             Approve
           </button>
-          <button
+          <button type="button"
             onClick={async () => {
               await post("/api/approve", { requestId: r.requestId, approved: false, by: "dashboard" });
               onDone();
@@ -938,7 +945,7 @@ function Chip({ children }: { children: React.ReactNode }) {
 
 function IconButton({ label, onClick, disabled, children }: { label: string; onClick: () => void; disabled?: boolean; children: React.ReactNode }) {
   return (
-    <button aria-label={label} title={label} onClick={onClick} disabled={disabled} className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-white/5 hover:text-white disabled:opacity-30">
+    <button type="button" aria-label={label} title={label} onClick={onClick} disabled={disabled} className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-white/5 hover:text-white disabled:opacity-30">
       {children}
     </button>
   );

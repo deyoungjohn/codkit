@@ -27,6 +27,7 @@ export interface McpPaywallOptions extends Omit<PaywallOptions, "routes"> {
 }
 
 /** Any MCP SDK tool callback: `(args, extra) => CallToolResult`. */
+// biome-ignore lint/suspicious/noExplicitAny: matches any McpServer.registerTool callback signature
 export type ToolHandler = (args: any, extra: any) => any;
 
 export interface McpPaywall {

@@ -4,11 +4,14 @@ import { providersFromEnv, runAgent, toOpenAITools, type AgentEvent, type LlmPro
 import { policyTools } from "../src/tools/policy.js";
 import { CHAIN, fixtures, USDC } from "./helpers.js";
 
+/** The bits of a Chat Completions request body the assertions read. */
+type Body = { tools: { function: { name: string } }[]; messages: { role: string; tool_call_id?: string; content?: string }[]; [k: string]: unknown };
+
 type Reply = { status?: number; body: unknown; headers?: Record<string, string> };
 
 /** Scripted Chat Completions API: returns `replies` in order and records requests. */
 function scripted(replies: Reply[]) {
-  const requests: { url: string; headers: Headers; body: Record<string, any> }[] = [];
+  const requests: { url: string; headers: Headers; body: Body }[] = [];
   const fetch = (async (url: string | URL | Request, init?: RequestInit) => {
     requests.push({ url: String(url), headers: new Headers(init?.headers), body: JSON.parse(String(init?.body)) });
     const reply = replies[requests.length - 1];
@@ -52,7 +55,7 @@ describe("runAgent (OpenAI-compatible loop)", () => {
     expect(first.url).toBe("https://api.groq.test/openai/v1/chat/completions");
     expect(first.headers.get("authorization")).toBe("Bearer k1");
     expect(first.body).toMatchObject({ model: "gpt-oss", tool_choice: "auto", messages: [{ role: "system", content: "Be careful." }, { role: "user", content: "Pay 9 USDC" }] });
-    expect(first.body.tools.map((t: any) => t.function.name)).toEqual(["policy_check", "policy_status", "policy_halt"]);
+    expect(first.body.tools.map((t) => t.function.name)).toEqual(["policy_check", "policy_status", "policy_halt"]);
     expect(JSON.stringify(first.body)).not.toContain("null"); // some relays reject null fields
 
     // second request carries the assistant tool call and the real policy engine's verdict
@@ -60,7 +63,7 @@ describe("runAgent (OpenAI-compatible loop)", () => {
     expect(assistant).toMatchObject({ role: "assistant", tool_calls: [{ id: "c1" }] });
     expect(assistant).not.toHaveProperty("reasoning");
     expect(tool).toMatchObject({ role: "tool", tool_call_id: "c1" });
-    expect(tool.content).toContain('"verdict": "deny"');
+    expect(tool!.content).toContain('"verdict": "deny"');
     expect(res.messages.at(-1)).toMatchObject({ role: "assistant", content: res.text });
   });
 
@@ -71,11 +74,11 @@ describe("runAgent (OpenAI-compatible loop)", () => {
       completion({ content: "Fixed." }),
     ]);
     await runAgent({ fetch, providers: groq, tools: policyTools(engine), prompt: "go" });
-    const results = requests[1]!.body.messages.filter((m: any) => m.role === "tool");
-    expect(results.map((m: any) => m.tool_call_id)).toEqual(["a", "b", "call_1_2"]);
-    expect(results[0].content).toMatch(/^Error: invalid input/);
-    expect(results[1].content).toMatch(/not valid JSON/);
-    expect(results[2].content).toMatch(/unknown tool "nope"/);
+    const results = requests[1]!.body.messages.filter((m) => m.role === "tool");
+    expect(results.map((m) => m.tool_call_id)).toEqual(["a", "b", "call_1_2"]);
+    expect(results[0]!.content).toMatch(/^Error: invalid input/);
+    expect(results[1]!.content).toMatch(/not valid JSON/);
+    expect(results[2]!.content).toMatch(/unknown tool "nope"/);
   });
 
   it("retries 429s, then fails over to the next provider and stays there", async () => {

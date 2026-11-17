@@ -70,7 +70,7 @@ if (!ephemeral && existsSync(pubfile)) {
     }
     console.log(`> --fresh: replacing the ${network} publication ${at}`);
     pubfileOriginal = text;
-    writeFileSync(pubfile, text.replace(block, "").replace(/\n{3,}/g, "\n\n").trimEnd() + "\n");
+    writeFileSync(pubfile, `${text.replace(block, "").replace(/\n{3,}/g, "\n\n").trimEnd()}\n`);
   }
 }
 console.log(`> publishing ${join(root, "sui")} to ${network} from ${sender}${dryRun ? " (dry run)" : ""}`);

@@ -18,31 +18,71 @@
   },
   "type": "module",
   "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./node": {
-      "types": "./dist/node.d.ts",
-      "import": "./dist/node.js"
+      "import": {
+        "types": "./dist/node.d.ts",
+        "default": "./dist/node.js"
+      },
+      "require": {
+        "types": "./dist/node.d.cts",
+        "default": "./dist/node.cjs"
+      }
     },
     "./evm": {
-      "types": "./dist/anchors/evm.d.ts",
-      "import": "./dist/anchors/evm.js"
+      "import": {
+        "types": "./dist/anchors/evm.d.ts",
+        "default": "./dist/anchors/evm.js"
+      },
+      "require": {
+        "types": "./dist/anchors/evm.d.cts",
+        "default": "./dist/anchors/evm.cjs"
+      }
     },
     "./solana": {
-      "types": "./dist/anchors/solana.d.ts",
-      "import": "./dist/anchors/solana.js"
+      "import": {
+        "types": "./dist/anchors/solana.d.ts",
+        "default": "./dist/anchors/solana.js"
+      },
+      "require": {
+        "types": "./dist/anchors/solana.d.cts",
+        "default": "./dist/anchors/solana.cjs"
+      }
     },
     "./sui": {
-      "types": "./dist/anchors/sui.d.ts",
-      "import": "./dist/anchors/sui.js"
+      "import": {
+        "types": "./dist/anchors/sui.d.ts",
+        "default": "./dist/anchors/sui.js"
+      },
+      "require": {
+        "types": "./dist/anchors/sui.d.cts",
+        "default": "./dist/anchors/sui.cjs"
+      }
     },
     "./walrus": {
-      "types": "./dist/anchors/walrus.d.ts",
-      "import": "./dist/anchors/walrus.js"
-    }
+      "import": {
+        "types": "./dist/anchors/walrus.d.ts",
+        "default": "./dist/anchors/walrus.js"
+      },
+      "require": {
+        "types": "./dist/anchors/walrus.d.cts",
+        "default": "./dist/anchors/walrus.cjs"
+      }
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",
@@ -50,7 +90,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsup",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "clean": "rm -rf dist .turbo",

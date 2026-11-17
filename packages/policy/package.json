@@ -18,15 +18,31 @@
   },
   "type": "module",
   "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./evm": {
-      "types": "./dist/adapters/evm.d.ts",
-      "import": "./dist/adapters/evm.js"
-    }
+      "import": {
+        "types": "./dist/adapters/evm.d.ts",
+        "default": "./dist/adapters/evm.js"
+      },
+      "require": {
+        "types": "./dist/adapters/evm.d.cts",
+        "default": "./dist/adapters/evm.cjs"
+      }
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",
@@ -34,7 +50,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsup",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "clean": "rm -rf dist .turbo",
