@@ -26,7 +26,7 @@ Chains first: **EVM + Solana**; Sui follows as an adapter. Templates: **Next.js 
 
 - Phase 0 ✅: wallet-kit decision ([0001](docs/decisions/0001-wallet-kit.md)), [VERSIONS.md](VERSIONS.md).
 - Phase 1 ✅ (config published 0.1.0): move every package to tsup (ESM + CJS + types) and Biome; then `@codkit/config`: a chain registry (id, name, ecosystem, RPC URLs, explorer, native token), a typed env schema (zod), `getRpcUrl(chain)` with a fallback order; first publish.
-- Phase 2 ✅ (2026-11-17; first publish pending): `@codkit/wallet` (`useWallet()` → `{ ecosystem, address, connect, disconnect, signMessage, sendTransaction, switchChain }`) and `@codkit/ui` (ConnectButton, TokenAmountInput, TxStatusToast, AddressPill, ChainSwitcher; shadcn-style, copy-in or import).
+- Phase 2 ✅ (published 2026-11-19): `@codkit/wallet` (`useWallet()` → `{ ecosystem, address, connect, disconnect, signMessage, sendTransaction, switchChain }`) and `@codkit/ui` (ConnectButton, TokenAmountInput, TxStatusToast, AddressPill, ChainSwitcher; shadcn-style, copy-in or import).
 - Phase 3: contracts consumable from other repos: `forge install` + remapping into `packages/contracts/evm/src`, a cargo git dependency, a Move git dependency with `subdir`; deploy JSON readable by `@codkit/config`; Codama / TS client codegen.
 - Phase 4: `@codkit/agent-tools` (getBalance, transfer, quoteSwap, swap; AgentKit / LI.FI / Jupiter; Vercel AI SDK + MCP exports; dry-run and per-call caps, reusing `@codkit/policy`). Payments are already `@codkit/pay`.
 - Phase 5: `create-app` (`pnpm create @codkit/app`): ecosystem(s), agent y/n, payments y/n → a standalone repo from `templates/`.

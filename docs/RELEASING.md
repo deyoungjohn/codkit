@@ -33,6 +33,17 @@ After that, you can turn off token publishing in each package's settings (**Requ
 
 A **new** package has to be published once by hand (`pnpm publish --access public` from its folder, after `pnpm build`; pnpm, not npm, so `workspace:^` dependencies become real versions) before trust can be set up for it.
 
+## Check what's on npm
+
+After a release (allow a few minutes for the registry to catch up):
+
+```bash
+pnpm smoke:npm                       # every package
+pnpm smoke:npm -- --only wallet,ui   # some
+```
+
+It installs the published packages into a fresh project outside the workspace, loads every entry point with `import()` and `require()`, rejects leftover `workspace:` ranges, and typechecks a consumer with `bundler` and `nodenext` resolution.
+
 ## Check without publishing
 
 ```bash
