@@ -1,6 +1,6 @@
 {
   "name": "@codkit/config",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Chain registry (EVM, Solana, Sui), RPC resolution with fallbacks and keyed providers, explorer links, and a typed env schema for dapps.",
   "license": "MIT",
   "engines": {
