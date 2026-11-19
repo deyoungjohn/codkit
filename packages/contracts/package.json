@@ -1,6 +1,6 @@
 {
   "name": "@codkit/contracts",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Escrow (create → fund → deliver → release/refund) + reputation counter in Solidity (Foundry), Sui Move and Solana (Anchor), with typed viem, Sui and @solana/kit bindings that plug into @codkit/policy.",
   "license": "MIT",
   "engines": {
