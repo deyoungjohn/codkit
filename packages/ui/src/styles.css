@@ -109,14 +109,22 @@
   flex: none;
 }
 .ck-dialog {
-  width: min(380px, calc(100vw - 32px));
+  width: min(400px, calc(100vw - 32px));
+  max-height: min(560px, calc(100vh - 48px));
   padding: 20px;
+  box-sizing: border-box;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
   border: 1px solid var(--ck-border);
   border-radius: calc(var(--ck-radius) + 4px);
   background: var(--ck-bg);
   color: var(--ck-fg);
   box-shadow: var(--ck-shadow);
   font-family: var(--ck-font);
+}
+.ck-dialog[open] {
+  display: flex;
 }
 .ck-dialog::backdrop {
   background: rgb(0 0 0 / 0.45);
@@ -125,20 +133,87 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
 }
-.ck-group h3 {
-  margin: 16px 0 8px;
-  font-size: 12px;
-  font-weight: 600;
+.ck-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--ck-radius);
+  background: var(--ck-surface);
+  border: 1px solid var(--ck-border);
+}
+.ck-tab {
+  font: inherit;
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: calc(var(--ck-radius) - 4px);
+  background: none;
   color: var(--ck-muted);
+  font-weight: 600;
+  cursor: pointer;
 }
-.ck-group ul {
+.ck-tab[aria-selected="true"] {
+  background: var(--ck-bg);
+  color: var(--ck-fg);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
+}
+.ck-tab:focus-visible {
+  outline: 2px solid var(--ck-accent);
+  outline-offset: 1px;
+}
+.ck-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ck-success);
+}
+.ck-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+/* The wallet list scrolls inside the dialog instead of stretching it */
+.ck-list {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0 2px 0 0;
   display: grid;
   gap: 6px;
+  overflow-y: auto;
+  max-height: min(360px, calc(100vh - 220px));
+  overscroll-behavior: contain;
+}
+.ck-current {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--ck-border);
+  border-radius: var(--ck-radius);
+  background: var(--ck-surface);
+}
+.ck-current > div {
+  display: grid;
+  gap: 6px;
+  flex: 1;
+  justify-items: start;
+}
+.ck-note {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--ck-radius);
+  background: var(--ck-surface);
+  color: var(--ck-muted);
+  font-size: 0.9em;
+}
+.ck-panel > .ck-muted {
+  margin: 0;
 }
 .ck-option {
   font: inherit;
@@ -146,7 +221,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
+  padding: 9px 12px;
   border: 1px solid var(--ck-border);
   border-radius: var(--ck-radius);
   background: var(--ck-surface);

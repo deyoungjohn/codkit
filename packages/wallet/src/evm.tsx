@@ -23,7 +23,8 @@ import {
   watchConnectors,
 } from "wagmi/actions";
 import { injected, walletConnect } from "wagmi/connectors";
-import { createStore, toError } from "./store.js";
+import { WalletError } from "./errors.js";
+import { createStore, toWalletError } from "./store.js";
 import type { WalletAdapter, WalletInfo, WalletSnapshot } from "./types.js";
 
 export interface EvmAdapterOptions {
@@ -103,14 +104,52 @@ export function evmAdapter(opts: EvmAdapterOptions): EvmAdapter {
   // explicit undefineds so a disconnect clears the previous address and wallet
   const refresh = () => store.set({ address: undefined, wallet: undefined, ...read() });
 
-  const run = async <T,>(fn: () => Promise<T>): Promise<T> => {
+  const run = async <T,>(action: string, fn: () => Promise<T>, wallet = store.get().wallet?.name): Promise<T> => {
     try {
       const r = await fn();
       store.set({ error: undefined });
       return r;
     } catch (e) {
-      store.set({ error: toError(e) });
-      throw e;
+      const err = toWalletError(e, { ...(wallet && { wallet }), action });
+      store.set({ error: err });
+      throw err;
+    }
+  };
+
+  /** EIP-191 sign. viem sends `personal_sign` hex-encoded; some wallets only take the text, so retry with it. */
+  const sign = async (message: string | Uint8Array): Promise<`0x${string}`> => {
+    try {
+      return await signMessage(wagmiConfig, { message: typeof message === "string" ? message : { raw: message } });
+    } catch (e) {
+      const err = toWalletError(e);
+      if (typeof message !== "string" || err.code === "rejected" || err.code === "pending") throw e;
+      const { connector, address } = getConnection(wagmiConfig);
+      const provider = (await connector?.getProvider()) as
+        | { request(a: { method: string; params: unknown[] }): Promise<unknown> }
+        | undefined;
+      if (!provider || !address) throw e;
+      const sig = await provider.request({ method: "personal_sign", params: [message, address] }).catch(() => {
+        throw e; // report the first failure, which says what the wallet disliked
+      });
+      if (typeof sig !== "string" || !/^0x[0-9a-fA-F]{130}$/.test(sig)) throw e;
+      return sig as `0x${string}`;
+    }
+  };
+
+  /** Ask the wallet to forget this site. Wallets without `wallet_revokePermissions` keep it approved. */
+  const revoke = async (connector: Connector): Promise<boolean> => {
+    try {
+      const provider = (await connector.getProvider()) as
+        | { request(a: { method: string; params: unknown[] }): Promise<unknown> }
+        | undefined;
+      if (!provider) return false;
+      await Promise.race([
+        provider.request({ method: "wallet_revokePermissions", params: [{ eth_accounts: {} }] }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 1500)),
+      ]);
+      return true;
+    } catch {
+      return false;
     }
   };
 
@@ -138,24 +177,38 @@ export function evmAdapter(opts: EvmAdapterOptions): EvmAdapter {
         offList();
       };
     },
-    connect: (walletId) =>
-      run(async () => {
-        const all = getConnectors(wagmiConfig);
-        const id = walletId ?? listWallets()[0]?.id;
-        const connector = all.find((c) => c.id === id || c.uid === id);
-        if (!connector) throw new Error(walletId ? `no EVM wallet "${walletId}"` : "no EVM wallet found; install a browser wallet");
-        if (getConnection(wagmiConfig).connector?.uid === connector.uid) return;
-        await connect(wagmiConfig, { connector, chainId: read().chain.chainId! });
-        refresh();
-      }),
+    connect: (walletId) => {
+      const all = getConnectors(wagmiConfig);
+      const id = walletId ?? listWallets()[0]?.id;
+      const connector = all.find((c) => c.id === id || c.uid === id);
+      return run(
+        "connect",
+        async () => {
+          if (!connector) {
+            throw new WalletError(
+              "unavailable",
+              walletId ? `No EVM wallet "${walletId}".` : "No EVM wallet found. Install a browser wallet, then reload.",
+            );
+          }
+          if (getConnection(wagmiConfig).connector?.uid === connector.uid) return;
+          await connect(wagmiConfig, { connector, chainId: read().chain.chainId! });
+          store.set({ lastDisconnect: undefined });
+          refresh();
+        },
+        connector?.name,
+      );
+    },
     disconnect: () =>
-      run(async () => {
+      run("disconnect", async () => {
+        const { connector } = getConnection(wagmiConfig);
+        const revoked = connector ? await revoke(connector) : true;
         await disconnect(wagmiConfig);
         refresh();
+        if (connector) store.set({ lastDisconnect: { wallet: info(connector), revoked } });
       }),
-    signMessage: (message) => run(() => signMessage(wagmiConfig, { message: typeof message === "string" ? message : { raw: message } })),
+    signMessage: (message) => run("sign the message", () => sign(message)),
     sendTransaction: (tx) =>
-      run(() =>
+      run("send the transaction", () =>
         sendTransaction(wagmiConfig, {
           to: tx.to,
           ...(tx.value !== undefined && { value: tx.value }),
@@ -164,9 +217,10 @@ export function evmAdapter(opts: EvmAdapterOptions): EvmAdapter {
         }),
       ),
     switchChain: (ref) =>
-      run(async () => {
+      run("switch network", async () => {
         const c = getChain(ref);
-        if (!byChainId.has(c.chainId ?? -1)) throw new Error(`switchChain: ${c.key} is not one of this adapter's chains`);
+        if (!byChainId.has(c.chainId ?? -1))
+          throw new WalletError("unsupported", `switchChain: ${c.key} is not one of this adapter's chains`);
         if (getConnection(wagmiConfig).status === "connected") await switchChain(wagmiConfig, { chainId: c.chainId! });
         else wagmiConfig.setState((s) => ({ ...s, chainId: c.chainId! }));
         refresh();

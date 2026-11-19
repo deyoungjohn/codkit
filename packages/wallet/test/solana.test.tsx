@@ -115,9 +115,24 @@ describe("solanaAdapter", () => {
 
   it("explains what is missing", async () => {
     const a = adapter();
-    await expect(a.signMessage("x")).rejects.toThrow(/no Solana wallet connected/);
-    await expect(a.connect("Nope")).rejects.toThrow(/no Solana wallet "Nope"/);
+    await expect(a.signMessage("x")).rejects.toMatchObject({ code: "unavailable", message: "No Solana wallet connected." });
+    await expect(a.connect("Nope")).rejects.toMatchObject({ code: "unavailable", message: 'No Solana wallet "Nope".' });
     expect(a.getSnapshot().error?.message).toMatch(/Nope/);
     expect(() => solanaAdapter({ chains: ["base-sepolia"] })).toThrow(/not a Solana chain/);
+  });
+});
+
+describe("Solana wallet errors", () => {
+  it("turns a wallet's rejection into a WalletError", async () => {
+    const fake = fakeSolanaWallet(await generateKeyPairSigner(), { name: "Refuser" });
+    (fake.wallet.features["standard:connect"] as { connect: () => Promise<never> }).connect = async () => {
+      throw Object.assign(new Error("User rejected the request."), { code: 4001 });
+    };
+    registerWallet(fake.wallet);
+    const a = adapter();
+    const off = a.mount();
+    await expect(a.connect("Refuser")).rejects.toMatchObject({ code: "rejected", message: "You rejected the request in Refuser." });
+    expect(a.getSnapshot()).toMatchObject({ status: "disconnected", error: { code: "rejected" } });
+    off();
   });
 });

@@ -70,21 +70,25 @@ describe("units", () => {
 });
 
 describe("ConnectButton", () => {
-  it("lists wallets per ecosystem, connects, shows the address and disconnects", async () => {
+  it("shows one tab per ecosystem, connects, moves to the next tab, and disconnects", async () => {
     const evm = fakeAdapter("evm", ["base-sepolia"]);
     const sol = fakeAdapter("solana", ["solana-devnet"]);
     withWallets([evm.adapter, sol.adapter], <ConnectButton />);
     fireEvent.click(screen.getByRole("button", { name: "Connect wallet" }));
-    expect(screen.getByText("Ethereum & EVM")).toBeTruthy();
-    expect(screen.getByText("Solana")).toBeTruthy();
+    const tabs = screen.getAllByRole("tab");
+    expect(tabs.map((t) => [t.textContent, t.getAttribute("aria-selected")])).toEqual([
+      ["EVM", "true"],
+      ["Solana", "false"],
+    ]);
+    // only the selected ecosystem's wallets are listed
+    expect(screen.queryByRole("button", { name: /solana Wallet/ })).toBeNull();
 
     await act(async () => fireEvent.click(screen.getByRole("button", { name: /evm Wallet/ })));
     expect(evm.calls).toEqual(["connect:w1"]);
-    expect(screen.getByText("0x1234…5678")).toBeTruthy();
-    expect(screen.getByRole("link", { name: "View on explorer" }).getAttribute("href")).toBe(
-      "https://sepolia.basescan.org/address/0x1234567890abcdef1234567890abcdef12345678",
-    );
-    // the other ecosystem can still be added
+    // the picker moves on to the ecosystem still to connect
+    expect(screen.getByRole("tab", { name: "Solana" }).getAttribute("aria-selected")).toBe("true");
+    expect(screen.getByRole("tab", { name: /EVM/ }).querySelector(".ck-dot")).toBeTruthy();
+    expect(screen.getAllByText("0x1234…5678").length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: "Add wallet" })).toBeTruthy();
 
     await act(async () => fireEvent.click(screen.getByRole("button", { name: "Disconnect Ethereum & EVM" })));
@@ -92,13 +96,34 @@ describe("ConnectButton", () => {
     expect(screen.getByRole("button", { name: "Connect wallet" })).toBeTruthy();
   });
 
-  it("shows the wallet's error and keeps the picker open", async () => {
+  it("moves between tabs with the arrow keys", () => {
+    const evm = fakeAdapter("evm", ["base-sepolia"]);
+    const sol = fakeAdapter("solana", ["solana-devnet"]);
+    withWallets([evm.adapter, sol.adapter], <ConnectButton />);
+    fireEvent.click(screen.getByRole("button", { name: "Connect wallet" }));
+    fireEvent.keyDown(screen.getByRole("tab", { name: "EVM" }), { key: "ArrowRight" });
+    expect(screen.getByRole("tab", { name: "Solana" }).getAttribute("aria-selected")).toBe("true");
+    expect(screen.getByRole("button", { name: /solana Wallet/ })).toBeTruthy();
+    fireEvent.keyDown(screen.getByRole("tab", { name: "Solana" }), { key: "ArrowRight" });
+    expect(screen.getByRole("tab", { name: "EVM" }).getAttribute("aria-selected")).toBe("true");
+  });
+
+  it("shows the wallet's error in plain words and keeps the picker open", async () => {
     const evm = fakeAdapter("evm", ["base-sepolia"]);
     evm.set({ wallets: [{ id: "broken", name: "Broken", ecosystem: "evm" }] });
     withWallets([evm.adapter], <ConnectButton />);
     fireEvent.click(screen.getByRole("button", { name: "Connect wallet" }));
+    expect(screen.queryByRole("tablist")).toBeNull(); // a single ecosystem needs no tabs
     await act(async () => fireEvent.click(screen.getByRole("button", { name: /Broken/ })));
     expect(screen.getByRole("alert").textContent).toBe("User rejected the request");
+  });
+
+  it("explains a wallet that kept the site connected after a disconnect", () => {
+    const evm = fakeAdapter("evm", ["base-sepolia"]);
+    evm.set({ lastDisconnect: { wallet: { id: "okx", name: "OKX Wallet", ecosystem: "evm" }, revoked: false } });
+    withWallets([evm.adapter], <ConnectButton />);
+    fireEvent.click(screen.getByRole("button", { name: "Connect wallet" }));
+    expect(screen.getByText(/OKX Wallet keeps this site connected/).textContent).toMatch(/switch accounts in OKX Wallet/);
   });
 
   it("explains when no wallet is installed", () => {

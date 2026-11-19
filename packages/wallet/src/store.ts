@@ -18,4 +18,4 @@ export function createStore<T extends object>(initial: T) {
   };
 }
 
-export const toError = (e: unknown): Error => (e instanceof Error ? e : new Error(String(e)));
+export { toWalletError } from "./errors.js";

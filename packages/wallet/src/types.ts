@@ -1,5 +1,6 @@
 import type { ChainConfig, ChainRef } from "@codkit/config";
 import type { ComponentType, ReactNode } from "react";
+import type { WalletError } from "./errors.js";
 
 export type WalletEcosystem = "evm" | "solana";
 
@@ -26,7 +27,13 @@ export interface WalletSnapshot {
   wallets: readonly WalletInfo[];
   /** The chains this adapter was configured with. */
   chains: readonly ChainConfig[];
-  error?: Error;
+  /** The last failure, normalised (`error.code`: "rejected", "pending", "unsupported", …). */
+  error?: WalletError;
+  /**
+   * Set after a disconnect the wallet couldn't fully honour: some wallets (no `wallet_revokePermissions`)
+   * keep the site approved, so connecting again returns the same account until the user switches it there.
+   */
+  lastDisconnect?: { wallet: WalletInfo; revoked: boolean };
 }
 
 export interface EvmTransaction {

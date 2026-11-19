@@ -184,8 +184,10 @@ try {
     await page.getByTestId("evm-status").getByText("Codkit Test EVM").waitFor();
   });
 
-  await step("connect the Solana wallet (Wallet Standard)", async () => {
-    await page.getByRole("button", { name: "Add wallet" }).click();
+  await step("the picker moves on to the Solana tab; connect there (Wallet Standard)", async () => {
+    const tab = page.getByRole("tab", { name: "Solana" });
+    if ((await tab.getAttribute("aria-selected")) !== "true") throw new Error("picker did not switch to the Solana tab");
+    await page.screenshot({ path: join(shots, "picker.png") });
     await page.getByRole("button", { name: /Codkit Test Solana/ }).click();
     await page.getByTestId("solana-status").getByText("Codkit Test Solana").waitFor();
   });

@@ -51,7 +51,24 @@ const sig = await sol.sendTransaction({
 });
 ```
 
-`useWallet()` with no argument returns the first connected wallet; `useWallets()` returns all. Solana transactions are built for you: the connected wallet is the fee payer, the blockhash comes from the chain's RPC, and it's sent with the wallet's `signAndSendTransaction` (or `signTransaction` plus the RPC). Errors also land on `wallet.error`.
+`useWallet()` with no argument returns the first connected wallet; `useWallets()` returns all. Solana transactions are built for you: the connected wallet is the fee payer, the blockhash comes from the chain's RPC, and it's sent with the wallet's `signAndSendTransaction` (or `signTransaction` plus the RPC).
+
+## Errors
+
+Every action throws a `WalletError` (also kept on `wallet.error`) whose message is written for people, with the library's original error on `cause`:
+
+| `code`        | Example message                                                                                |
+| ------------- | ---------------------------------------------------------------------------------------------- |
+| `rejected`    | You rejected the request in OKX Wallet.                                                        |
+| `pending`     | MetaMask already has a request open. Check the extension.                                      |
+| `unsupported` | Phantom doesn't support signing transactions.                                                  |
+| `unavailable` | No Solana wallet found. Install one (Phantom, Solflare, Backpack …), then reload.              |
+| `wallet`      | HOT Wallet couldn't sign the message. An unknown RPC error occurred: (the wallet's own reason) |
+
+## Wallet quirks handled
+
+- **Text-only `personal_sign`:** viem sends the message hex-encoded; if a wallet refuses that (anything but a rejection), the message is retried once as plain text.
+- **Disconnect that doesn't disconnect:** injected wallets keep a site approved until they revoke it. `disconnect()` asks the wallet to (`wallet_revokePermissions`); wallets without it reconnect the same account next time. `wallet.lastDisconnect` (`{ wallet, revoked: false }`) tells the UI to say so; `ConnectButton` does. Switching accounts inside the wallet is followed live.
 
 ## Options
 

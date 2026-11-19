@@ -28,7 +28,8 @@ import {
 import { getWallets } from "@wallet-standard/app";
 import type { Wallet as StandardWallet, WalletAccount } from "@wallet-standard/base";
 import type { StandardConnectFeature, StandardDisconnectFeature, StandardEventsFeature } from "@wallet-standard/features";
-import { createStore, toError } from "./store.js";
+import { WalletError } from "./errors.js";
+import { createStore, toWalletError } from "./store.js";
 import type { SolanaTransaction, WalletAdapter, WalletInfo, WalletSnapshot } from "./types.js";
 
 export interface SolanaAdapterOptions {
@@ -111,25 +112,30 @@ export function solanaAdapter(opts: SolanaAdapterOptions): WalletAdapter<"solana
     } catch (e) {
       setDisconnected();
       if (!silent) {
-        store.set({ error: toError(e) });
-        throw e;
+        const err = toWalletError(e, { wallet: wallet.name, action: "connect" });
+        store.set({ error: err });
+        throw err;
       }
     }
   };
 
   const need = () => {
-    if (!current) throw new Error("no Solana wallet connected");
+    if (!current) throw new WalletError("unavailable", "No Solana wallet connected.");
     return current;
   };
   const rpc = () => createSolanaRpc(getRpcUrl(store.get().chain, env));
   const walletChain = (c: ChainConfig) => (c.walletChain ?? c.id) as `${string}:${string}`;
 
-  const run = async <T>(fn: () => Promise<T>): Promise<T> => {
+  const run = async <T>(action: string, fn: () => Promise<T>): Promise<T> => {
     try {
-      return await fn();
+      const r = await fn();
+      store.set({ error: undefined });
+      return r;
     } catch (e) {
-      store.set({ error: toError(e) });
-      throw e;
+      const name = current?.wallet.name;
+      const err = toWalletError(e, { ...(name && { wallet: name }), action });
+      store.set({ error: err });
+      throw err;
     }
   };
 
@@ -165,14 +171,21 @@ export function solanaAdapter(opts: SolanaAdapterOptions): WalletAdapter<"solana
       };
     },
     connect: (walletId) =>
-      run(async () => {
+      run("connect", async () => {
         const w = walletId ? registered.find((x) => x.name === walletId) : registered[0];
-        if (!w) throw new Error(walletId ? `no Solana wallet "${walletId}"` : "no Solana wallet found; install a Wallet Standard wallet");
+        if (!w) {
+          throw new WalletError(
+            "unavailable",
+            walletId
+              ? `No Solana wallet "${walletId}".`
+              : "No Solana wallet found. Install one (Phantom, Solflare, Backpack …), then reload.",
+          );
+        }
         if (current?.wallet === w) return;
         await connectWallet(w, false);
       }),
     disconnect: () =>
-      run(async () => {
+      run("disconnect", async () => {
         const w = current?.wallet;
         setDisconnected();
         try {
@@ -183,16 +196,16 @@ export function solanaAdapter(opts: SolanaAdapterOptions): WalletAdapter<"solana
         await (w && features(w)["standard:disconnect"]?.disconnect());
       }),
     signMessage: (message) =>
-      run(async () => {
+      run("sign the message", async () => {
         const { wallet, account } = need();
         const f = features(wallet)["solana:signMessage"];
-        if (!f) throw new Error(`${wallet.name} cannot sign messages`);
+        if (!f) throw new WalletError("unsupported", `${wallet.name} doesn't support signing messages.`);
         const bytes = typeof message === "string" ? new TextEncoder().encode(message) : message;
         const [out] = await f.signMessage({ account, message: bytes });
         return b58.decode(out!.signature);
       }),
     sendTransaction: (tx: SolanaTransaction) =>
-      run(async () => {
+      run("send the transaction", async () => {
         const { wallet, account } = need();
         const chain = store.get().chain;
         const client = rpc();
@@ -216,15 +229,16 @@ export function solanaAdapter(opts: SolanaAdapterOptions): WalletAdapter<"solana
           return b58.decode(out!.signature);
         }
         const signFeature = f["solana:signTransaction"];
-        if (!signFeature) throw new Error(`${wallet.name} cannot sign transactions`);
+        if (!signFeature) throw new WalletError("unsupported", `${wallet.name} doesn't support signing transactions.`);
         const [signed] = await signFeature.signTransaction({ account, chain: walletChain(chain), transaction: wire });
         const b64 = getBase64Decoder().decode(signed!.signedTransaction) as Parameters<typeof client.sendTransaction>[0];
         return await client.sendTransaction(b64, { encoding: "base64", preflightCommitment: "confirmed" }).send();
       }),
     switchChain: (ref) =>
-      run(async () => {
+      run("switch network", async () => {
         const c = getChain(ref);
-        if (!chains.some((x) => x.key === c.key)) throw new Error(`switchChain: ${c.key} is not one of this adapter's chains`);
+        if (!chains.some((x) => x.key === c.key))
+          throw new WalletError("unsupported", `switchChain: ${c.key} is not one of this adapter's chains`);
         store.set({ chain: c });
       }),
     waitForTransaction: async (signature, o) => {

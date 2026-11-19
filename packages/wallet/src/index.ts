@@ -1,3 +1,4 @@
+export { isWalletError, toWalletError, WalletError, type WalletErrorCode } from "./errors.js";
 export { useWallet, useWallets, WalletProvider, type WalletProviderProps } from "./react.js";
 export type {
   EvmTransaction,
