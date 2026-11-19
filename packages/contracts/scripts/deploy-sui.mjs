@@ -112,6 +112,7 @@ if (dryRun) {
 if (!packageId || !reputationId) throw new Error("could not find packageId / Reputation in publish output");
 const explorer = ["testnet", "devnet", "mainnet"].includes(network) ? `https://suiscan.xyz/${network}` : null;
 writeDeployment(`sui-${network}`, {
+  chain: `sui:${network}`, // the shape @codkit/config reads
   network: `sui:${network}`,
   deployer: sender,
   deployedAt: new Date().toISOString(),
@@ -121,4 +122,5 @@ writeDeployment(`sui-${network}`, {
   upgradeCap,
   digest: res.digest,
   ...(explorer && { url: `${explorer}/object/${packageId}`, tx: `${explorer}/tx/${res.digest}` }),
+  contracts: { kit_escrow: { address: packageId, tx: res.digest }, Reputation: { address: reputationId } },
 });

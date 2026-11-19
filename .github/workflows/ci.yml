@@ -10,6 +10,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: recursive
+          fetch-depth: 0 # the consumer check clones this checkout at HEAD
       - uses: foundry-rs/foundry-toolchain@v1
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
@@ -26,12 +27,16 @@ jobs:
           pnpm --filter example-dapp-vite exec playwright-core install --with-deps chromium
           pnpm --filter example-dapp-vite e2e
           pnpm --filter example-dapp-next e2e
+      - name: Other repos can build against the contracts (forge install)
+        run: node scripts/consumer-check.mjs --only evm
   move:
     runs-on: ubuntu-latest
     env:
       SUI_VERSION: testnet-v1.82.1
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # the consumer check resolves a Move git dependency on this checkout
       - name: Install Sui CLI
         run: |
           curl -sSfL "https://github.com/MystenLabs/sui/releases/download/${SUI_VERSION}/sui-${SUI_VERSION}-ubuntu-x86_64.tgz" | tar xz -C /usr/local/bin ./sui
@@ -39,6 +44,8 @@ jobs:
       - name: Move unit tests
         working-directory: packages/contracts/sui
         run: sui move test < /dev/null
+      - name: Other repos can depend on the Move package (git + subdir)
+        run: node scripts/consumer-check.mjs --only sui
   solana:
     runs-on: ubuntu-latest
     env:
@@ -49,6 +56,8 @@ jobs:
         working-directory: packages/contracts/solana
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # the consumer check resolves a cargo git dependency on this checkout
       - uses: actions/cache@v5
         with:
           path: |
@@ -76,6 +85,9 @@ jobs:
           cargo test
           cargo clippy --all-targets -- -D warnings
           cargo fmt --check
+      - name: Other repos can depend on the Anchor crate (cargo git + CPI)
+        working-directory: .
+        run: node scripts/consumer-check.mjs --only solana
   # Versioning and publishing (Changesets + npm Trusted Publishing). Runs on main only after
   # every test job is green: pending changesets → opens/updates a "Version Packages" PR;
   # merging that PR → publishes the new versions (OIDC, provenance), tags them, creates releases.

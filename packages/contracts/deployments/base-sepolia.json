@@ -1,4 +1,5 @@
 {
+  "chain": "eip155:84532",
   "network": "base-sepolia",
   "chainId": 84532,
   "deployer": "0xefa0913b8a51359ebdf897a434e2783b1c86001a",

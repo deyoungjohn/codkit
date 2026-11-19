@@ -18,7 +18,8 @@
       "!**/*.json",
       "!**/*.svg",
       "!packages/contracts/evm/lib",
-      "!.changeset"
+      "!.changeset",
+      "!packages/contracts/src/deployments.ts"
     ]
   },
   "formatter": {

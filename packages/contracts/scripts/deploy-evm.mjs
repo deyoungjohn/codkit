@@ -82,6 +82,7 @@ const contracts = Object.fromEntries(
 );
 for (const name of ["Reputation", "Escrow", "ReceiptAnchor"]) if (!contracts[name]) throw new Error(`${name} missing from broadcast`);
 writeDeployment(network, {
+  chain: `eip155:${net.chainId}`, // the shape @codkit/config reads
   network,
   chainId: net.chainId,
   deployer: created[0].transaction.from,

@@ -3,58 +3,75 @@
 
 export const deployments = {
   "base-sepolia": {
-    network: "base-sepolia",
-    chainId: 84532,
-    deployer: "0xefa0913b8a51359ebdf897a434e2783b1c86001a",
-    deployedAt: "2026-10-15T22:21:07.293Z",
-    verified: "etherscan",
-    commit: "423e514",
-    contracts: {
-      Reputation: {
-        address: "0x62d9258d0707e29650a8300a716312fb976557a2",
-        tx: "0x5f390e50b7fd8f9673696349be484dd52f2ccf524bdf1606ac10d2575e5189e4",
-        url: "https://sepolia.basescan.org/address/0x62d9258d0707e29650a8300a716312fb976557a2",
+    "chain": "eip155:84532",
+    "network": "base-sepolia",
+    "chainId": 84532,
+    "deployer": "0xefa0913b8a51359ebdf897a434e2783b1c86001a",
+    "deployedAt": "2026-10-15T22:21:07.293Z",
+    "verified": "etherscan",
+    "commit": "423e514",
+    "contracts": {
+      "Reputation": {
+        "address": "0x62d9258d0707e29650a8300a716312fb976557a2",
+        "tx": "0x5f390e50b7fd8f9673696349be484dd52f2ccf524bdf1606ac10d2575e5189e4",
+        "url": "https://sepolia.basescan.org/address/0x62d9258d0707e29650a8300a716312fb976557a2"
       },
-      Escrow: {
-        address: "0xb32ea9219afc9ba5e77db9fd414d5a4a8746c023",
-        tx: "0x45c95da052ed63c024c4924d347d25aeb74ed7106140abed3aab15a3fca4a8d7",
-        url: "https://sepolia.basescan.org/address/0xb32ea9219afc9ba5e77db9fd414d5a4a8746c023",
+      "Escrow": {
+        "address": "0xb32ea9219afc9ba5e77db9fd414d5a4a8746c023",
+        "tx": "0x45c95da052ed63c024c4924d347d25aeb74ed7106140abed3aab15a3fca4a8d7",
+        "url": "https://sepolia.basescan.org/address/0xb32ea9219afc9ba5e77db9fd414d5a4a8746c023"
       },
-      ReceiptAnchor: {
-        address: "0x308023e44fe2e0411b515272fda9049af7330828",
-        tx: "0xa4ca19c5c7b8142c7903112577f4fc1cdd42f94f262db7f2e2ea3bf5feabf450",
-        url: "https://sepolia.basescan.org/address/0x308023e44fe2e0411b515272fda9049af7330828",
-      },
-    },
+      "ReceiptAnchor": {
+        "address": "0x308023e44fe2e0411b515272fda9049af7330828",
+        "tx": "0xa4ca19c5c7b8142c7903112577f4fc1cdd42f94f262db7f2e2ea3bf5feabf450",
+        "url": "https://sepolia.basescan.org/address/0x308023e44fe2e0411b515272fda9049af7330828"
+      }
+    }
   },
   "solana-devnet": {
-    network: "solana:devnet",
-    deployer: "FvWqH2t3cuCcAVVzTde4nhxn2KXQqXm1SjcKoTFgzMow",
-    upgradeAuthority: "FvWqH2t3cuCcAVVzTde4nhxn2KXQqXm1SjcKoTFgzMow",
-    deployedAt: "2026-10-15T22:40:40.000Z",
-    slot: 511503212,
-    commit: "dba1e8f",
-    programId: "8kQBzMWRWAEssN4wtBzrH4G8fHtbhrbHs9e24V2jWMkX",
-    programData: "7bLjth5odhvcuDbrk7KNHUcEgnPRfJXYbqoX9zy57gCC",
-    sbpf: "v3",
-    sha256: "7a56bc7f78ba71936a9814c672a7c63d76bd8cce1f0a0b11b232c0b2bc2fd3f5",
-    idl: "onchain (anchor idl init)",
-    tx: "TYneZ6tPZuxAumyyiUg4uvLLkwuTpNQGass2FbnKbYTgGQ2BhJPhS29hNW3sQQdDrb1NDxiC4vkP3meJzRbRYPE",
-    url: "https://explorer.solana.com/address/8kQBzMWRWAEssN4wtBzrH4G8fHtbhrbHs9e24V2jWMkX?cluster=devnet",
-    txUrl:
-      "https://explorer.solana.com/tx/TYneZ6tPZuxAumyyiUg4uvLLkwuTpNQGass2FbnKbYTgGQ2BhJPhS29hNW3sQQdDrb1NDxiC4vkP3meJzRbRYPE?cluster=devnet",
+    "chain": "solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1",
+    "network": "solana:devnet",
+    "deployer": "FvWqH2t3cuCcAVVzTde4nhxn2KXQqXm1SjcKoTFgzMow",
+    "upgradeAuthority": "FvWqH2t3cuCcAVVzTde4nhxn2KXQqXm1SjcKoTFgzMow",
+    "deployedAt": "2026-10-15T22:40:40.000Z",
+    "slot": 511503212,
+    "commit": "dba1e8f",
+    "programId": "8kQBzMWRWAEssN4wtBzrH4G8fHtbhrbHs9e24V2jWMkX",
+    "programData": "7bLjth5odhvcuDbrk7KNHUcEgnPRfJXYbqoX9zy57gCC",
+    "sbpf": "v3",
+    "sha256": "7a56bc7f78ba71936a9814c672a7c63d76bd8cce1f0a0b11b232c0b2bc2fd3f5",
+    "idl": "onchain (anchor idl init)",
+    "tx": "TYneZ6tPZuxAumyyiUg4uvLLkwuTpNQGass2FbnKbYTgGQ2BhJPhS29hNW3sQQdDrb1NDxiC4vkP3meJzRbRYPE",
+    "url": "https://explorer.solana.com/address/8kQBzMWRWAEssN4wtBzrH4G8fHtbhrbHs9e24V2jWMkX?cluster=devnet",
+    "txUrl": "https://explorer.solana.com/tx/TYneZ6tPZuxAumyyiUg4uvLLkwuTpNQGass2FbnKbYTgGQ2BhJPhS29hNW3sQQdDrb1NDxiC4vkP3meJzRbRYPE?cluster=devnet",
+    "contracts": {
+      "kit_escrow": {
+        "address": "8kQBzMWRWAEssN4wtBzrH4G8fHtbhrbHs9e24V2jWMkX",
+        "tx": "TYneZ6tPZuxAumyyiUg4uvLLkwuTpNQGass2FbnKbYTgGQ2BhJPhS29hNW3sQQdDrb1NDxiC4vkP3meJzRbRYPE"
+      }
+    }
   },
   "sui-testnet": {
-    network: "sui:testnet",
-    deployer: "0x0edf9ba9df762186979b58d8caa3b3d37bc9d6035ed79a5a773f664be7d2bc55",
-    deployedAt: "2026-10-15T22:30:51.088Z",
-    commit: "dba1e8f",
-    packageId: "0x9bc025aaff8b63103a4cea136304c11267af7816e0ae2b8eeeb51bea99293944",
-    reputationId: "0xa03b50fe14f685602811348b86a378651aca3e674abd78229287222b5df80aa8",
-    upgradeCap: "0x4f3ec3878fe724a592aad23c8c1658d1e352b647b37a20e0bbf24ce8bee9c189",
-    digest: "G1Rf7icqRKhMXPo5rCn5pUQrR7NKTCJb3nvohFGCLMDm",
-    url: "https://suiscan.xyz/testnet/object/0x9bc025aaff8b63103a4cea136304c11267af7816e0ae2b8eeeb51bea99293944",
-    tx: "https://suiscan.xyz/testnet/tx/G1Rf7icqRKhMXPo5rCn5pUQrR7NKTCJb3nvohFGCLMDm",
+    "chain": "sui:testnet",
+    "network": "sui:testnet",
+    "deployer": "0x0edf9ba9df762186979b58d8caa3b3d37bc9d6035ed79a5a773f664be7d2bc55",
+    "deployedAt": "2026-10-15T22:30:51.088Z",
+    "commit": "dba1e8f",
+    "packageId": "0x9bc025aaff8b63103a4cea136304c11267af7816e0ae2b8eeeb51bea99293944",
+    "reputationId": "0xa03b50fe14f685602811348b86a378651aca3e674abd78229287222b5df80aa8",
+    "upgradeCap": "0x4f3ec3878fe724a592aad23c8c1658d1e352b647b37a20e0bbf24ce8bee9c189",
+    "digest": "G1Rf7icqRKhMXPo5rCn5pUQrR7NKTCJb3nvohFGCLMDm",
+    "url": "https://suiscan.xyz/testnet/object/0x9bc025aaff8b63103a4cea136304c11267af7816e0ae2b8eeeb51bea99293944",
+    "tx": "https://suiscan.xyz/testnet/tx/G1Rf7icqRKhMXPo5rCn5pUQrR7NKTCJb3nvohFGCLMDm",
+    "contracts": {
+      "kit_escrow": {
+        "address": "0x9bc025aaff8b63103a4cea136304c11267af7816e0ae2b8eeeb51bea99293944",
+        "tx": "G1Rf7icqRKhMXPo5rCn5pUQrR7NKTCJb3nvohFGCLMDm"
+      },
+      "Reputation": {
+        "address": "0xa03b50fe14f685602811348b86a378651aca3e674abd78229287222b5df80aa8"
+      }
+    }
   },
 } as const;
 

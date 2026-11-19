@@ -1,4 +1,5 @@
 {
+  "chain": "sui:testnet",
   "network": "sui:testnet",
   "deployer": "0x0edf9ba9df762186979b58d8caa3b3d37bc9d6035ed79a5a773f664be7d2bc55",
   "deployedAt": "2026-10-15T22:30:51.088Z",
@@ -8,5 +9,14 @@
   "upgradeCap": "0x4f3ec3878fe724a592aad23c8c1658d1e352b647b37a20e0bbf24ce8bee9c189",
   "digest": "G1Rf7icqRKhMXPo5rCn5pUQrR7NKTCJb3nvohFGCLMDm",
   "url": "https://suiscan.xyz/testnet/object/0x9bc025aaff8b63103a4cea136304c11267af7816e0ae2b8eeeb51bea99293944",
-  "tx": "https://suiscan.xyz/testnet/tx/G1Rf7icqRKhMXPo5rCn5pUQrR7NKTCJb3nvohFGCLMDm"
+  "tx": "https://suiscan.xyz/testnet/tx/G1Rf7icqRKhMXPo5rCn5pUQrR7NKTCJb3nvohFGCLMDm",
+  "contracts": {
+    "kit_escrow": {
+      "address": "0x9bc025aaff8b63103a4cea136304c11267af7816e0ae2b8eeeb51bea99293944",
+      "tx": "G1Rf7icqRKhMXPo5rCn5pUQrR7NKTCJb3nvohFGCLMDm"
+    },
+    "Reputation": {
+      "address": "0xa03b50fe14f685602811348b86a378651aca3e674abd78229287222b5df80aa8"
+    }
+  }
 }

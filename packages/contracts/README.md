@@ -2,11 +2,11 @@
 
 Escrow and reputation primitives for agent commerce: **create → fund → deliver → release / refund**, plus an onchain track record.
 
-| Chain                   | Status                                                                                   | Location            |
-| ----------------------- | ---------------------------------------------------------------------------------------- | ------------------- |
-| EVM (Solidity, Foundry) | ✅ tested: unit, invariant fuzzing, 100% coverage, testnet end to end                    | [`evm/`](evm)       |
-| Sui (Move)              | ✅ tested: unit, 100% coverage, testnet end to end                                       | [`sui/`](sui)       |
-| Solana (Anchor)         | ✅ tested: LiteSVM unit + random-walk invariants on the SBPF v3 binary; not deployed yet | [`solana/`](solana) |
+| Chain                   | Status                                                                                    | Location            |
+| ----------------------- | ----------------------------------------------------------------------------------------- | ------------------- |
+| EVM (Solidity, Foundry) | ✅ tested: unit, invariant fuzzing, 100% coverage, testnet end to end                     | [`evm/`](evm)       |
+| Sui (Move)              | ✅ tested: unit, 100% coverage, testnet end to end                                        | [`sui/`](sui)       |
+| Solana (Anchor)         | ✅ tested: LiteSVM unit + random-walk invariants on the SBPF v3 binary, devnet end to end | [`solana/`](solana) |
 
 > Reviewed ([security review](https://github.com/deyoungjohn/codkit/blob/main/docs/security/escrow-review.md)) but **not independently audited**. Use it on testnets and in hackathon demos only.
 
@@ -15,6 +15,68 @@ All three implement the same rules:
 - **Review period:** at most 30 days, and above zero when there's an arbiter.
 - **Arbiter timeout:** if a dispute is still unresolved 30 days after the review period ends, the client can refund it.
 - **Fee-charging tokens** are rejected.
+
+## Use the contracts from your own repo
+
+Each ecosystem installs codkit its native way. CI rebuilds a fresh consumer for all three on every push (`node scripts/consumer-check.mjs`). Pin a commit (or tag) rather than `main`.
+
+**Foundry**
+
+```bash
+forge install deyoungjohn/codkit
+```
+
+```solidity
+import {Escrow} from "codkit/Escrow.sol";      // auto-remapped to lib/codkit/packages/contracts/evm/src/
+import {Reputation} from "codkit/Reputation.sol";
+```
+
+**Anchor** (call the escrow program from yours)
+
+```toml
+[dependencies]
+kit_escrow = { git = "https://github.com/deyoungjohn/codkit", rev = "<commit>", features = ["cpi"] }
+```
+
+```rust
+kit_escrow::cpi::deliver(CpiContext::new(escrow_program, kit_escrow::cpi::accounts::Deliver { provider, deal }), hash)?;
+// account types: kit_escrow::state::{Deal, Reputation}; program id check: Program<'info, kit_escrow::program::KitEscrow>
+```
+
+**Sui Move**
+
+```toml
+[dependencies]
+kit_escrow = { git = "https://github.com/deyoungjohn/codkit.git", subdir = "packages/contracts/sui", rev = "<commit>" }
+```
+
+On testnet the dependency links to codkit's published package (`0x9bc0…3944`, recorded in `Published.toml`), so you reuse the deployed escrow instead of publishing a copy.
+
+### Record your own deployments
+
+Mix `DeploymentRecorder` into a Foundry deploy script and it writes `deployments/<chainId>.json`, which `@codkit/config` reads:
+
+```solidity
+import {DeploymentRecorder} from "codkit/DeploymentRecorder.sol";
+
+contract Deploy is DeploymentRecorder {
+    function run() external {
+        vm.startBroadcast();
+        Shop shop = new Shop();
+        vm.stopBroadcast();
+        record("Shop", address(shop));
+        writeDeployments(); // foundry.toml: fs_permissions = [{ access = "read-write", path = "./deployments" }]
+    }
+}
+```
+
+```ts
+import { contractAddress } from "@codkit/config";
+import baseSepolia from "../contracts/deployments/84532.json";
+const shop = contractAddress(baseSepolia, "base-sepolia", "Shop");
+```
+
+codkit's own records in [`deployments/`](deployments) use the same shape (`chain` + `contracts`) for all three ecosystems, so `contractAddress(Object.values(deployments), "solana-devnet", "kit_escrow")` works too.
 
 ## Escrow (EVM)
 

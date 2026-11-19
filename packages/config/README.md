@@ -64,6 +64,18 @@ export const env = parseEnv(rpcEnvSchema(["base-sepolia", "solana-devnet"]).exte
 
 `rpcEnvSchema` covers the variables above plus `WALLETCONNECT_PROJECT_ID`; pass `{ prefix: "NEXT_PUBLIC_" }` for client builds. `parseEnv` treats empty strings as unset and throws an `EnvError` that lists every bad variable at once, without echoing values.
 
+## Deployments
+
+```ts
+import { contractAddress, parseDeployment } from "@codkit/config";
+import { deployments } from "@codkit/contracts";
+
+contractAddress(Object.values(deployments), "base-sepolia", "Escrow"); // 0xb32e…
+contractAddress(parseDeployment(myJson), 84532, "Shop"); // your own deploy record
+```
+
+A record is `{ "chain": "<key or CAIP-2>", "contracts": { "<Name>": { "address": "…", "tx"?: "…", "block"?: n } } }`, with any extra fields kept. Foundry's `DeploymentRecorder` (from `@codkit/contracts`) writes exactly this. A missing chain or contract throws a message listing what is deployed.
+
 ## Example
 
 ```bash

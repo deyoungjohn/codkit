@@ -65,7 +65,13 @@ try {
         console.log(`✓ ${spec}@${pkg.version} (import + require)`);
       } catch (e) {
         failed++;
-        console.log(`✗ ${spec}: ${String(e.stderr || e.message).split("\n").find((l) => /Error/.test(l)) ?? e.message}`);
+        console.log(
+          `✗ ${spec}: ${
+            String(e.stderr || e.message)
+              .split("\n")
+              .find((l) => /Error/.test(l)) ?? e.message
+          }`,
+        );
       }
     }
   }
@@ -75,7 +81,23 @@ try {
   for (const mode of ["bundler", "nodenext"]) {
     const module = mode === "bundler" ? "esnext" : "nodenext";
     try {
-      run("npx", ["tsc", "--noEmit", "--strict", "--skipLibCheck", "--target", "es2022", "--lib", "es2022,dom", "--module", module, "--moduleResolution", mode, "--jsx", "react-jsx", "consumer.ts"]);
+      run("npx", [
+        "tsc",
+        "--noEmit",
+        "--strict",
+        "--skipLibCheck",
+        "--target",
+        "es2022",
+        "--lib",
+        "es2022,dom",
+        "--module",
+        module,
+        "--moduleResolution",
+        mode,
+        "--jsx",
+        "react-jsx",
+        "consumer.ts",
+      ]);
       console.log(`✓ consumer typechecks (moduleResolution ${mode})`);
     } catch (e) {
       failed++;

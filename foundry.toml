@@ -1,0 +1,5 @@
+# Lets other repos `forge install deyoungjohn/codkit` and `import "codkit/Escrow.sol"`:
+# Foundry maps `codkit/` to this `src`. The Foundry project itself is packages/contracts/evm.
+[profile.default]
+src = "packages/contracts/evm/src"
+libs = ["packages/contracts/evm/lib"]
