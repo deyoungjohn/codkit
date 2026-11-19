@@ -31,7 +31,7 @@ Equivalent on npmjs.com: each package's **Settings → Trusted publishing → Gi
 
 After that, you can turn off token publishing in each package's settings (**Require two-factor authentication and disallow tokens**). Trusted Publishing keeps working.
 
-A **new** package has to be published once by hand (`npm publish --access public` from its folder, after `pnpm build`) before trust can be set up for it.
+A **new** package has to be published once by hand (`pnpm publish --access public` from its folder, after `pnpm build`; pnpm, not npm, so `workspace:^` dependencies become real versions) before trust can be set up for it.
 
 ## Check without publishing
 
