@@ -26,3 +26,7 @@ packages/contracts/sui/traces/
 # design reference (third-party artwork, not ours to redistribute) and Windows download metadata
 ui-inspira*.webp
 *:Zone.Identifier
+examples/*/e2e/out/
+examples/dapp-next/.next/
+examples/dapp-next/next-env.d.ts
+examples/*/dist/

@@ -8,8 +8,8 @@
 
 Wire the official libraries by hand, behind one `useWallet()` interface:
 
-- **EVM:** `wagmi` 3 + `viem` 2. Wallets are discovered through EIP-6963 with the `injected` connector. Coinbase and WalletConnect are **opt-in connectors loaded on demand** (`import()`), never bundled by default.
-- **Solana:** `@solana/react` 8 + `@wallet-standard/react`, which are Wallet Standard discovery and signing on the same release line as `@solana/kit`. Solana Mobile (`@solana-mobile/wallet-standard-mobile`) registers as one more Wallet Standard wallet when enabled.
+- **EVM:** `wagmi` 3 + `viem` 2. Wallets are discovered through EIP-6963 with the `injected` connector. WalletConnect (and Coinbase, MetaMask SDK) are **opt-in**: wagmi loads their SDKs with `import()`, so they're separate chunks, but a registered connector fetches its SDK at startup, so they're only registered when a project asks.
+- **Solana:** the Wallet Standard (`@wallet-standard/app` discovery + the `standard:*` / `solana:*` features) with transactions built by `@solana/kit`. That's the same layer `@solana/react` wraps, used directly so the adapter is a plain store rather than per-wallet hooks. Solana Mobile (`@solana-mobile/wallet-standard-mobile`) registers as one more Wallet Standard wallet when enabled.
 
 The adapter for each ecosystem lives in its own file, so swapping a vendor means editing one file. No third-party modal: `@codkit/ui` supplies the connect UI.
 
@@ -31,16 +31,17 @@ The same minimal flow (provider + connect button, EVM and Solana) was bundled fo
 
 Scores against the handoff criteria:
 
-|                 | Chain coverage (EVM + Solana) | Bundle   | Headless / custom UI | SSR (Next.js)                                                                                                       | Licence          | Activity |
-| --------------- | ----------------------------- | -------- | -------------------- | ------------------------------------------------------------------------------------------------------------------- | ---------------- | -------- |
-| Chosen baseline | ✅                            | ✅ 41 KB | ✅ hooks only        | wagmi has `ssr: true` + cookie storage; Wallet Standard runs only on the client. **Verify in the Phase 2 example.** | MIT / Apache-2.0 | ✅       |
-| ConnectorKit    | ✅                            | ⚠️       | ✅                   | to verify                                                                                                           | MIT              | ✅ (0.x) |
-| dzap            | ✅ (+ BTC, Sui)               | ❌       | ⚠️ ships its own UI  | ❌ needs polyfills                                                                                                  | MIT              | ⚠️       |
-| sodax           | ✅ (+ many)                   | ❌       | ⚠️                   | ❌ needs polyfills                                                                                                  | MIT              | ✅       |
+|                 | Chain coverage (EVM + Solana) | Bundle   | Headless / custom UI | SSR (Next.js)                                                                                                                                                | Licence          | Activity |
+| --------------- | ----------------------------- | -------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------- | -------- |
+| Chosen baseline | ✅                            | ✅ 41 KB | ✅ hooks only        | ✅ verified: `examples/dapp-next` server-renders, hydrates without warnings, and restores the connection after a reload (wagmi `ssr: true` + cookie storage) | MIT / Apache-2.0 | ✅       |
+| ConnectorKit    | ✅                            | ⚠️       | ✅                   | to verify                                                                                                                                                    | MIT              | ✅ (0.x) |
+| dzap            | ✅ (+ BTC, Sui)               | ❌       | ⚠️ ships its own UI  | ❌ needs polyfills                                                                                                                                           | MIT              | ⚠️       |
+| sodax           | ✅ (+ many)                   | ❌       | ⚠️                   | ❌ needs polyfills                                                                                                                                           | MIT              | ✅       |
 
 ## Consequences
 
-- `@codkit/wallet` owns the unified interface and the two adapters. It depends on `wagmi`, `viem`, `@solana/react` and `@wallet-standard/react` as **peers**, so projects keep one copy of each.
+- `@codkit/wallet` owns the unified interface; the adapters are subpaths (`/evm`, `/solana`), so an EVM-only app never installs Solana packages. `wagmi`, `viem`, `@tanstack/react-query` and `@solana/kit` are optional **peers**, so projects keep one copy of each.
+- Phase 2 check (2026-11-17): `examples/dapp-vite`'s e2e connects both ecosystems through the UI, signs on each, and sends a transfer on each, on Anvil + a stub RPC, and with `--testnet` on Base Sepolia and Solana devnet.
 - No Reown AppKit. WalletConnect is used for connection only, through wagmi's connector with a project ID from the free WalletConnect dashboard, and only when a project enables it.
 - Sui later: `@mysten/dapp-kit-react` is also built on the Wallet Standard, so a Sui adapter fits the same shape.
 - Revisit if ConnectorKit reaches 1.0 with a smaller footprint, or if a multichain kit appears that is headless, browser-clean and uses peer dependencies.

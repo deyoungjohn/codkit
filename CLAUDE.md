@@ -14,7 +14,7 @@ Two tracks, in priority order:
 - **No hackathon project code here.** `apps/` holds the demo dashboard and testnet e2e runners; `examples/` holds tiny apps that prove each package installs and works from npm.
 - **Don't wrap what installs in one line.** viem, wagmi, @solana/kit, Anchor, Foundry and the Vercel AI SDK are used directly. A package exists only if it saves real setup time or hides vendor churn.
 - **Don't rebuild infrastructure.** No custom WalletConnect relay, MPC/embedded wallets, bundlers, paymasters, RPC or indexers.
-- **Wallets:** hand-wired wagmi + `@solana/react` behind one `useWallet()`, one adapter file per ecosystem ([decision 0001](docs/decisions/0001-wallet-kit.md)). No Reown AppKit paid tiers; WalletConnect is an opt-in connector, loaded on demand.
+- **Wallets:** hand-wired wagmi + the Solana Wallet Standard (with `@solana/kit`) behind one `useWallet()`, one adapter file per ecosystem ([decision 0001](docs/decisions/0001-wallet-kit.md)). No Reown AppKit paid tiers; WalletConnect is an opt-in connector, loaded on demand.
 - Each package is usable on its own; no package imports a chain SDK in its core (chain code goes in adapters / subpath exports, with chain SDKs as peers).
 - Every package ships with tests and a runnable example.
 - Never commit keys. Testnet/devnet only in examples; mainnet deployments are run by the human.
@@ -25,8 +25,8 @@ Two tracks, in priority order:
 Chains first: **EVM + Solana**; Sui follows as an adapter. Templates: **Next.js and Vite**.
 
 - Phase 0 ✅: wallet-kit decision ([0001](docs/decisions/0001-wallet-kit.md)), [VERSIONS.md](VERSIONS.md).
-- Phase 1: move every package to tsup (ESM + CJS + types) and Biome; then `@codkit/config`: a chain registry (id, name, ecosystem, RPC URLs, explorer, native token), a typed env schema (zod), `getRpcUrl(chain)` with a fallback order; first publish.
-- Phase 2: `@codkit/wallet` (`useWallet()` → `{ ecosystem, address, connect, disconnect, signMessage, sendTransaction, switchChain }`) and `@codkit/ui` (ConnectButton, TokenAmountInput, TxStatusToast, AddressPill, ChainSwitcher; shadcn-style, copy-in or import).
+- Phase 1 ✅ (config published 0.1.0): move every package to tsup (ESM + CJS + types) and Biome; then `@codkit/config`: a chain registry (id, name, ecosystem, RPC URLs, explorer, native token), a typed env schema (zod), `getRpcUrl(chain)` with a fallback order; first publish.
+- Phase 2 ✅ (2026-11-17; first publish pending): `@codkit/wallet` (`useWallet()` → `{ ecosystem, address, connect, disconnect, signMessage, sendTransaction, switchChain }`) and `@codkit/ui` (ConnectButton, TokenAmountInput, TxStatusToast, AddressPill, ChainSwitcher; shadcn-style, copy-in or import).
 - Phase 3: contracts consumable from other repos: `forge install` + remapping into `packages/contracts/evm/src`, a cargo git dependency, a Move git dependency with `subdir`; deploy JSON readable by `@codkit/config`; Codama / TS client codegen.
 - Phase 4: `@codkit/agent-tools` (getBalance, transfer, quoteSwap, swap; AgentKit / LI.FI / Jupiter; Vercel AI SDK + MCP exports; dry-run and per-call caps, reusing `@codkit/policy`). Payments are already `@codkit/pay`.
 - Phase 5: `create-app` (`pnpm create @codkit/app`): ecosystem(s), agent y/n, payments y/n → a standalone repo from `templates/`.

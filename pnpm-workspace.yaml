@@ -1,9 +1,7 @@
 packages:
   - "packages/*"
   - "apps/*"
+  - "examples/*"
 
 allowBuilds:
   esbuild: true
-
-minimumReleaseAgeExclude:
-  - viem@2.58.0

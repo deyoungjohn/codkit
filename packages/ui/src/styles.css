@@ -1,0 +1,233 @@
+/*
+ * @codkit/ui default theme. Import once: `import "@codkit/ui/styles.css"`.
+ * Every color and radius is a variable; override them on :root or any ancestor.
+ */
+:root {
+  --ck-font: inherit;
+  --ck-bg: #ffffff;
+  --ck-fg: #0f1115;
+  --ck-muted: #646a73;
+  --ck-border: #e3e5e8;
+  --ck-surface: #f6f7f8;
+  --ck-accent: #3b5bdb;
+  --ck-accent-fg: #ffffff;
+  --ck-success: #2f9e44;
+  --ck-danger: #e03131;
+  --ck-radius: 12px;
+  --ck-shadow: 0 12px 40px rgb(0 0 0 / 0.16);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ck-bg: #15171c;
+    --ck-fg: #eceef1;
+    --ck-muted: #9aa0a9;
+    --ck-border: #2a2e36;
+    --ck-surface: #1d2027;
+    --ck-accent: #748ffc;
+    --ck-accent-fg: #0f1115;
+  }
+}
+:root[data-theme="dark"] {
+  --ck-bg: #15171c;
+  --ck-fg: #eceef1;
+  --ck-muted: #9aa0a9;
+  --ck-border: #2a2e36;
+  --ck-surface: #1d2027;
+  --ck-accent: #748ffc;
+  --ck-accent-fg: #0f1115;
+}
+
+.ck-connect,
+.ck-connected,
+.ck-pill,
+.ck-amount-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--ck-font);
+}
+.ck-connect {
+  flex-wrap: wrap;
+}
+.ck-button {
+  font: inherit;
+  font-weight: 600;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: var(--ck-radius);
+  background: var(--ck-accent);
+  color: var(--ck-accent-fg);
+  cursor: pointer;
+}
+.ck-button:focus-visible,
+.ck-ghost:focus-visible,
+.ck-option:focus-visible,
+.ck-pill-copy:focus-visible,
+.ck-select:focus-visible,
+.ck-amount input:focus-visible {
+  outline: 2px solid var(--ck-accent);
+  outline-offset: 2px;
+}
+.ck-ghost {
+  font: inherit;
+  background: none;
+  border: 0;
+  color: var(--ck-muted);
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 8px;
+}
+.ck-ghost:hover {
+  color: var(--ck-fg);
+  background: var(--ck-surface);
+}
+.ck-pill {
+  gap: 4px;
+  padding: 6px 10px;
+  border: 1px solid var(--ck-border);
+  border-radius: 999px;
+  background: var(--ck-surface);
+  color: var(--ck-fg);
+  font-variant-numeric: tabular-nums;
+}
+.ck-pill-copy {
+  font: inherit;
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+.ck-pill-link {
+  color: var(--ck-muted);
+  text-decoration: none;
+}
+.ck-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  flex: none;
+}
+.ck-dialog {
+  width: min(380px, calc(100vw - 32px));
+  padding: 20px;
+  border: 1px solid var(--ck-border);
+  border-radius: calc(var(--ck-radius) + 4px);
+  background: var(--ck-bg);
+  color: var(--ck-fg);
+  box-shadow: var(--ck-shadow);
+  font-family: var(--ck-font);
+}
+.ck-dialog::backdrop {
+  background: rgb(0 0 0 / 0.45);
+}
+.ck-dialog-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.ck-group h3 {
+  margin: 16px 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ck-muted);
+}
+.ck-group ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.ck-option {
+  font: inherit;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--ck-border);
+  border-radius: var(--ck-radius);
+  background: var(--ck-surface);
+  color: var(--ck-fg);
+  cursor: pointer;
+  text-align: left;
+}
+.ck-option:hover:not(:disabled) {
+  border-color: var(--ck-accent);
+}
+.ck-option:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+.ck-muted {
+  color: var(--ck-muted);
+  font-size: 0.9em;
+}
+.ck-error {
+  color: var(--ck-danger);
+  font-size: 0.9em;
+  margin: 8px 0 0;
+}
+.ck-select,
+.ck-amount input {
+  font: inherit;
+  padding: 9px 12px;
+  border: 1px solid var(--ck-border);
+  border-radius: var(--ck-radius);
+  background: var(--ck-bg);
+  color: var(--ck-fg);
+}
+.ck-amount {
+  display: grid;
+  gap: 6px;
+  font-family: var(--ck-font);
+}
+.ck-amount label {
+  font-size: 0.9em;
+  color: var(--ck-muted);
+}
+.ck-amount input {
+  flex: 1;
+  min-width: 0;
+  font-variant-numeric: tabular-nums;
+}
+.ck-amount input[aria-invalid="true"] {
+  border-color: var(--ck-danger);
+}
+.ck-toasts {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  display: grid;
+  gap: 8px;
+  z-index: 50;
+  width: min(360px, calc(100vw - 32px));
+}
+.ck-toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--ck-border);
+  border-left: 3px solid var(--ck-muted);
+  border-radius: var(--ck-radius);
+  background: var(--ck-bg);
+  color: var(--ck-fg);
+  box-shadow: var(--ck-shadow);
+  font-family: var(--ck-font);
+}
+.ck-toast > div {
+  display: grid;
+  flex: 1;
+}
+.ck-toast a {
+  color: var(--ck-accent);
+}
+.ck-toast-confirmed {
+  border-left-color: var(--ck-success);
+}
+.ck-toast-failed {
+  border-left-color: var(--ck-danger);
+}

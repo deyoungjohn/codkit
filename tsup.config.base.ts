@@ -3,7 +3,7 @@
  * (`"./evm"` → `src/adapters/evm.ts`, read off its `types` path), so the two
  * can't drift. Output: ESM `.js` + CJS `.cjs`, each with types.
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Options } from "tsup";
 
@@ -14,11 +14,11 @@ export function packageConfig(dir: string, overrides: Options = {}): Options {
   const pkg = JSON.parse(readFileSync(join(dir, "package.json"), "utf8")) as { exports: Record<string, ExportEntry> };
   const entry: Record<string, string> = {};
   for (const [key, value] of Object.entries(pkg.exports)) {
-    if (key === "./package.json") continue;
+    if (key === "./package.json" || key.endsWith(".css")) continue;
     const types = typeOf(value);
     if (!types?.startsWith("./dist/") || !types.endsWith(".d.ts")) throw new Error(`${key}: expected ./dist/….d.ts, got ${types}`);
     const name = types.slice("./dist/".length, -".d.ts".length);
-    entry[name] = `src/${name}.ts`;
+    entry[name] = existsSync(join(dir, `src/${name}.tsx`)) ? `src/${name}.tsx` : `src/${name}.ts`;
   }
   return {
     entry,

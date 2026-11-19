@@ -21,6 +21,11 @@ jobs:
       - run: pnpm build
       - run: pnpm typecheck
       - run: pnpm test
+      - name: Browser e2e (test wallets, Anvil + stub Solana RPC; Next.js SSR)
+        run: |
+          pnpm --filter example-dapp-vite exec playwright-core install --with-deps chromium
+          pnpm --filter example-dapp-vite e2e
+          pnpm --filter example-dapp-next e2e
   move:
     runs-on: ubuntu-latest
     env:

@@ -1,0 +1,71 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: var(--ck-fg);
+  background: var(--ck-bg);
+}
+body {
+  margin: 0;
+}
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+h1 {
+  font-size: 20px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+.panel {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  padding: 20px;
+  border: 1px solid var(--ck-border);
+  border-radius: 16px;
+  background: var(--ck-surface);
+}
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+h2 {
+  margin: 0;
+  font-size: 16px;
+}
+.muted {
+  color: var(--ck-muted);
+  margin: 0;
+}
+.mono {
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  word-break: break-all;
+  margin: 0;
+}
+.field {
+  display: grid;
+  gap: 6px;
+  font-size: 0.9em;
+  color: var(--ck-muted);
+}
+.field input {
+  font: inherit;
+  padding: 9px 12px;
+  border: 1px solid var(--ck-border);
+  border-radius: 12px;
+  background: var(--ck-bg);
+  color: var(--ck-fg);
+}
