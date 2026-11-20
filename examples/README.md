@@ -2,10 +2,10 @@
 
 Small apps that prove the packages work together. Not project code: hackathon projects live in their own repos.
 
-| Example                | What it shows                                                                                                                                                     |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [dapp-vite](dapp-vite) | `@codkit/wallet` + `@codkit/ui` in Vite: connect EVM and Solana wallets, sign on each, send a transfer on each with toasts. `pnpm --filter example-dapp-vite dev` |
-| [dapp-next](dapp-next) | The same in the Next.js App Router: server-rendered, hydrates cleanly, keeps the connection across reloads. `pnpm --filter example-dapp-next dev`                 |
+| Example                                                                                                        | What it shows                                                                                                                                                     |
+| -------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [dapp-vite](dapp-vite) (its dev server reads the packages' source, so package edits show up without a rebuild) | `@codkit/wallet` + `@codkit/ui` in Vite: connect EVM and Solana wallets, sign on each, send a transfer on each with toasts. `pnpm --filter example-dapp-vite dev` |
+| [dapp-next](dapp-next)                                                                                         | The same in the Next.js App Router: server-rendered, hydrates cleanly, keeps the connection across reloads. `pnpm --filter example-dapp-next dev`                 |
 
 ## End-to-end checks
 

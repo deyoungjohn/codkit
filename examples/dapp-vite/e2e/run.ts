@@ -184,7 +184,9 @@ try {
     await page.getByTestId("evm-status").getByText("Codkit Test EVM").waitFor();
   });
 
-  await step("the picker moves on to the Solana tab; connect there (Wallet Standard)", async () => {
+  await step("the picker closed after connecting; reopened, it starts on Solana (Wallet Standard)", async () => {
+    await page.getByRole("dialog").waitFor({ state: "hidden", timeout: 5_000 }); // closes once connect() resolves
+    await page.getByRole("button", { name: "Add wallet" }).click();
     const tab = page.getByRole("tab", { name: "Solana" });
     if ((await tab.getAttribute("aria-selected")) !== "true") throw new Error("picker did not switch to the Solana tab");
     await page.screenshot({ path: join(shots, "picker.png") });

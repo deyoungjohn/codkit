@@ -15,6 +15,10 @@
   --ck-danger: #e03131;
   --ck-radius: 12px;
   --ck-shadow: 0 12px 40px rgb(0 0 0 / 0.16);
+  /* wallet picker: rows shown before the list scrolls */
+  --ck-option-height: 42px;
+  --ck-option-gap: 6px;
+  --ck-visible-options: 10;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -110,7 +114,7 @@
 }
 .ck-dialog {
   width: min(400px, calc(100vw - 32px));
-  max-height: min(560px, calc(100vh - 48px));
+  max-height: calc(100vh - 32px);
   padding: 20px;
   box-sizing: border-box;
   flex-direction: column;
@@ -178,15 +182,18 @@
   gap: 10px;
   min-height: 0;
 }
-/* The wallet list scrolls inside the dialog instead of stretching it */
+/* Room for exactly --ck-visible-options wallets; the list only scrolls beyond that (or on short screens) */
 .ck-list {
   list-style: none;
   margin: 0;
   padding: 0 2px 0 0;
   display: grid;
-  gap: 6px;
+  gap: var(--ck-option-gap);
   overflow-y: auto;
-  max-height: min(360px, calc(100vh - 220px));
+  max-height: min(
+    calc(var(--ck-visible-options) * var(--ck-option-height) + (var(--ck-visible-options) - 1) * var(--ck-option-gap)),
+    calc(100vh - 200px)
+  );
   overscroll-behavior: contain;
 }
 .ck-current {
@@ -217,11 +224,13 @@
 }
 .ck-option {
   font: inherit;
+  box-sizing: border-box;
   width: 100%;
+  height: var(--ck-option-height);
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 9px 12px;
+  padding: 0 12px;
   border: 1px solid var(--ck-border);
   border-radius: var(--ck-radius);
   background: var(--ck-surface);

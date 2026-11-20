@@ -14,7 +14,8 @@ export interface ConnectButtonProps {
 }
 
 /**
- * Disconnected: a button that opens a wallet picker, one tab per ecosystem.
+ * Disconnected: a button that opens a wallet picker, one tab per ecosystem. It closes once a
+ * wallet connects and reopens on the first ecosystem that isn't connected yet.
  * Connected: an address pill per connected ecosystem, with disconnect.
  */
 export function ConnectButton({ ecosystems, label = "Connect wallet", className }: ConnectButtonProps) {
@@ -59,20 +60,12 @@ export function ConnectButton({ ecosystems, label = "Connect wallet", className 
         {wallets
           .filter((w) => w.ecosystem === (tab ?? wallets[0]?.ecosystem))
           .map((w) => (
-            <Panel
-              key={w.ecosystem}
-              wallet={w}
-              onConnected={() =>
-                wallets.some((x) => x !== w && x.status !== "connected") ? setTab(firstOther(wallets, w)) : dialog.current?.close()
-              }
-            />
+            <Panel key={w.ecosystem} wallet={w} onConnected={() => dialog.current?.close()} />
           ))}
       </dialog>
     </div>
   );
 }
-
-const firstOther = (wallets: Wallet[], w: Wallet) => wallets.find((x) => x !== w && x.status !== "connected")?.ecosystem;
 
 function Tabs({
   wallets,

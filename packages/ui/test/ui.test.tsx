@@ -70,13 +70,14 @@ describe("units", () => {
 });
 
 describe("ConnectButton", () => {
-  it("shows one tab per ecosystem, connects, moves to the next tab, and disconnects", async () => {
+  it("shows one tab per ecosystem, closes after connecting, reopens on the next ecosystem, and disconnects", async () => {
     const evm = fakeAdapter("evm", ["base-sepolia"]);
     const sol = fakeAdapter("solana", ["solana-devnet"]);
     withWallets([evm.adapter, sol.adapter], <ConnectButton />);
     fireEvent.click(screen.getByRole("button", { name: "Connect wallet" }));
-    const tabs = screen.getAllByRole("tab");
-    expect(tabs.map((t) => [t.textContent, t.getAttribute("aria-selected")])).toEqual([
+    const dialog = screen.getByRole("dialog", { hidden: true });
+    expect(dialog.hasAttribute("open")).toBe(true);
+    expect(screen.getAllByRole("tab").map((t) => [t.textContent, t.getAttribute("aria-selected")])).toEqual([
       ["EVM", "true"],
       ["Solana", "false"],
     ]);
@@ -85,15 +86,19 @@ describe("ConnectButton", () => {
 
     await act(async () => fireEvent.click(screen.getByRole("button", { name: /evm Wallet/ })));
     expect(evm.calls).toEqual(["connect:w1"]);
-    // the picker moves on to the ecosystem still to connect
+    expect(dialog.hasAttribute("open")).toBe(false); // closes on success
+    expect(screen.getAllByText("0x1234…5678").length).toBeGreaterThan(0);
+
+    // reopening starts on the ecosystem still to connect
+    fireEvent.click(screen.getByRole("button", { name: "Add wallet" }));
     expect(screen.getByRole("tab", { name: "Solana" }).getAttribute("aria-selected")).toBe("true");
     expect(screen.getByRole("tab", { name: /EVM/ }).querySelector(".ck-dot")).toBeTruthy();
-    expect(screen.getAllByText("0x1234…5678").length).toBeGreaterThan(0);
-    expect(screen.getByRole("button", { name: "Add wallet" })).toBeTruthy();
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: /solana Wallet/ })));
+    expect(dialog.hasAttribute("open")).toBe(false);
 
     await act(async () => fireEvent.click(screen.getByRole("button", { name: "Disconnect Ethereum & EVM" })));
     expect(evm.calls).toEqual(["connect:w1", "disconnect"]);
-    expect(screen.getByRole("button", { name: "Connect wallet" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Add wallet" })).toBeTruthy();
   });
 
   it("moves between tabs with the arrow keys", () => {
@@ -116,6 +121,7 @@ describe("ConnectButton", () => {
     expect(screen.queryByRole("tablist")).toBeNull(); // a single ecosystem needs no tabs
     await act(async () => fireEvent.click(screen.getByRole("button", { name: /Broken/ })));
     expect(screen.getByRole("alert").textContent).toBe("User rejected the request");
+    expect(screen.getByRole("dialog", { hidden: true }).hasAttribute("open")).toBe(true); // stays open on failure
   });
 
   it("explains a wallet that kept the site connected after a disconnect", () => {
