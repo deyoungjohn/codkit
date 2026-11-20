@@ -1,5 +1,12 @@
 # @codkit/ui
 
+## 0.1.2
+
+### Patch Changes
+
+- 966006c: `ConnectButton` closes once a wallet connects (and reopens on the first ecosystem not yet connected), and its list fits 10 wallets before scrolling (`--ck-visible-options`, `--ck-option-height` to tune).
+- 64f785d: `ConnectButton` suggests wallets that aren't installed: official install links on desktop and "Open in Phantom / Solflare / Backpack / MetaMask" deep links on phones (`suggestions` prop, `suggestedWallets`). Fixes a missing space in the "keeps this site connected" note.
+
 ## 0.1.1
 
 ### Patch Changes
