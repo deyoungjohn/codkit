@@ -238,6 +238,29 @@
   cursor: pointer;
   text-align: left;
 }
+a.ck-option {
+  text-decoration: none;
+}
+.ck-suggestion > span:nth-child(2) {
+  flex: 1;
+}
+.ck-letter {
+  display: inline-grid;
+  place-items: center;
+  background: var(--ck-border);
+  color: var(--ck-fg);
+  font-size: 11px;
+  font-weight: 700;
+}
+.ck-list-heading {
+  margin: 6px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ck-muted);
+}
+.ck-list-heading:empty {
+  display: none;
+}
 .ck-option:hover:not(:disabled) {
   border-color: var(--ck-accent);
 }

@@ -1,6 +1,7 @@
 import { useWallets, type Wallet, type WalletEcosystem } from "@codkit/wallet";
-import { type KeyboardEvent, useId, useRef, useState } from "react";
+import { type KeyboardEvent, useEffect, useId, useRef, useState } from "react";
 import { AddressPill, cx } from "./AddressPill.js";
+import { sameWallet, suggestedWallets, type WalletSuggestion } from "./wallets.js";
 
 /** Tab labels; a new ecosystem (Sui, NEAR …) only needs an adapter and a name here. */
 const TABS: Record<WalletEcosystem, string> = { evm: "EVM", solana: "Solana" };
@@ -11,6 +12,11 @@ export interface ConnectButtonProps {
   ecosystems?: WalletEcosystem[];
   label?: string;
   className?: string;
+  /**
+   * Wallets to suggest when they aren't installed (install links on desktop, "Open in …" on mobile).
+   * Default: `suggestedWallets`. Pass `[...suggestedWallets, mine]` to add, `[]` to hide the section.
+   */
+  suggestions?: readonly WalletSuggestion[];
 }
 
 /**
@@ -18,7 +24,7 @@ export interface ConnectButtonProps {
  * wallet connects and reopens on the first ecosystem that isn't connected yet.
  * Connected: an address pill per connected ecosystem, with disconnect.
  */
-export function ConnectButton({ ecosystems, label = "Connect wallet", className }: ConnectButtonProps) {
+export function ConnectButton({ ecosystems, label = "Connect wallet", className, suggestions = suggestedWallets }: ConnectButtonProps) {
   const wallets = useWallets().filter((w) => !ecosystems || ecosystems.includes(w.ecosystem));
   const dialog = useRef<HTMLDialogElement>(null);
   const connected = wallets.filter((w) => w.status === "connected" && w.address);
@@ -60,7 +66,7 @@ export function ConnectButton({ ecosystems, label = "Connect wallet", className 
         {wallets
           .filter((w) => w.ecosystem === (tab ?? wallets[0]?.ecosystem))
           .map((w) => (
-            <Panel key={w.ecosystem} wallet={w} onConnected={() => dialog.current?.close()} />
+            <Panel key={w.ecosystem} wallet={w} suggestions={suggestions} onConnected={() => dialog.current?.close()} />
           ))}
       </dialog>
     </div>
@@ -115,10 +121,31 @@ function Tabs({
   );
 }
 
-function Panel({ wallet: w, onConnected }: { wallet: Wallet; onConnected: () => void }) {
+/** Phones and tablets have no wallet extensions; wallets open the dapp in their own app instead. Client-only (false during SSR). */
+function useMobile(): boolean {
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    const ua = navigator.userAgent;
+    // iPadOS reports a desktop Safari user agent, so also look for a touch Mac
+    setMobile(/Android|iPhone|iPad|iPod|Mobile/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1));
+  }, []);
+  return mobile;
+}
+
+function Panel({
+  wallet: w,
+  suggestions,
+  onConnected,
+}: {
+  wallet: Wallet;
+  suggestions: readonly WalletSuggestion[];
+  onConnected: () => void;
+}) {
   const [pending, setPending] = useState<string>();
   const [error, setError] = useState<string>();
+  const mobile = useMobile();
   const kept = w.lastDisconnect && !w.lastDisconnect.revoked ? w.lastDisconnect.wallet : undefined;
+  const missing = suggestions.filter((s) => s.ecosystems.includes(w.ecosystem) && !w.wallets.some((x) => sameWallet(x.name, s.name)));
 
   const pick = async (id: string) => {
     setPending(id);
@@ -154,7 +181,14 @@ function Panel({ wallet: w, onConnected }: { wallet: Wallet; onConnected: () => 
 
   return (
     <section role="tabpanel" className="ck-panel" aria-label={LONG[w.ecosystem]}>
-      {w.wallets.length ? (
+      {!w.wallets.length && (
+        <p className="ck-muted">
+          {mobile
+            ? `Open this page in a wallet app to connect.`
+            : `No ${LONG[w.ecosystem]} wallet found in this browser.${missing.length ? " Install one, then reload." : ""}`}
+        </p>
+      )}
+      {(w.wallets.length > 0 || missing.length > 0) && (
         <ul className="ck-list">
           {w.wallets.map((option) => (
             <li key={option.id}>
@@ -165,15 +199,31 @@ function Panel({ wallet: w, onConnected }: { wallet: Wallet; onConnected: () => 
               </button>
             </li>
           ))}
+          {missing.length > 0 && (
+            <li className="ck-list-heading" aria-hidden={!w.wallets.length}>
+              {w.wallets.length ? "Get a wallet" : ""}
+            </li>
+          )}
+          {missing.map((s) => {
+            const open = mobile && s.openIn ? s.openIn(window.location.href) : undefined;
+            return (
+              <li key={s.name}>
+                <a className="ck-option ck-suggestion" href={open ?? s.install} target={open ? undefined : "_blank"} rel="noreferrer">
+                  <span className="ck-icon ck-letter" aria-hidden="true">
+                    {s.name[0]}
+                  </span>
+                  <span>{open ? `Open in ${s.name}` : s.name}</span>
+                  <span className="ck-muted">{open ? "↗" : "Install ↗"}</span>
+                </a>
+              </li>
+            );
+          })}
         </ul>
-      ) : (
-        <p className="ck-muted">No {LONG[w.ecosystem]} wallet found. Install one, then reload.</p>
       )}
       {kept && (
         <p className="ck-note">
           {kept.name} keeps this site connected after a disconnect, so it will reconnect the same address. To use another one, switch
-          accounts in {kept.name}
-          first, or remove this site from its connected sites.
+          accounts in {kept.name} first, or remove this site from its connected sites.
         </p>
       )}
       {error && (
