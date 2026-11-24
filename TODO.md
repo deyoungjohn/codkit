@@ -1,6 +1,6 @@
 # Remaining tasks
 
-> The dapp toolkit (config, wallet, ui, create-app) now comes first: see [CLAUDE.md](CLAUDE.md) and [docs/HANDOFF.md](docs/HANDOFF.md). All nine packages are on npm with trusted publishing (2026-11-19; `pnpm smoke:npm` passes). **Needs you:** the Phase 2 check with your own wallets: `pnpm --filter example-dapp-vite dev`, connect MetaMask (or any EVM wallet) and Phantom (or any Solana wallet), sign and send a small testnet transfer on each.
+> The dapp toolkit (config, wallet, ui, create-app) now comes first: see [CLAUDE.md](CLAUDE.md) and [docs/HANDOFF.md](docs/HANDOFF.md). All nine packages are on npm with trusted publishing (2026-11-19; `pnpm smoke:npm` passes). **Needs you:** the Phase 2 check with your own wallets: `pnpm --filter example-dapp-vite dev`, connect MetaMask (or any EVM wallet) and Phantom (or any Solana wallet), sign and send a small testnet transfer on each. **Also:** `@codkit/agent-tools` is built and tested live but still `"private": true`: confirm the three deviations in [decision 0002](docs/decisions/0002-agent-tools.md), then remove `private`, publish it by hand with `pnpm publish`, run `npm trust github`, and add a changeset.
 
 Status as of 2026-10-15. Modules 1 to 6 are built, tested and pushed. CI is green: Node and Foundry tests in one job, Move tests in the other. Everything below is what's left. It's split into tasks only you can do, and work I (or you) can do next.
 

@@ -13,7 +13,7 @@ Provenance: entries before 2026-10-29 were reconstructed from git history and th
 | Phase 1 (tsup + Biome, `@codkit/config`)                               | Done                                     | config 0.1.2                                                                         |
 | Phase 2 (`@codkit/wallet`, `@codkit/ui`, Vite + Next examples)         | Done; owner has tested with real wallets | wallet 0.1.2 · ui 0.1.3                                                              |
 | Phase 3 (contracts usable from other repos, deployments in config)     | Done; codegen intentionally not wrapped  |                                                                                      |
-| Phase 4 (`@codkit/agent-tools`)                                        | **In progress**: tools + live testnet e2e pass; examples and README next |                                                                                      |
+| Phase 4 (`@codkit/agent-tools`)                                        | **Built, unpublished**: waiting on owner sign-off |                                                                                      |
 | Phase 5 (`create-app` + templates)                                     | Not started                              |                                                                                      |
 
 All nine packages publish through GitHub Actions Trusted Publishing (set up 2026-11-19). Nothing has been deployed to a mainnet.
@@ -28,7 +28,8 @@ All nine packages publish through GitHub Actions Trusted Publishing (set up 2026
 - **`settle()` in the EVM adapter** (committed here): after an approval or a swap it re-reads until the allowance or balance shows the change, because load-balanced RPCs can answer from a block behind. 57 tests still pass.
 - **Policy limits are chain-scoped in the e2e** (`chain` on each limit) so ETH and SOL, both "native", don't share a cap.
 - **Could not verify:** a LI.FI route executed against a mainnet fork; the agent example with a real LLM; behaviour once testnet pool liquidity changes.
-- **Next:** examples (AI SDK agent, stdio MCP server), package README, then ask the owner to confirm the three HANDOFF deviations.
+- **Examples and README:** `packages/agent-tools/examples/agent.ts` (AI SDK + any OpenAI-compatible provider from `.env`; dry run by default, `--live` to swap) and `mcp-server.ts` (stdio), sharing `setup.ts`; package README. **Run for real:** the agent in dry run (the LLM quoted and previewed, nothing sent) and `--live` (the LLM checked balances, quoted and swapped 0.0001 ETH → 0.025222 USDC on Base Sepolia, tx on basescan); the MCP server was started over stdio by a real MCP client, which listed the tools and got a dry-run swap preview. Not run: the examples against Claude Desktop/Cursor. The examples cast the viem clients `as never` only because this monorepo resolves two viem copies.
+- **Next (owner):** confirm the three HANDOFF deviations ([decision 0002](docs/decisions/0002-agent-tools.md)); then remove `private`, publish by hand, `npm trust github`, add a changeset (TODO.md). Phase 5 (`create-app`) follows.
 
 ### 2026-11-24 — Phase 4, slice 2: swap providers (Uniswap v3, LI.FI, Jupiter) and Solana
 

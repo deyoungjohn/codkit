@@ -95,7 +95,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "clean": "rm -rf dist .turbo",
-    "prepublishOnly": "pnpm run build"
+    "prepublishOnly": "pnpm run build",
+    "example:agent": "tsx --env-file-if-exists=../../.env examples/agent.ts",
+    "example:server": "tsx --env-file-if-exists=../../.env examples/mcp-server.ts"
   },
   "dependencies": {
     "@codkit/config": "workspace:^",
