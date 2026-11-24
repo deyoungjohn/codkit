@@ -30,3 +30,5 @@ examples/*/e2e/out/
 examples/dapp-next/.next/
 examples/dapp-next/next-env.d.ts
 examples/*/dist/
+# written by `next dev` (agent instructions); not ours to commit
+examples/dapp-next/AGENTS.md
