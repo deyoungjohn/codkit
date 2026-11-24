@@ -11,6 +11,7 @@ Two tracks, in priority order:
 
 ## Rules
 
+- **Log every change in [PROGRESS.md](PROGRESS.md).** Add a dated entry in the same commit as the change: what changed and why, how it was verified, and what could _not_ be verified. Cover decisions, owner requests, releases, failures and corrections as well as code, newest first, and keep the Status table at the top current. A change without an entry isn't finished.
 - **No hackathon project code here.** `apps/` holds the demo dashboard and testnet e2e runners; `examples/` holds tiny apps that prove each package installs and works from npm.
 - **Don't wrap what installs in one line.** viem, wagmi, @solana/kit, Anchor, Foundry and the Vercel AI SDK are used directly. A package exists only if it saves real setup time or hides vendor churn.
 - **Don't rebuild infrastructure.** No custom WalletConnect relay, MPC/embedded wallets, bundlers, paymasters, RPC or indexers.
