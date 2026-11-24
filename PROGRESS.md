@@ -6,21 +6,25 @@ Provenance: entries before 2026-10-29 were reconstructed from git history and th
 
 ## Status (2026-11-24)
 
-| Track / phase                                                          | State                                             | Published                                                                            |
-| ---------------------------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Agent modules: policy, pay, contracts, receipts, mcp, feed, demo-shell | Built, tested, e2e on testnets                    | policy 0.1.1 · pay 0.1.2 · contracts 0.1.3 · receipts 0.1.1 · mcp 0.2.2 · feed 0.1.1 |
-| dapp toolkit, Phase 0 (wallet-kit decision, VERSIONS.md)               | Done                                              |                                                                                      |
-| Phase 1 (tsup + Biome, `@codkit/config`)                               | Done                                              | config 0.1.2                                                                         |
-| Phase 2 (`@codkit/wallet`, `@codkit/ui`, Vite + Next examples)         | Done; owner has tested with real wallets          | wallet 0.1.2 · ui 0.1.3                                                              |
-| Phase 3 (contracts usable from other repos, deployments in config)     | Done; codegen intentionally not wrapped           |                                                                                      |
-| Phase 4 (`@codkit/agent-tools`)                                        | **Built, unpublished**: waiting on owner sign-off |                                                                                      |
-| Phase 5 (`create-app` + templates)                                     | Not started                                       |                                                                                      |
+| Track / phase                                                          | State                                    | Published                                                                            |
+| ---------------------------------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------ |
+| Agent modules: policy, pay, contracts, receipts, mcp, feed, demo-shell | Built, tested, e2e on testnets           | policy 0.1.1 · pay 0.1.2 · contracts 0.1.3 · receipts 0.1.1 · mcp 0.2.2 · feed 0.1.1 |
+| dapp toolkit, Phase 0 (wallet-kit decision, VERSIONS.md)               | Done                                     |                                                                                      |
+| Phase 1 (tsup + Biome, `@codkit/config`)                               | Done                                     | config 0.1.2                                                                         |
+| Phase 2 (`@codkit/wallet`, `@codkit/ui`, Vite + Next examples)         | Done; owner has tested with real wallets | wallet 0.1.2 · ui 0.1.3                                                              |
+| Phase 3 (contracts usable from other repos, deployments in config)     | Done; codegen intentionally not wrapped  |                                                                                      |
+| Phase 4 (`@codkit/agent-tools`)                                        | Done                                     | agent-tools 0.1.0 · mcp 0.3.0                                                        |
+| Phase 5 (`create-app` + templates)                                     | Not started                              |                                                                                      |
 
 All nine packages publish through GitHub Actions Trusted Publishing (set up 2026-11-19). Nothing has been deployed to a mainnet.
 
 **Waiting on the owner:** phone check of the "Open in …" deep links (MetaMask's encoding is the unverified one); a WalletConnect project ID if they want it on in the examples; the Trust Wallet link report (could not be reproduced). Backlog that isn't Phase 4/5 lives in [TODO.md](TODO.md).
 
 ## Log
+
+### 2026-11-24 — `@codkit/agent-tools` 0.1.0 published
+
+- The owner published it by hand (`pnpm publish`) after `@codkit/mcp` 0.3.0, and ran `npm trust github`. **Verified:** `npm view @codkit/agent-tools` shows 0.1.0, `"private"` is gone on `main`, and the owner reports `pnpm smoke:npm` passes for every package including this one. **Not verified by me:** the trusted-publishing setup (the next release of this package will show it). Phase 4 is done; Phase 5 (`create-app`) is next, after the UI pass in TODO.md if the owner wants it first.
 
 ### 2026-11-24 — `@codkit/mcp` 0.3.0 released; smoke test learns the new optional peers
 
