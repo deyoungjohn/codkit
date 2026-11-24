@@ -1,5 +1,11 @@
 # @codkit/mcp
 
+## 0.3.0
+
+### Minor Changes
+
+- 0c7835a: `@codkit/mcp/ai-sdk`: `toAiSdkTools(tools)` turns any kit tool into a Vercel AI SDK tool (`ai` 7), with schema validation, errors that reach the model, and bigint-safe results.
+
 ## 0.2.2
 
 ### Patch Changes
