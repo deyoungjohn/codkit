@@ -22,6 +22,10 @@ All nine packages publish through GitHub Actions Trusted Publishing (set up 2026
 
 ## Log
 
+### 2026-11-24 — Owner replies on Phase 4 deviations
+
+- **AgentKit:** the owner asked whether it is needed; it isn't (viem covers it), so it stays out. **Mainnet:** the owner will test LI.FI and Jupiter execution on mainnet themselves later; codkit's tests and examples still never execute there. The third deviation (AI SDK export in `@codkit/mcp/ai-sdk`) was not addressed and is still open. CI is green on `e954b4c` (the two earlier failures were only a Biome format error in PROGRESS.md).
+
 ### 2026-11-24 — Phase 4, slice 3: live testnet run through the tools
 
 - **`pnpm e2e:agent-tools`** (`apps/testnet-e2e/src/agent-tools.ts`), driving the tools the way an agent does, with the `.env` testnet keys and tiny caps. **Base Sepolia:** balances match the chain; Uniswap quote; dry run and operator-forced dry run send nothing (pending nonce unchanged); the per-call cap and the policy engine each refuse before anything is sent; **real swaps** 0.0001 ETH → 0.025222 USDC (above the guaranteed minimum) and 0.025222 USDC → ETH (approval exactly the input, allowance back to 0); real self-transfers of USDC and ETH; the spend ledger holds 4 committed spends, each with its tx hash. **Solana devnet:** balance, cap refusal, dry run, real self-transfers of SOL and USDC. **Mainnet, read-only:** LI.FI quote through the provider passes validation; a Jupiter swap transaction for a public funded wallet passes the fee-payer and program-allowlist checks and **simulates OK** (signature checks off, nothing signed or sent). 17/17 steps passed. Report: `apps/testnet-e2e/reports/agent-tools-testnets-2026-11-24T18-18-35-529Z.md` (scanned for secrets first).

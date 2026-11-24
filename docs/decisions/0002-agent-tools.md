@@ -27,7 +27,7 @@ A new package, `@codkit/agent-tools`, with four zod-typed tools: `get_balance`, 
 | Is `@coinbase/agentkit` worth using for EVM balance/transfer? | **No.** 35 direct dependencies (Privy, ZeroDev, Zora, Across, Allora, Coinbase CDP …), 825 MB installed, pins `@solana/kit` 2.3 (codkit uses 8), and `import("@coinbase/agentkit")` fails on Node 22 here (`ERR_PACKAGE_PATH_NOT_EXPORTED` for a kit subpath). Its transfers would also bypass the policy engine. viem does the same job directly. |
 | Vercel AI SDK                                                 | `ai` 7.0.180 with `@ai-sdk/openai-compatible` 3.0.94 (`createOpenAICompatible`), peer `zod ^3.25.76 \|\| ^4.1.8`. v7 differs from older majors: loop control is `isStepCount(n)` (not `stepCountIs`), and there is a built-in `toolApproval` option.                                                                                               |
 
-## Deviations from HANDOFF (owner to confirm)
+## Deviations from HANDOFF (1 and 2 confirmed by the owner 2026-11-24; the owner will run LI.FI/Jupiter on mainnet themselves; 3 still to confirm)
 
 1. **AgentKit is not used.** See above. HANDOFF listed it for EVM; viem replaces it.
 2. **The "execute a testnet swap" check uses Uniswap v3 on Base Sepolia, not LI.FI or Jupiter.** Both are mainnet only, and mainnet is off-limits for the tooling. LI.FI and Jupiter are still shipped as providers (quotes are read-only and safe): LI.FI's execution path is tested against a mainnet fork on Anvil, and Jupiter's by simulating the unsigned transaction on mainnet. Neither is ever sent to mainnet by codkit's tests or examples.
