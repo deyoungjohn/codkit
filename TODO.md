@@ -1,6 +1,6 @@
 # Remaining tasks
 
-> The dapp toolkit (config, wallet, ui, create-app) now comes first: see [CLAUDE.md](CLAUDE.md) and [docs/HANDOFF.md](docs/HANDOFF.md). All nine packages are on npm with trusted publishing (2026-11-19; `pnpm smoke:npm` passes). **Needs you:** the Phase 2 check with your own wallets: `pnpm --filter example-dapp-vite dev`, connect MetaMask (or any EVM wallet) and Phantom (or any Solana wallet), sign and send a small testnet transfer on each. **Also:** `@codkit/agent-tools` is built and tested live but still `"private": true`: confirm the three deviations in [decision 0002](docs/decisions/0002-agent-tools.md), then remove `private`, publish it by hand with `pnpm publish`, run `npm trust github`, and add a changeset.
+> The dapp toolkit (config, wallet, ui, create-app) now comes first: see [CLAUDE.md](CLAUDE.md) and [docs/HANDOFF.md](docs/HANDOFF.md). All nine packages are on npm with trusted publishing (2026-11-19; `pnpm smoke:npm` passes). **Needs you:** the Phase 2 check with your own wallets: `pnpm --filter example-dapp-vite dev`, connect MetaMask (or any EVM wallet) and Phantom (or any Solana wallet), sign and send a small testnet transfer on each. **Also:** `@codkit/agent-tools` is built and tested live but still `"private": true`: the deviations in [decision 0002](docs/decisions/0002-agent-tools.md) are accepted, so remove `private`, publish it by hand with `pnpm publish`, run `npm trust github`, and add a changeset.
 
 Status as of 2026-10-15. Modules 1 to 6 are built, tested and pushed. CI is green: Node and Foundry tests in one job, Move tests in the other. Everything below is what's left. It's split into tasks only you can do, and work I (or you) can do next.
 
@@ -53,6 +53,14 @@ pnpm --filter demo-shell dev                      # the dashboard switches to "L
 Install Rust, the Solana CLI and Anchor (`avm`). Then the Solana items in section 2 can be built and tested.
 
 ## 2. Engineering backlog (I can pick these up)
+
+### UI quality pass: `unslop` and `modern-web-guidance`
+
+Run both over everything with a user-facing UI before Phase 5 templates copy it: `@codkit/ui` (ConnectButton, wallet picker, TokenAmountInput, TxStatusToast, AddressPill, ChainSwitcher), the Vite and Next examples, and the demo dashboard (`apps/`).
+
+- [ ] **`modern-web-guidance`**: check dialogs/popovers (the wallet picker uses `<dialog>`), forms and inputs (TokenAmountInput), dark mode, accessibility and layout against current web-platform practice; replace outdated patterns.
+- [ ] **`unslop`**: remove the AI-generated look (spacing, colour, icons, copy, type, details) from the same surfaces, keeping the owner's picker rules (no scrollbar for up to ten wallets, "Get a wallet" only when fewer than three).
+- [ ] Re-run `pnpm --filter example-dapp-vite e2e:picker` and a visual check in Chrome after each pass; log in PROGRESS.md.
 
 ### contracts
 

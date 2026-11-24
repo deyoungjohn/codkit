@@ -24,7 +24,7 @@ All nine packages publish through GitHub Actions Trusted Publishing (set up 2026
 
 ### 2026-11-24 — Owner replies on Phase 4 deviations
 
-- **AgentKit:** the owner asked whether it is needed; it isn't (viem covers it), so it stays out. **Mainnet:** the owner will test LI.FI and Jupiter execution on mainnet themselves later; codkit's tests and examples still never execute there. The third deviation (AI SDK export in `@codkit/mcp/ai-sdk`) was not addressed and is still open. CI is green on `e954b4c` (the two earlier failures were only a Biome format error in PROGRESS.md).
+- **AgentKit:** the owner asked whether it is needed; it isn't (viem covers it), so it stays out. **Mainnet:** the owner will test LI.FI and Jupiter execution on mainnet themselves later; codkit's tests and examples still never execute there. The third deviation (AI SDK export in `@codkit/mcp/ai-sdk`) was accepted on the same grounds: the owner cares about the outcome, not the HANDOFF layout, and the outcome is met (an AI SDK agent swapped on Base Sepolia; the same tools served over MCP). Also added a TODO item to run `unslop` and `modern-web-guidance` over the UI. CI is green on `e954b4c` (the two earlier failures were only a Biome format error in PROGRESS.md).
 
 ### 2026-11-24 — Phase 4, slice 3: live testnet run through the tools
 
