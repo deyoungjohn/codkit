@@ -22,10 +22,18 @@ All nine packages publish through GitHub Actions Trusted Publishing (set up 2026
 
 ## Log
 
+### 2026-11-24 — Phase 4, slice 1: the agent tools on EVM, in the AI SDK and MCP
+
+- **Design recorded first** ([decision 0002](docs/decisions/0002-agent-tools.md)) after checking the facts HANDOFF assumed. Three of them were wrong: LI.FI has **no routes on Base Sepolia** (HTTP 404 "No available quotes", swap and bridge); Jupiter is **mainnet only**; `@coinbase/agentkit` is **35 dependencies / 825 MB**, pins `@solana/kit` 2.3 and **fails to import on Node 22 here**, so it isn't used. What does work on a testnet: **Uniswap v3 on Base Sepolia** (WETH/USDC pools at all four fee tiers, non-zero liquidity), so the testnet swap check will use it. LI.FI and Jupiter ship as providers (quotes are read-only and safe); they are never executed on mainnet by codkit's tests.
+- **`@codkit/mcp/ai-sdk`** (new export, `toAiSdkTools`): any kit tool as a Vercel AI SDK tool. Written against `ai` 7.0.180, whose API differs from older majors (`isStepCount`, built-in `toolApproval`). Tested with the real SDK against a scripted OpenAI-compatible server: tool call, bigint-safe results, a thrown tool error reaching the model, and invalid input never executing.
+- **`@codkit/agent-tools`** (new, **private until it's complete**, so the release job skips it): `get_balance`, `transfer`, `quote_swap`, `swap` over `@codkit/mcp`'s tool type. Every fund-moving call goes through three gates in order: the operator's per-call cap (`maxPerCall`, per asset; an asset with no cap can't be moved; the model's `maxSpend` can only tighten it), dry run (operator-forced or model-requested; the model can't switch off the operator's), then `@codkit/policy` (caps, lists, approval, mandatory simulation, kill switch). EVM adapter on viem: balances, native and ERC-20 transfers, swaps with an exact-amount approval counted as one policy unit (not 2× the spend), best-of-providers quotes, and a reverted transaction throws so the engine releases the reserved spend.
+- **Verified:** 25 tests against a real local Anvil (23 on the tools, 2 proving the same tools run through the AI SDK and through a real MCP client/server pair). Mutation check: removing the cap check, ignoring the operator's dry run, or ignoring the model's `maxSpend` each made the right tests fail (4, 1 and 1).
+- **Not yet:** Uniswap v3 and LI.FI providers, Solana, Jupiter, the live Base Sepolia / devnet checks, examples, README.
+
 ### 2026-11-24 — PROGRESS.md; Phase 4 starts
 
 - Added this file and the rule that keeps it current ([CLAUDE.md](CLAUDE.md)). Reconstructed the entries below from `git log` (70 commits, 7 release PRs) and session history.
-- Phase 4 (`@codkit/agent-tools`) begun; entries follow as it lands.
+- Phase 4 (`@codkit/agent-tools`) begun; see the entry above.
 
 ### 2026-11-24 — Picker: suggestions only below 3 wallets, no scrollbar · `daac9ee` `624e468`
 

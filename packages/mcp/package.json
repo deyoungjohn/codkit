@@ -62,6 +62,16 @@
         "default": "./dist/webmcp.cjs"
       }
     },
+    "./ai-sdk": {
+      "import": {
+        "types": "./dist/ai-sdk.d.ts",
+        "default": "./dist/ai-sdk.js"
+      },
+      "require": {
+        "types": "./dist/ai-sdk.d.cts",
+        "default": "./dist/ai-sdk.cjs"
+      }
+    },
     "./tools/policy": {
       "import": {
         "types": "./dist/tools/policy.d.ts",
@@ -137,6 +147,7 @@
     "@codkit/policy": "workspace:^",
     "@codkit/receipts": "workspace:^",
     "@modelcontextprotocol/sdk": "^1.30.0",
+    "ai": "^7.0.0",
     "viem": "^2.48.0"
   },
   "peerDependenciesMeta": {
@@ -154,9 +165,13 @@
     },
     "viem": {
       "optional": true
+    },
+    "ai": {
+      "optional": true
     }
   },
   "devDependencies": {
+    "@ai-sdk/openai-compatible": "^3.0.94",
     "@codkit/contracts": "workspace:*",
     "@codkit/pay": "workspace:*",
     "@codkit/policy": "workspace:*",
@@ -164,6 +179,7 @@
     "@modelcontextprotocol/sdk": "^1.32.0",
     "@x402/core": "~2.28.0",
     "@x402/mcp": "~2.28.0",
+    "ai": "^7.0.180",
     "hono": "^4.10.0",
     "viem": "^2.48.0"
   }
