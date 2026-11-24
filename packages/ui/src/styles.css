@@ -15,10 +15,9 @@
   --ck-danger: #e03131;
   --ck-radius: 12px;
   --ck-shadow: 0 12px 40px rgb(0 0 0 / 0.16);
-  /* wallet picker: rows shown before the list scrolls */
+  /* wallet picker rows */
   --ck-option-height: 42px;
   --ck-option-gap: 6px;
-  --ck-visible-options: 10;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -176,24 +175,24 @@
   border-radius: 50%;
   background: var(--ck-success);
 }
+/* The dialog is as tall as its content, up to the window. Only when the window is too short does the
+   wallet list give up height (it is the one part that can shrink) and scroll. */
 .ck-panel {
   display: flex;
   flex-direction: column;
+  flex: 0 1 auto;
   gap: 10px;
   min-height: 0;
 }
-/* Room for exactly --ck-visible-options wallets; the list only scrolls beyond that (or on short screens) */
 .ck-list {
   list-style: none;
   margin: 0;
-  padding: 0 2px 0 0;
+  padding: 0;
   display: grid;
   gap: var(--ck-option-gap);
+  flex: 0 1 auto;
+  min-height: 0;
   overflow-y: auto;
-  max-height: min(
-    calc(var(--ck-visible-options) * var(--ck-option-height) + (var(--ck-visible-options) - 1) * var(--ck-option-gap)),
-    calc(100vh - 200px)
-  );
   overscroll-behavior: contain;
 }
 .ck-current {

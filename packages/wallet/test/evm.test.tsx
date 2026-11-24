@@ -2,7 +2,7 @@ import { act, renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { createPublicClient, http, parseEther, verifyMessage } from "viem";
 import { mock } from "wagmi/connectors";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { evmAdapter } from "../src/evm.js";
 import { useWallet, useWallets, WalletProvider } from "../src/index.js";
 import { solanaAdapter } from "../src/solana.js";
@@ -20,6 +20,24 @@ beforeAll(async () => {
 afterAll(() => anvil.stop());
 
 const adapter = () => evmAdapter({ chains: ["anvil"], env: { ANVIL_RPC_URL: anvil.url }, connectors: [mock({ accounts: [ALICE] })] });
+
+describe("evmAdapter wallet list", () => {
+  const ids = (a: ReturnType<typeof evmAdapter>) => a.getSnapshot().wallets.map((w) => w.id);
+  afterEach(() => {
+    Reflect.deleteProperty(window, "ethereum");
+  });
+
+  it("lists no wallet when the browser has none (no phantom 'Injected' option)", () => {
+    expect(ids(evmAdapter({ chains: ["anvil"], env: {} }))).toEqual([]);
+  });
+
+  it("lists the generic injected wallet only for wallets that predate EIP-6963", () => {
+    Object.assign(window, { ethereum: { request: async () => [] } });
+    expect(evmAdapter({ chains: ["anvil"], env: {} }).getSnapshot().wallets).toEqual([
+      { id: "injected", name: "Injected", ecosystem: "evm" },
+    ]);
+  });
+});
 
 describe("evmAdapter", () => {
   it("lists connectors, connects, signs, sends and confirms on a real node", async () => {

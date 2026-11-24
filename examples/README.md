@@ -14,5 +14,6 @@ Both drive headless Chromium with test wallets injected into the page (an EIP-69
 ```bash
 pnpm --filter example-dapp-vite e2e               # local: Anvil + a stub Solana RPC
 pnpm --filter example-dapp-vite e2e -- --testnet  # real self-transfers on Base Sepolia + Solana devnet (agent keys from .env)
+pnpm --filter example-dapp-vite e2e:picker         # picker layout in real Chromium: no scrollbar with 11-14 wallets, suggestions only below 3
 pnpm --filter example-dapp-next build && pnpm --filter example-dapp-next e2e   # SSR + hydration + reconnect
 ```

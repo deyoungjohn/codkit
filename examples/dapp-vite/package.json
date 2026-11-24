@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit && tsc --noEmit -p e2e",
-    "e2e": "tsx --env-file-if-exists=../../.env e2e/run.ts"
+    "e2e": "tsx --env-file-if-exists=../../.env e2e/run.ts",
+    "e2e:picker": "tsx e2e/picker.ts"
   },
   "dependencies": {
     "@codkit/config": "workspace:*",

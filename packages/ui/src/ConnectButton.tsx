@@ -17,6 +17,12 @@ export interface ConnectButtonProps {
    * Default: `suggestedWallets`. Pass `[...suggestedWallets, mine]` to add, `[]` to hide the section.
    */
   suggestions?: readonly WalletSuggestion[];
+  /**
+   * Suggest wallets to install only while fewer than this many are detected in the browser (default 3).
+   * Someone with several wallets doesn't need the section, and a long list would force the picker to scroll.
+   * `Infinity` always shows it.
+   */
+  suggestBelow?: number;
 }
 
 /**
@@ -24,7 +30,13 @@ export interface ConnectButtonProps {
  * wallet connects and reopens on the first ecosystem that isn't connected yet.
  * Connected: an address pill per connected ecosystem, with disconnect.
  */
-export function ConnectButton({ ecosystems, label = "Connect wallet", className, suggestions = suggestedWallets }: ConnectButtonProps) {
+export function ConnectButton({
+  ecosystems,
+  label = "Connect wallet",
+  className,
+  suggestions = suggestedWallets,
+  suggestBelow = 3,
+}: ConnectButtonProps) {
   const wallets = useWallets().filter((w) => !ecosystems || ecosystems.includes(w.ecosystem));
   const dialog = useRef<HTMLDialogElement>(null);
   const connected = wallets.filter((w) => w.status === "connected" && w.address);
@@ -66,7 +78,12 @@ export function ConnectButton({ ecosystems, label = "Connect wallet", className,
         {wallets
           .filter((w) => w.ecosystem === (tab ?? wallets[0]?.ecosystem))
           .map((w) => (
-            <Panel key={w.ecosystem} wallet={w} suggestions={suggestions} onConnected={() => dialog.current?.close()} />
+            <Panel
+              key={w.ecosystem}
+              wallet={w}
+              suggestions={w.wallets.length < suggestBelow ? suggestions : []}
+              onConnected={() => dialog.current?.close()}
+            />
           ))}
       </dialog>
     </div>

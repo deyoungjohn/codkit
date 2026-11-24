@@ -87,11 +87,16 @@ export function evmAdapter(opts: EvmAdapterOptions): EvmAdapter {
 
   const byChainId = new Map(chainConfigs.map((c) => [c.chainId!, c]));
   const info = (c: Connector): WalletInfo => ({ id: c.id, name: c.name, ecosystem: "evm", ...(c.icon && { icon: c.icon }) });
-  /** The generic `injected` connector duplicates EIP-6963 wallets; show it only when none announced themselves. */
+  /**
+   * wagmi always includes a generic `injected` connector that reads `window.ethereum`. It is a real choice
+   * only for wallets that predate EIP-6963: hide it when the wallets announced themselves (it would duplicate
+   * them) and when nothing defines `window.ethereum` (connecting could only fail).
+   */
   const listWallets = (): WalletInfo[] => {
     const all = getConnectors(wagmiConfig);
     const announced = all.some((c) => c.type === "injected" && c.id !== "injected");
-    return all.filter((c) => !(announced && c.id === "injected")).map(info);
+    const legacy = typeof window !== "undefined" && "ethereum" in window;
+    return all.filter((c) => !(c.id === "injected" && (announced || !legacy))).map(info);
   };
 
   const read = (): Omit<WalletSnapshot, "wallets" | "chains" | "ecosystem"> => {

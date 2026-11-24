@@ -26,6 +26,7 @@ jobs:
         run: |
           pnpm --filter example-dapp-vite exec playwright-core install --with-deps chromium
           pnpm --filter example-dapp-vite e2e
+          pnpm --filter example-dapp-vite e2e:picker
           pnpm --filter example-dapp-next e2e
       - name: Other repos can build against the contracts (forge install)
         run: node scripts/consumer-check.mjs --only evm

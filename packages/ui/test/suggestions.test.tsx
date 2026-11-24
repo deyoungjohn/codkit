@@ -86,6 +86,34 @@ describe("ConnectButton suggestions", () => {
     expect(phantom.getAttribute("target")).toBeNull(); // same tab: the OS hands it to the app
   });
 
+  it("suggests only while fewer than 3 wallets are detected", () => {
+    const names = ["Rabby Wallet", "OKX Wallet", "HOT Wallet"];
+    const detected = (n: number) => names.slice(0, n).map((name, i) => ({ id: `w${i}`, name, ecosystem: "evm" as const }));
+    for (const [n, shown] of [
+      [0, true],
+      [1, true],
+      [2, true],
+      [3, false],
+    ] as const) {
+      const evm = fakeAdapter("evm", ["base-sepolia"]);
+      evm.set({ wallets: detected(n) });
+      show(<ConnectButton />, [evm.adapter]);
+      expect(screen.queryAllByRole("link").length > 0, `${n} detected`).toBe(shown);
+      expect(screen.queryByText("Get a wallet") !== null, `${n} detected: heading`).toBe(shown && n > 0);
+      cleanup();
+    }
+  });
+
+  it("lets a project change the threshold", () => {
+    const evm = fakeAdapter("evm", ["base-sepolia"]);
+    evm.set({ wallets: ["Rabby Wallet", "OKX Wallet", "HOT Wallet"].map((name, i) => ({ id: `w${i}`, name, ecosystem: "evm" as const })) });
+    show(<ConnectButton suggestBelow={Number.POSITIVE_INFINITY} />, [evm.adapter]);
+    expect(screen.getByText("Get a wallet")).toBeTruthy();
+    cleanup();
+    show(<ConnectButton suggestBelow={0} />, [fakeAdapter("evm", ["base-sepolia"]).adapter]);
+    expect(screen.queryAllByRole("link")).toHaveLength(0);
+  });
+
   it("takes custom suggestions, or none", () => {
     const evm = fakeAdapter("evm", ["base-sepolia"]);
     evm.set({ wallets: [] });
