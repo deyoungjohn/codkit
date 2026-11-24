@@ -43,6 +43,46 @@
         "default": "./dist/evm.cjs"
       }
     },
+    "./uniswap": {
+      "import": {
+        "types": "./dist/uniswap.d.ts",
+        "default": "./dist/uniswap.js"
+      },
+      "require": {
+        "types": "./dist/uniswap.d.cts",
+        "default": "./dist/uniswap.cjs"
+      }
+    },
+    "./lifi": {
+      "import": {
+        "types": "./dist/lifi.d.ts",
+        "default": "./dist/lifi.js"
+      },
+      "require": {
+        "types": "./dist/lifi.d.cts",
+        "default": "./dist/lifi.cjs"
+      }
+    },
+    "./solana": {
+      "import": {
+        "types": "./dist/solana.d.ts",
+        "default": "./dist/solana.js"
+      },
+      "require": {
+        "types": "./dist/solana.d.cts",
+        "default": "./dist/solana.cjs"
+      }
+    },
+    "./jupiter": {
+      "import": {
+        "types": "./dist/jupiter.d.ts",
+        "default": "./dist/jupiter.js"
+      },
+      "require": {
+        "types": "./dist/jupiter.d.cts",
+        "default": "./dist/jupiter.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -64,16 +104,31 @@
     "zod": "^4.1.0"
   },
   "peerDependencies": {
+    "@solana-program/system": "^0.15.0",
+    "@solana-program/token": "^0.17.0",
+    "@solana/kit": "^8.0.0",
     "viem": "^2.48.0"
   },
   "peerDependenciesMeta": {
     "viem": {
+      "optional": true
+    },
+    "@solana/kit": {
+      "optional": true
+    },
+    "@solana-program/system": {
+      "optional": true
+    },
+    "@solana-program/token": {
       "optional": true
     }
   },
   "devDependencies": {
     "@ai-sdk/openai-compatible": "^3.0.94",
     "@modelcontextprotocol/sdk": "^1.32.1",
+    "@solana-program/system": "0.15.0",
+    "@solana-program/token": "0.17.0",
+    "@solana/kit": "^8.6.0",
     "ai": "^7.0.180",
     "viem": "^2.57.20"
   }
