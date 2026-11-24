@@ -21,6 +21,7 @@
     "e2e:sui": "pnpm --filter testnet-e2e run sui",
     "e2e:solana": "pnpm --filter testnet-e2e run solana",
     "e2e:x402-solana": "pnpm --filter testnet-e2e run x402-solana",
+    "e2e:agent-tools": "pnpm --filter testnet-e2e run agent-tools",
     "changeset": "changeset",
     "version-packages": "changeset version && pnpm install --lockfile-only",
     "release": "node scripts/release.mjs",

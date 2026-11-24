@@ -257,9 +257,18 @@ importers:
 
   apps/testnet-e2e:
     dependencies:
+      '@codkit/agent-tools':
+        specifier: workspace:*
+        version: link:../../packages/agent-tools
+      '@codkit/config':
+        specifier: workspace:*
+        version: link:../../packages/config
       '@codkit/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@codkit/mcp':
+        specifier: workspace:*
+        version: link:../../packages/mcp
       '@codkit/pay':
         specifier: workspace:*
         version: link:../../packages/pay

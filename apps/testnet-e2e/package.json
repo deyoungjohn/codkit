@@ -10,10 +10,14 @@
     "sui": "tsx --env-file-if-exists=../../.env src/sui.ts",
     "typecheck": "tsc --noEmit",
     "solana": "tsx --env-file-if-exists=../../.env src/solana.ts",
-    "x402-solana": "tsx --env-file-if-exists=../../.env src/x402-solana.ts"
+    "x402-solana": "tsx --env-file-if-exists=../../.env src/x402-solana.ts",
+    "agent-tools": "tsx --env-file-if-exists=../../.env src/agent-tools.ts"
   },
   "dependencies": {
+    "@codkit/agent-tools": "workspace:*",
+    "@codkit/config": "workspace:*",
     "@codkit/contracts": "workspace:*",
+    "@codkit/mcp": "workspace:*",
     "@codkit/pay": "workspace:*",
     "@codkit/policy": "workspace:*",
     "@codkit/receipts": "workspace:*",

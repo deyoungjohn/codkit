@@ -116,6 +116,19 @@ export function evmChain(opts: EvmChainOptions): ChainAdapter {
     return hash;
   };
   const link = (hash: Hex) => explorerTxUrl(chain, hash);
+  /**
+   * Re-read until `done`, for RPC providers that load-balance across nodes: right after a mined transaction a read can
+   * land on a node that hasn't seen it. Gives up after `timeoutMs` and returns the last value, so a wrong answer
+   * surfaces as the real error (a failed simulation, a zero balance change) rather than hanging.
+   */
+  const settle = async <T>(read: () => Promise<T>, done: (v: T) => boolean, timeoutMs = 15_000): Promise<T> => {
+    const until = Date.now() + timeoutMs;
+    for (;;) {
+      const v = await read();
+      if (done(v) || Date.now() > until) return v;
+      await new Promise((r) => setTimeout(r, 500));
+    }
+  };
   const simulate = (tx: EvmTx) => simulateEvmTx(publicClient, account, tx);
 
   return {
@@ -225,12 +238,29 @@ export function evmChain(opts: EvmChainOptions): ChainAdapter {
           let approval: Hex | undefined;
           if (approveTx) {
             approval = await sendAndConfirm(approveTx, "approval");
+            // the swap is simulated against the approval, so wait until the node answering us can see it
+            await settle(
+              () =>
+                publicClient.readContract({
+                  address: quote.from.id as Address,
+                  abi: erc20Abi,
+                  functionName: "allowance",
+                  args: [account, plan.spender!],
+                }),
+              (allowance) => allowance >= quote.from.amount,
+            );
             const sim = await simulate(plan.tx);
             if (!sim.ok)
               throw new Error(`swap simulation failed after the approval (${approval}); the exact-amount approval remains: ${sim.error}`);
           }
           const hash = await sendAndConfirm(plan.tx, "swap");
-          const received = receiving && before !== undefined ? (await balanceOf(receiving, account)) - before : undefined;
+          const received =
+            receiving && before !== undefined
+              ? (await settle(
+                  () => balanceOf(receiving, account),
+                  (after) => after > before,
+                )) - before
+              : undefined;
           return {
             id: hash,
             ...(link(hash) && { explorer: link(hash)! }),

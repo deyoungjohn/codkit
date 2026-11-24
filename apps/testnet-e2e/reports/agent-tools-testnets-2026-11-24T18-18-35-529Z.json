@@ -1,0 +1,124 @@
+{
+  "network": "agent-tools-testnets",
+  "startedAt": "2026-11-24T18:18:35.529Z",
+  "ok": true,
+  "passed": 16,
+  "total": 16,
+  "meta": {
+    "evmAgent": "0x144509235A869cd391e644d46d19b6a4CB09b9C3",
+    "solanaAgent": "Bc8MUG6gkGGie7fYftZpZNHBCPnLiV3r1hkhUNALnN38"
+  },
+  "steps": [
+    {
+      "name": "base-sepolia: preflight balances",
+      "ok": true,
+      "ms": 6652,
+      "detail": "0.497885494369997027 ETH, 20 USDC"
+    },
+    {
+      "name": "base-sepolia: get_balance matches the chain",
+      "ok": true,
+      "ms": -1364,
+      "detail": "{\"ETH\":\"0.497885494369997027\",\"USDC\":\"20\"}"
+    },
+    {
+      "name": "base-sepolia: quote_swap ETH → USDC through Uniswap v3",
+      "ok": true,
+      "ms": 1572,
+      "detail": "0.0001 ETH → 0.025222 USDC (at least 0.025095)"
+    },
+    {
+      "name": "base-sepolia: dry run previews the swap and sends nothing",
+      "ok": true,
+      "ms": 2586,
+      "detail": "would succeed; policy allow; simulation ok"
+    },
+    {
+      "name": "base-sepolia: an operator-forced dry run can't be switched off by the model",
+      "ok": true,
+      "ms": 1956,
+      "detail": "dryRun:false was overridden; nothing sent"
+    },
+    {
+      "name": "base-sepolia: the per-call cap refuses 0.01 ETH before anything else happens",
+      "ok": true,
+      "ms": 1142,
+      "detail": "per-call cap: 0.01 ETH is more than the 0.0005 ETH allowed in one call"
+    },
+    {
+      "name": "base-sepolia: the policy engine denies what the cap allows",
+      "ok": true,
+      "ms": 881,
+      "detail": "denied: denied: ETH: 300000000000000 exceeds per-tx cap 200000000000000"
+    },
+    {
+      "name": "base-sepolia: LIVE swap 0.0001 ETH → USDC",
+      "ok": true,
+      "ms": 4100,
+      "detail": "received 0.025222 USDC (guaranteed ≥ 0.025095); policy allowed",
+      "links": [
+        "https://sepolia.basescan.org/tx/0xa21d711a095ad2489a714d0e099df41da36642aa37ac91ba88824319ac36cd95"
+      ]
+    },
+    {
+      "name": "base-sepolia: LIVE swap USDC → ETH (approves exactly the input, swaps, unwraps)",
+      "ok": true,
+      "ms": 5485,
+      "detail": "sold 0.025222 USDC for ETH; allowance back to 0 (approved exactly the input)",
+      "links": [
+        "https://sepolia.basescan.org/tx/0xf568104d056218b2aa008380a3f75f78ccc6b543e9c0547f7ebdb7ede3d2a653",
+        "https://sepolia.basescan.org/tx/0x87efdb9b83c8fb86430eea56ce326fcaec36e821a27352c4784abacc26aee7b7"
+      ]
+    },
+    {
+      "name": "base-sepolia: LIVE transfers to itself (USDC and ETH)",
+      "ok": true,
+      "ms": 3177,
+      "detail": "0.01 USDC and 0.000001 ETH sent",
+      "links": [
+        "https://sepolia.basescan.org/tx/0x3f17753a28078722cee2c2e7b7a481b9261673beec93c58adef03527736c56e7",
+        "https://sepolia.basescan.org/tx/0x6337cf16a81117f513ccc26f76663dd058d1a8c4cf385cf1219aac136612d7fb"
+      ]
+    },
+    {
+      "name": "base-sepolia: the spend ledger holds every live spend, each with its tx hash",
+      "ok": true,
+      "ms": 0,
+      "detail": "4 committed spends (swap ×2, transfer ×2); nothing left reserved"
+    },
+    {
+      "name": "mainnet (READ-ONLY): LI.FI quotes Base USDC → ETH and the response passes validation",
+      "ok": true,
+      "ms": 2479,
+      "detail": "1 USDC → 0.000592524028444016 ETH (at least 0.000589561408301795); spender 0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE; nothing signed"
+    },
+    {
+      "name": "solana-devnet: get_balance",
+      "ok": true,
+      "ms": 1563,
+      "detail": "{\"SOL\":\"0.29443336\",\"USDC\":\"20\"}"
+    },
+    {
+      "name": "solana-devnet: the per-call cap refuses 0.01 SOL; a dry run sends nothing",
+      "ok": true,
+      "ms": 646,
+      "detail": "per-call cap: 0.01 SOL is more than the 0.005 SOL allowed in one call; dry run simulated ok"
+    },
+    {
+      "name": "solana-devnet: LIVE transfers to itself (SOL and USDC)",
+      "ok": true,
+      "ms": 5102,
+      "detail": "0.000001 SOL and 0.01 USDC sent and confirmed",
+      "links": [
+        "https://explorer.solana.com/tx/3MvpBwjuVqArv1ZUqmWCei1axWUmYg6YDENbr7hBftcs5bgyBUEpAG1xRpaiuoNokE1Yc8myXJtNv7GRtm72fuC2?cluster=devnet",
+        "https://explorer.solana.com/tx/5CPXG7aHnNv7xW6Udwpdf81hLt4ME3BB2ZQacSj4LtNDZcUBjbdFYAaihukFaznLSj6L7KkZh5VFHNXymezCctNP?cluster=devnet"
+      ]
+    },
+    {
+      "name": "mainnet (READ-ONLY): a real Jupiter swap transaction simulates cleanly and only calls allowed programs",
+      "ok": true,
+      "ms": 11228,
+      "detail": "0.05 SOL → 3.481789 USDC (at least 3.464381); simulated OK on mainnet, 4 top-level programs all allowed; nothing signed or sent"
+    }
+  ]
+}

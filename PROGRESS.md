@@ -13,7 +13,7 @@ Provenance: entries before 2026-10-29 were reconstructed from git history and th
 | Phase 1 (tsup + Biome, `@codkit/config`)                               | Done                                     | config 0.1.2                                                                         |
 | Phase 2 (`@codkit/wallet`, `@codkit/ui`, Vite + Next examples)         | Done; owner has tested with real wallets | wallet 0.1.2 · ui 0.1.3                                                              |
 | Phase 3 (contracts usable from other repos, deployments in config)     | Done; codegen intentionally not wrapped  |                                                                                      |
-| Phase 4 (`@codkit/agent-tools`)                                        | **In progress**                          |                                                                                      |
+| Phase 4 (`@codkit/agent-tools`)                                        | **In progress**: tools + live testnet e2e pass; examples and README next |                                                                                      |
 | Phase 5 (`create-app` + templates)                                     | Not started                              |                                                                                      |
 
 All nine packages publish through GitHub Actions Trusted Publishing (set up 2026-11-19). Nothing has been deployed to a mainnet.
@@ -21,6 +21,14 @@ All nine packages publish through GitHub Actions Trusted Publishing (set up 2026
 **Waiting on the owner:** phone check of the "Open in …" deep links (MetaMask's encoding is the unverified one); a WalletConnect project ID if they want it on in the examples; the Trust Wallet link report (could not be reproduced). Backlog that isn't Phase 4/5 lives in [TODO.md](TODO.md).
 
 ## Log
+
+### 2026-11-24 — Phase 4, slice 3: live testnet run through the tools
+
+- **`pnpm e2e:agent-tools`** (`apps/testnet-e2e/src/agent-tools.ts`), driving the tools the way an agent does, with the `.env` testnet keys and tiny caps. **Base Sepolia:** balances match the chain; Uniswap quote; dry run and operator-forced dry run send nothing (pending nonce unchanged); the per-call cap and the policy engine each refuse before anything is sent; **real swaps** 0.0001 ETH → 0.025222 USDC (above the guaranteed minimum) and 0.025222 USDC → ETH (approval exactly the input, allowance back to 0); real self-transfers of USDC and ETH; the spend ledger holds 4 committed spends, each with its tx hash. **Solana devnet:** balance, cap refusal, dry run, real self-transfers of SOL and USDC. **Mainnet, read-only:** LI.FI quote through the provider passes validation; a Jupiter swap transaction for a public funded wallet passes the fee-payer and program-allowlist checks and **simulates OK** (signature checks off, nothing signed or sent). 17/17 steps passed. Report: `apps/testnet-e2e/reports/agent-tools-testnets-2026-11-24T18-18-35-529Z.md` (scanned for secrets first).
+- **`settle()` in the EVM adapter** (committed here): after an approval or a swap it re-reads until the allowance or balance shows the change, because load-balanced RPCs can answer from a block behind. 57 tests still pass.
+- **Policy limits are chain-scoped in the e2e** (`chain` on each limit) so ETH and SOL, both "native", don't share a cap.
+- **Could not verify:** a LI.FI route executed against a mainnet fork; the agent example with a real LLM; behaviour once testnet pool liquidity changes.
+- **Next:** examples (AI SDK agent, stdio MCP server), package README, then ask the owner to confirm the three HANDOFF deviations.
 
 ### 2026-11-24 — Phase 4, slice 2: swap providers (Uniswap v3, LI.FI, Jupiter) and Solana
 
