@@ -16,7 +16,7 @@ const arg = (n) => {
   const i = process.argv.indexOf(`--${n}`);
   return i > 0 ? process.argv[i + 1] : undefined;
 };
-const all = ["policy", "pay", "contracts", "receipts", "mcp", "feed", "config", "wallet", "ui"];
+const all = ["policy", "pay", "contracts", "receipts", "mcp", "feed", "config", "wallet", "ui", "agent-tools"];
 const only = arg("only")?.split(",") ?? all;
 // peers the entry points need at import time
 const peers = [
@@ -27,6 +27,9 @@ const peers = [
   "react@^19.0.0",
   "react-dom@^19.0.0",
   "@modelcontextprotocol/sdk@^1.30.0",
+  "ai@^7.0.0",
+  "@solana-program/system@^0.15.0",
+  "@solana-program/token@^0.17.0",
   "@x402/mcp@~2.28.0",
   "@x402/svm@~2.28.0",
   "@x402/hono@~2.28.0",
