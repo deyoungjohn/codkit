@@ -1,6 +1,6 @@
 {
   "name": "@codkit/agent-tools",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Tools an AI agent can use to read balances, send tokens and swap on EVM and Solana, behind per-call caps, dry-run and @codkit/policy. Runs in the Vercel AI SDK and MCP.",
   "license": "MIT",
   "engines": {
