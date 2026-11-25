@@ -9,13 +9,13 @@ x402 payments for agents. This package is a thin layer over the official [`@x402
 
 ```bash
 npm install @codkit/pay @codkit/policy
-npm install hono @x402/hono                                 # for @codkit/pay/hono
-npm install express @x402/express && npm i -D @types/express # for @codkit/pay/express
-npm install @x402/mcp @modelcontextprotocol/sdk               # for @codkit/pay/mcp
-npm install @x402/svm @solana/kit                             # for @codkit/pay/svm (Solana)
+npm install hono @x402/hono@~2.28.0                           # for @codkit/pay/hono
+npm install express @x402/express@~2.28.0 && npm i -D @types/express # for @codkit/pay/express
+npm install @x402/mcp@~2.28.0 @modelcontextprotocol/sdk         # for @codkit/pay/mcp
+npm install @x402/svm@~2.28.0 @solana/kit                       # for @codkit/pay/svm (Solana)
 ```
 
-The server frameworks are optional peer dependencies, so install only the one you use.
+The server frameworks are optional peer dependencies, so install only the one you use. Keep the `@x402/*` packages on `~2.28` (the version `@codkit/pay` is built against); a newer one installs a second copy of x402 next to it. Don't add `@x402/core` or `@x402/evm` yourself.
 
 ## Server
 

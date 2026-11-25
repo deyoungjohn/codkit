@@ -1,6 +1,6 @@
 # Remaining tasks
 
-> The dapp toolkit (config, wallet, ui, create-app) now comes first: see [CLAUDE.md](CLAUDE.md) and [docs/HANDOFF.md](docs/HANDOFF.md). All nine packages are on npm with trusted publishing (2026-11-19; `pnpm smoke:npm` passes). **Needs you:** the Phase 2 check with your own wallets: `pnpm --filter example-dapp-vite dev`, connect MetaMask (or any EVM wallet) and Phantom (or any Solana wallet), sign and send a small testnet transfer on each.
+> The dapp toolkit (config, wallet, ui, agent-tools) now comes first: see [CLAUDE.md](CLAUDE.md) and [docs/HANDOFF.md](docs/HANDOFF.md). All nine packages are on npm with trusted publishing (2026-11-19; `pnpm smoke:npm` passes). **Needs you:** the Phase 2 check with your own wallets: `pnpm --filter example-dapp-vite dev`, connect MetaMask (or any EVM wallet) and Phantom (or any Solana wallet), sign and send a small testnet transfer on each.
 
 Status as of 2026-10-15. Modules 1 to 6 are built, tested and pushed. CI is green: Node and Foundry tests in one job, Move tests in the other. Everything below is what's left. It's split into tasks only you can do, and work I (or you) can do next.
 
@@ -56,7 +56,7 @@ Install Rust, the Solana CLI and Anchor (`avm`). Then the Solana items in sectio
 
 ### UI quality pass: `unslop` and `modern-web-guidance`
 
-Run both over everything with a user-facing UI before Phase 5 templates copy it: `@codkit/ui` (ConnectButton, wallet picker, TokenAmountInput, TxStatusToast, AddressPill, ChainSwitcher), the Vite and Next examples, and the demo dashboard (`apps/`).
+Run both over everything with a user-facing UI (done; the Phase 5 templates it was for were dropped): `@codkit/ui` (ConnectButton, wallet picker, TokenAmountInput, TxStatusToast, AddressPill, ChainSwitcher), the Vite and Next examples, and the demo dashboard (`apps/`).
 
 - [x] **`modern-web-guidance`** (done 2026-11-25): check dialogs/popovers (the wallet picker uses `<dialog>`), forms and inputs (TokenAmountInput), dark mode, accessibility and layout against current web-platform practice; replace outdated patterns.
 - [x] **`unslop`** (done 2026-11-25): remove the AI-generated look (spacing, colour, icons, copy, type, details) from the same surfaces, keeping the owner's picker rules (no scrollbar for up to ten wallets, "Get a wallet" only when fewer than three).

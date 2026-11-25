@@ -16,7 +16,6 @@ import { simulateEvmTx } from "@codkit/policy/evm";
 import {
   type Account,
   type Address,
-  type Chain,
   encodeFunctionData,
   erc20Abi,
   getAddress,
@@ -61,7 +60,8 @@ export interface EvmSwapQuoteRequest {
   to: EvmAsset;
   amount: bigint;
   slippageBps: number;
-  publicClient: PublicClient<Transport, Chain | undefined>;
+  // biome-ignore lint/suspicious/noExplicitAny: a client made for a specific chain (Base, OP: their transaction types differ) isn't assignable to `Chain`, so the chain parameter is left open
+  publicClient: PublicClient<Transport, any>;
 }
 
 /** A swap venue for EVM: `uniswapV3()`, `lifi()`, or your own. */
@@ -74,9 +74,11 @@ export interface EvmSwapProvider {
 export interface EvmChainOptions {
   /** A `@codkit/config` chain: key, CAIP-2 id or chain id. */
   chain: ChainRef;
-  publicClient: PublicClient<Transport, Chain | undefined>;
+  // biome-ignore lint/suspicious/noExplicitAny: a client made for a specific chain (Base, OP: their transaction types differ) isn't assignable to `Chain`, so the chain parameter is left open
+  publicClient: PublicClient<Transport, any>;
   /** Created with `account` and `chain`. This is the agent's key, so keep it a testnet / low-balance key. */
-  walletClient: WalletClient<Transport, Chain, Account>;
+  // biome-ignore lint/suspicious/noExplicitAny: same reason as `publicClient`
+  walletClient: WalletClient<Transport, any, Account>;
   /** Tokens the agent may use, by symbol. The gas token is always included. */
   tokens?: Record<string, { address: Address; decimals: number }>;
   swap?: readonly EvmSwapProvider[];
@@ -107,6 +109,7 @@ export function evmChain(opts: EvmChainOptions): ChainAdapter {
   /** Send, wait for the receipt, and throw if it reverted (so the engine releases the reserved spend). */
   const sendAndConfirm = async (tx: EvmTx, what: string): Promise<Hex> => {
     const hash = await walletClient.sendTransaction({
+      chain: walletClient.chain,
       to: tx.to,
       ...(tx.value !== undefined && { value: tx.value }),
       ...(tx.data && { data: tx.data }),

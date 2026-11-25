@@ -6,21 +6,32 @@ Provenance: entries before 2026-10-29 were reconstructed from git history and th
 
 ## Status (2026-11-24)
 
-| Track / phase                                                          | State                                    | Published                                                                            |
-| ---------------------------------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------ |
-| Agent modules: policy, pay, contracts, receipts, mcp, feed, demo-shell | Built, tested, e2e on testnets           | policy 0.1.1 · pay 0.1.2 · contracts 0.1.3 · receipts 0.1.1 · mcp 0.2.2 · feed 0.1.1 |
-| dapp toolkit, Phase 0 (wallet-kit decision, VERSIONS.md)               | Done                                     |                                                                                      |
-| Phase 1 (tsup + Biome, `@codkit/config`)                               | Done                                     | config 0.1.2                                                                         |
-| Phase 2 (`@codkit/wallet`, `@codkit/ui`, Vite + Next examples)         | Done; owner has tested with real wallets | wallet 0.1.2 · ui 0.1.3                                                              |
-| Phase 3 (contracts usable from other repos, deployments in config)     | Done; codegen intentionally not wrapped  |                                                                                      |
-| Phase 4 (`@codkit/agent-tools`)                                        | Done                                     | agent-tools 0.1.0 · mcp 0.3.0                                                        |
-| Phase 5 (`create-app` + templates)                                     | Not started                              |                                                                                      |
+| Track / phase                                                          | State                                             | Published                                                                            |
+| ---------------------------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Agent modules: policy, pay, contracts, receipts, mcp, feed, demo-shell | Built, tested, e2e on testnets                    | policy 0.1.1 · pay 0.1.2 · contracts 0.1.3 · receipts 0.1.1 · mcp 0.2.2 · feed 0.1.1 |
+| dapp toolkit, Phase 0 (wallet-kit decision, VERSIONS.md)               | Done                                              |                                                                                      |
+| Phase 1 (tsup + Biome, `@codkit/config`)                               | Done                                              | config 0.1.2                                                                         |
+| Phase 2 (`@codkit/wallet`, `@codkit/ui`, Vite + Next examples)         | Done; owner has tested with real wallets          | wallet 0.1.2 · ui 0.1.3                                                              |
+| Phase 3 (contracts usable from other repos, deployments in config)     | Done; codegen intentionally not wrapped           |                                                                                      |
+| Phase 4 (`@codkit/agent-tools`)                                        | Done                                              | agent-tools 0.1.0 · mcp 0.3.0                                                        |
+| Phase 5 (`create-app` + templates)                                     | **Dropped**: replaced by an external consumer app |                                                                                      |
 
 All nine packages publish through GitHub Actions Trusted Publishing (set up 2026-11-19). Nothing has been deployed to a mainnet.
 
 **Waiting on the owner:** phone check of the "Open in …" deep links (MetaMask's encoding is the unverified one); a WalletConnect project ID if they want it on in the examples; the Trust Wallet link report (could not be reproduced). Backlog that isn't Phase 4/5 lives in [TODO.md](TODO.md).
 
 ## Log
+
+### 2026-11-25 — Phase 5 dropped; an external consumer app instead
+
+- **Decision (owner):** no `create-app` scaffolder. Instead a real app **outside this workspace**, `~/Projects/codkit-testapp` (its own git repo), that installs `@codkit/*` from npm, so the packages are tested the way a hackathon team gets them. CLAUDE.md, TODO.md, HANDOFF.md and the Status table are updated. The app is one Next.js project: wallets (`wallet` + `ui` + `config`), an agent page and route (`agent-tools` + `policy` + `mcp/ai-sdk`, dry run only), and an x402-paid endpoint (`pay/hono`).
+- **Verified, against the published packages:** `pnpm build` passes; the paid endpoint answers 402 unpaid, and `pnpm check:paid` **settled a real 0.001 USDC x402 payment on Base Sepolia** through the policy-checked client; the agent route (Gemini) returned balances and a swap preview with `enforcedByOperator: true` and nothing sent; the wallet and agent pages render (looked at in the owner's Chrome). **Not verified:** a wallet connection and a transaction from the test app's UI (the earlier e2e runs cover that in the examples), the Solana side of the app beyond the page rendering.
+- **Bugs and gaps it found:**
+  1. **`@codkit/agent-tools` 0.1.0: `evmChain` rejects chain-specific viem clients** (`createPublicClient({ chain: baseSepolia })`, any Base/OP chain). I had hit this inside the monorepo and **wrongly blamed duplicate viem copies**, casting `as never` with a false comment; the real cause is the OP-stack transaction type not being assignable to `Chain`. Fixed: the client chain parameter is open, `sendTransaction` passes the client's chain, casts and the wrong comment removed from the examples and the e2e. 57 tests pass and both type-check without casts. Changeset: `@codkit/agent-tools` patch (not yet released).
+  2. `@codkit/pay` pins `@x402/*` at `~2.28` while 2.32 is current, so a plain `pnpm add @x402/hono` installs a second copy of x402. Documented in the test app's README; the `@codkit/pay` README's install lines now pin `~2.28.0` and say not to add `@x402/core`/`@x402/evm` (docs only, no release needed).
+  3. pnpm's release-age gate skips fresh codkit releases for a new project (resolved `mcp` 0.2.2 and `ui` 0.1.2 instead of 0.3.0 and 0.1.3); pnpm 12 refuses to install with an unapproved `esbuild` build script; Groq's reasoning models fail multi-step tool calls through the AI SDK and `providersFromEnv()` lists Groq first. All in the test app's README.
+  4. **Open, not reproduced:** in the owner's Chrome (11 wallet extensions) the dev server logged a hydration mismatch in the wallet picker. Neither a decoy wallet announced before hydration nor a `window.ethereum`, in dev or production, reproduces it. A regression scenario for early-announced wallets was added to the Next SSR e2e (passes). No code changed for it.
+- **Secrets:** the test app's `.env` (agent test key, LLM keys) is git-ignored; the committed files were scanned for key patterns first. The app has no remote.
 
 ### 2026-11-25 — UI pass: `unslop` and `modern-web-guidance` over every surface
 

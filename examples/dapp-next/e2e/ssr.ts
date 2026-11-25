@@ -65,7 +65,29 @@ try {
   console.log("• connection restored after a reload (cookie storage) … ok");
 
   if (problems.length) throw new Error(`console errors:\n${problems.join("\n")}`);
-  console.log("• no hydration or console errors … ok\n\nPASS");
+  console.log("• no hydration or console errors … ok");
+
+  // Real browsers have wallet extensions that announce themselves (EIP-6963) before the page's scripts run,
+  // so the first client render sees wallets the server never did. That must not break hydration.
+  const early = await browser.newPage();
+  const earlyProblems: string[] = [];
+  early.on("pageerror", (e) => earlyProblems.push(e.message));
+  early.on("console", (m) => m.type() === "error" && !/Failed to load resource/.test(m.text()) && earlyProblems.push(m.text()));
+  await early.addInitScript({
+    content: `(() => {
+      const icon = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxIDEnPjxyZWN0IHdpZHRoPScxJyBoZWlnaHQ9JzEnIGZpbGw9JyM3NDhmZmMnLz48L3N2Zz4=";
+      const announce = () => ["Early One", "Early Two"].forEach((name, i) => window.dispatchEvent(new CustomEvent("eip6963:announceProvider", {
+        detail: Object.freeze({ info: { uuid: "early-" + i, name, icon, rdns: "early.w" + i }, provider: { request: async () => [], on() {}, removeListener() {} } }),
+      })));
+      window.addEventListener("eip6963:requestProvider", announce);
+      announce();
+    })();`,
+  });
+  await early.goto(url);
+  await early.getByRole("button", { name: "Connect wallet" }).click();
+  await early.getByRole("button", { name: /Early One/ }).waitFor();
+  if (earlyProblems.length) throw new Error(`wallets announced before hydration broke it:\n${earlyProblems.join("\n")}`);
+  console.log("• wallets announced before hydration (browser extensions) … ok\n\nPASS");
 } catch (e) {
   failed = true;
   console.log(`FAILED — ${e instanceof Error ? e.message : String(e)}`);

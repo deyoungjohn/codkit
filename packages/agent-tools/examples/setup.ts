@@ -18,9 +18,8 @@ export function setup(opts: { dryRun: boolean }) {
   const transport = http(getRpcUrl("base-sepolia"));
   const chain = evmChain({
     chain: "base-sepolia",
-    // `as never`: only needed inside this monorepo, where pnpm resolves two copies of viem (zod 3 and 4 peers).
-    publicClient: createPublicClient({ chain: baseSepolia, transport }) as never,
-    walletClient: createWalletClient({ account, chain: baseSepolia, transport }) as never,
+    publicClient: createPublicClient({ chain: baseSepolia, transport }),
+    walletClient: createWalletClient({ account, chain: baseSepolia, transport }),
     tokens: { USDC: { address: USDC, decimals: 6 } },
     swap: [uniswapV3()],
   });

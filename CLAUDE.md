@@ -6,7 +6,7 @@ Ship hackathon projects faster by owning the glue code that gets rewritten at ev
 
 Two tracks, in priority order:
 
-1. **dapp toolkit** (current priority; the owner uses it most): config, wallet, ui, create-app. Plan: [docs/HANDOFF.md](docs/HANDOFF.md).
+1. **dapp toolkit** (current priority; the owner uses it most): config, wallet, ui, agent-tools. Plan: [docs/HANDOFF.md](docs/HANDOFF.md).
 2. **agent modules** (built, maintained): policy, pay, contracts, receipts, mcp, feed, demo-shell.
 
 ## Rules
@@ -30,7 +30,7 @@ Chains first: **EVM + Solana**; Sui follows as an adapter. Templates: **Next.js 
 - Phase 2 ✅ (published 2026-11-19): `@codkit/wallet` (`useWallet()` → `{ ecosystem, address, connect, disconnect, signMessage, sendTransaction, switchChain }`) and `@codkit/ui` (ConnectButton, TokenAmountInput, TxStatusToast, AddressPill, ChainSwitcher; shadcn-style, copy-in or import).
 - Phase 3 ✅ (2026-11-19): contracts consumable from other repos: `forge install` + remapping into `packages/contracts/evm/src`, a cargo git dependency, a Move git dependency with `subdir`; deploy JSON readable by `@codkit/config`. Codegen: no codkit wrapper (owner's decision, 2026-11-20); the Phase 5 templates wire the official generators (`@wagmi/cli` for Foundry, Codama for Anchor, `@mysten/codegen` for Move) behind `pnpm codegen`.
 - Phase 4 ✅ (published 2026-11-24, [decision 0002](docs/decisions/0002-agent-tools.md)): `@codkit/agent-tools` (get_balance, transfer, quote_swap, swap on EVM + Solana; Uniswap v3 / LI.FI / Jupiter providers, no AgentKit; AI SDK export is `@codkit/mcp/ai-sdk`; dry-run and per-call caps, reusing `@codkit/policy`). Payments are already `@codkit/pay`.
-- Phase 5: `create-app` (`pnpm create @codkit/app`): ecosystem(s), agent y/n, payments y/n → a standalone repo from `templates/`, including `pnpm codegen` over the official generators.
+- Phase 5 dropped (owner's decision, 2026-11-25): no `create-app` scaffolder. Instead a real consumer app outside this workspace (`~/Projects/codkit-testapp`, installs `@codkit/*` from npm) proves the packages work the way a hackathon team uses them. Codegen stays the official generators (`@wagmi/cli`, Codama, `@mysten/codegen`), wired by each project.
 
 ## Agent modules (built)
 

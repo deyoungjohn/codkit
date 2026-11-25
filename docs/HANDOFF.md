@@ -118,7 +118,7 @@ Prefer npm over git dependencies for TypeScript. Git-subdirectory installs are f
 
 **Done when:** an agent example quotes and executes a testnet swap through the Vercel AI SDK, and the same tools run from the MCP server; a paid endpoint example settles via x402 on testnet.
 
-### Phase 5: Scaffolder
+### Phase 5: Scaffolder (dropped 2026-11-25; replaced by an external consumer app that installs the packages from npm)
 
 - `create-app`: prompts for ecosystem(s), agent yes/no and payments yes/no, copies a template from `templates/`, installs only the matching `@SCOPE/*` packages, and writes `.env.example`.
 

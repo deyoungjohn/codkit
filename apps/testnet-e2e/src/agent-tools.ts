@@ -70,8 +70,8 @@ if (!flag("skip-evm")) {
   const chainKey = "eip155:84532";
   const adapter = evmChain({
     chain: "base-sepolia",
-    publicClient: publicClient as never,
-    walletClient: walletClient as never,
+    publicClient: publicClient,
+    walletClient: walletClient,
     tokens: { USDC: { address: USDC, decimals: 6 } },
     swap: [uniswapV3()],
   });
