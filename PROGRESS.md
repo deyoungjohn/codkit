@@ -22,6 +22,11 @@ All nine packages publish through GitHub Actions Trusted Publishing (set up 2026
 
 ## Log
 
+### 2026-11-25 — Test app on GitHub; release PR ready
+
+- **Test app repo:** `deyoungjohn/codkit-testapp`, **private** (my choice, no secrets in it, `.env` ignored). It has a CI workflow with two jobs: build with the locked versions, and build with the latest `@codkit/*` from npm (plus a check that the paid endpoint answers 402), on push, pull request and daily. **The first run did not start**: GitHub reports "recent account payments have failed or your spending limit needs to be increased", which applies to private repos (this repo is public). So CI on the test app is unverified until the owner either fixes billing or makes the repo public.
+- **Release PR:** the Changesets bot already opened [PR 9](https://github.com/deyoungjohn/codkit/pull/9) "Version Packages": `@codkit/ui` 0.2.0 and `@codkit/agent-tools` 0.1.1. It is mergeable. **Not merged**: merging publishes to npm, which stays the owner's call. After it publishes, the test app's `as never` casts in `lib/agent.ts` can go.
+
 ### 2026-11-25 — Phase 5 dropped; an external consumer app instead
 
 - **Decision (owner):** no `create-app` scaffolder. Instead a real app **outside this workspace**, `~/Projects/codkit-testapp` (its own git repo), that installs `@codkit/*` from npm, so the packages are tested the way a hackathon team gets them. CLAUDE.md, TODO.md, HANDOFF.md and the Status table are updated. The app is one Next.js project: wallets (`wallet` + `ui` + `config`), an agent page and route (`agent-tools` + `policy` + `mcp/ai-sdk`, dry run only), and an x402-paid endpoint (`pay/hono`).
