@@ -1,5 +1,6 @@
 import { type ChainRef, explorerAddressUrl } from "@codkit/config";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowUpRightIcon, CheckIcon, CopyIcon } from "./icons.js";
 import { shortAddress } from "./units.js";
 
 export interface AddressPillProps {
@@ -14,6 +15,8 @@ export interface AddressPillProps {
 
 export function AddressPill({ address, chain, chars = 4, copy = true, className }: AddressPillProps) {
   const [copied, setCopied] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => () => clearTimeout(timer.current), []);
   const href = chain ? explorerAddressUrl(chain, address) : undefined;
   const label = shortAddress(address, chars);
   return (
@@ -24,19 +27,28 @@ export function AddressPill({ address, chain, chars = 4, copy = true, className 
           className="ck-pill-copy"
           aria-label={copied ? "Copied" : `Copy ${address}`}
           onClick={async () => {
-            await navigator.clipboard?.writeText(address);
+            try {
+              await navigator.clipboard.writeText(address);
+            } catch {
+              return; // no clipboard here (insecure page, or the browser said no): don't claim it worked
+            }
             setCopied(true);
-            setTimeout(() => setCopied(false), 1200);
+            clearTimeout(timer.current);
+            timer.current = setTimeout(() => setCopied(false), 1500);
           }}
         >
-          {copied ? "Copied" : label}
+          <span>{label}</span>
+          {copied ? <CheckIcon /> : <CopyIcon />}
+          <span className="ck-sr" role="status">
+            {copied ? "Copied" : ""}
+          </span>
         </button>
       ) : (
         <span>{label}</span>
       )}
       {href && (
         <a className="ck-pill-link" href={href} target="_blank" rel="noreferrer" aria-label="View on explorer">
-          ↗
+          <ArrowUpRightIcon />
         </a>
       )}
     </span>

@@ -67,11 +67,7 @@ describe("ConnectButton suggestions", () => {
     show(<ConnectButton />, [sol.adapter]);
     expect(screen.getByText(/No Solana wallet found in this browser\. Install one, then reload\./)).toBeTruthy();
     expect(screen.queryByText("Get a wallet")).toBeNull();
-    expect(screen.getAllByRole("link").map((a) => a.textContent)).toEqual([
-      "PPhantomInstall ↗",
-      "SSolflareInstall ↗",
-      "BBackpackInstall ↗",
-    ]);
+    expect(screen.getAllByRole("link").map((a) => a.textContent)).toEqual(["PPhantomInstall", "SSolflareInstall", "BBackpackInstall"]);
   });
 
   it("on a phone, opens the page inside the wallet app instead", async () => {

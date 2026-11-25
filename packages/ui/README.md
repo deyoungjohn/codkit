@@ -44,4 +44,4 @@ Also exported: `parseAmount`, `formatAmount`, `shortAddress`.
 
 ## Styling
 
-`styles.css` uses plain classes (`ck-*`) and CSS variables (`--ck-accent`, `--ck-radius`, `--ck-bg` …) with light and dark themes (`prefers-color-scheme`, or `data-theme` on `<html>`). Skip it and style the `ck-*` classes yourself, or pass `className`. No Tailwind required.
+`styles.css` uses plain classes (`ck-*`) and CSS variables (`--ck-accent`, `--ck-radius`, `--ck-bg` …) with light and dark themes (`prefers-color-scheme`, or `data-theme` on `<html>`). Skip it and style the `ck-*` classes yourself, or pass `className`. No Tailwind required. Helpers for your own screens: `ck-button-secondary` (the quiet companion to a primary button), `ck-field` (a labelled text input), and `--ck-raised` / `--ck-radius-lg` for one step up in surface and radius.

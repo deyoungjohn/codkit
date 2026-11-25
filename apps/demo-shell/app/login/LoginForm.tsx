@@ -25,65 +25,67 @@ export function LoginForm({ mode, next }: { mode: AuthMode; next: string }) {
   };
 
   return (
-    <main className="grid min-h-screen place-items-center bg-[radial-gradient(60%_50%_at_50%_100%,rgba(124,58,237,0.18),transparent_70%),#09090d] px-4">
-      <div className="relative w-full max-w-[420px] rounded-[26px] border border-violet-300/15 bg-[linear-gradient(180deg,#121019,#0d0c13)] p-8">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -inset-x-10 -bottom-16 top-1/2 -z-10 rounded-full bg-violet-600/20 blur-3xl"
-        />
+    <main className="grid min-h-screen place-items-center bg-canvas px-4">
+      <div className="w-full max-w-[400px] rounded-2xl border border-line bg-card p-8">
         <div className="flex items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-white text-[#0b0a10]">
-            <svg viewBox="0 0 24 24" className="h-6 w-6" fill="currentColor" aria-hidden>
-              <path d="M4 7.5 12 3l8 4.5-8 4.5-8-4.5Z" opacity=".55" />
-              <path d="M4 12l8 4.5 8-4.5v4.5L12 21l-8-4.5V12Z" />
-            </svg>
-          </span>
-          <div className="leading-tight">
-            <p className="text-[17px] text-white">codkit</p>
-            <p className="text-xs text-white/45">Agent Console</p>
-          </div>
+          <svg viewBox="0 0 32 32" className="h-8 w-8" aria-hidden>
+            <rect width="32" height="32" rx="8" className="fill-canvas" />
+            <path d="M16 7 25 16 16 25 7 16Z" className="fill-accent" />
+          </svg>
+          <p className="text-base font-medium text-fg">codkit</p>
+          <p className="text-[13px] text-fg-3">Agent console</p>
         </div>
-        <h1 className="mt-8 text-[28px] font-medium tracking-tight text-white">Sign in</h1>
+        <h1 className="mt-8 text-[28px] font-medium leading-[1.15] text-fg">Sign in</h1>
 
         {mode === "locked" ? (
-          <div className="mt-4 rounded-2xl border border-amber-300/25 bg-amber-300/[0.06] p-4 text-sm leading-relaxed text-amber-100/90">
+          <div className="mt-4 rounded-xl border border-warn/40 bg-warn/[0.06] p-4 text-sm leading-relaxed text-fg-2">
             This dashboard is locked because no operator password is set. It controls an agent that can spend money, so production requires
-            one. Set <code className="rounded bg-black/30 px-1">DASHBOARD_PASSWORD</code> and restart.
+            one. Set <code className="rounded bg-raised px-1 font-mono text-xs text-fg">DASHBOARD_PASSWORD</code> and restart.
           </div>
         ) : mode === "open" ? (
-          <p className="mt-3 text-sm text-white/55">
+          <p className="mt-3 text-sm text-fg-2">
             Auth is off in development (no DASHBOARD_PASSWORD).{" "}
-            <a href="/" className="text-violet-200 underline">
+            <a href="/" className="text-accent underline underline-offset-4">
               Open the dashboard
             </a>
             .
           </p>
         ) : (
-          <form onSubmit={submit} className="mt-5 flex flex-col gap-3">
-            <label className="text-[13px] text-white/55" htmlFor="password">
-              Operator password
-            </label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              // biome-ignore lint/a11y/noAutofocus: the page has one field and exists only to fill it
-              autoFocus
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4 py-3.5 text-[15px] text-white outline-none transition focus:border-violet-300/50"
-            />
-            {error && <p className="text-sm text-rose-300">{error}</p>}
+          <form onSubmit={submit} className="mt-6 flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <label className="text-[13px] text-fg-2" htmlFor="password">
+                Operator password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                enterKeyHint="go"
+                // biome-ignore lint/a11y/noAutofocus: the page has one field and exists only to fill it
+                autoFocus
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                aria-invalid={!!error}
+                aria-describedby={error ? "password-error" : undefined}
+                className="h-10 rounded-lg border border-line bg-raised px-4 text-sm text-fg outline-none transition-colors duration-150 hover:border-line-strong focus-visible:border-accent aria-[invalid=true]:border-bad"
+              />
+              {error && (
+                <p id="password-error" role="alert" className="text-[13px] text-bad">
+                  {error}
+                </p>
+              )}
+            </div>
             <button
               type="submit"
               disabled={busy || !password}
-              className="mt-2 rounded-2xl bg-violet-300 px-4 py-3.5 text-[16px] font-medium text-[#17112b] shadow-[0_0_30px_rgba(167,139,250,0.35)] transition hover:bg-violet-200 disabled:opacity-40"
+              className="inline-flex h-10 items-center justify-center rounded-lg bg-fg px-5 text-sm font-medium text-canvas shadow-[inset_0_1px_0_rgb(255_255_255/0.12)] transition-colors duration-150 hover:bg-white active:scale-[0.98] disabled:opacity-40 disabled:hover:bg-fg"
             >
               {busy ? "Signing in…" : "Sign in"}
             </button>
           </form>
         )}
-        <p className="mt-6 text-xs leading-relaxed text-white/35">
+        <p className="mt-6 text-xs leading-relaxed text-fg-3">
           Sessions last 12 hours. The agent&apos;s spending limits apply whoever is signed in.
         </p>
       </div>

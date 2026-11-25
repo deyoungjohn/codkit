@@ -119,7 +119,7 @@ try {
       ? "scrolls"
       : !m.hasHeading
         ? "no 'Get a wallet' heading"
-        : m.suggestions.map((s) => s.replace(/^\S/, "").replace(/Install ↗$/, "")).join(",") !== "MetaMask,Coinbase Wallet,Trust Wallet"
+        : m.suggestions.map((s) => s.replace(/^\S/, "").replace(/Install$/, "")).join(",") !== "MetaMask,Coinbase Wallet,Trust Wallet"
           ? `suggestions: ${m.suggestions}`
           : undefined,
   );

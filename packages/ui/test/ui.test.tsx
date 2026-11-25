@@ -205,7 +205,49 @@ describe("TxToastProvider", () => {
   });
 });
 
+describe("picker dismissal", () => {
+  it("is labelled by its title and closes on a click outside its box when the browser has no closedby", () => {
+    const evm = fakeAdapter("evm", ["base-sepolia"]);
+    withWallets([evm.adapter], <ConnectButton />);
+    fireEvent.click(screen.getByRole("button", { name: "Connect wallet" }));
+    const dialog = screen.getByRole("dialog", { name: "Connect a wallet", hidden: true });
+    expect(dialog.hasAttribute("open")).toBe(true);
+    dialog.getBoundingClientRect = () => ({ top: 100, bottom: 300, left: 100, right: 300 }) as DOMRect;
+    fireEvent.click(screen.getByText("Connect a wallet")); // inside the dialog: stays
+    expect(dialog.hasAttribute("open")).toBe(true);
+    fireEvent.click(dialog, { clientX: 50, clientY: 50 }); // the backdrop
+    expect(dialog.hasAttribute("open")).toBe(false);
+  });
+});
+
+describe("TxToastProvider stack", () => {
+  it("is a labelled notifications region that holds the toasts", async () => {
+    const evm = fakeAdapter("evm", ["base-sepolia"]);
+    withWallets(
+      [evm.adapter],
+      <TxToastProvider autoDismissMs={0}>
+        <Sender />
+      </TxToastProvider>,
+    );
+    const region = screen.getByRole("region", { name: "Notifications", hidden: true });
+    expect(region.hasAttribute("popover")).toBe(true);
+    fireEvent.click(screen.getByRole("button", { name: "send" }));
+    expect(region.querySelectorAll(".ck-toast").length).toBe(1);
+    await waitFor(() => expect(screen.getByText("Confirmed")).toBeTruthy());
+  });
+});
+
 describe("AddressPill", () => {
+  it("does not claim a copy that the browser refused", async () => {
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText: async () => Promise.reject(new Error("denied")) },
+      configurable: true,
+    });
+    render(<AddressPill address="0x1234567890abcdef1234567890abcdef12345678" />);
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: /Copy/ })));
+    expect(screen.queryByText("Copied")).toBeNull();
+  });
+
   it("copies the full address", async () => {
     let copied = "";
     Object.defineProperty(navigator, "clipboard", { value: { writeText: async (t: string) => void (copied = t) }, configurable: true });

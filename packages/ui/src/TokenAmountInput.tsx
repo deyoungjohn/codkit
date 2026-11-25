@@ -44,6 +44,8 @@ export function TokenAmountInput({ value, onChange, decimals, symbol, max, label
           id={id}
           inputMode="decimal"
           autoComplete="off"
+          autoCapitalize="off"
+          spellCheck={false}
           placeholder="0.0"
           value={text}
           disabled={disabled}

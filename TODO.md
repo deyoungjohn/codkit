@@ -58,9 +58,9 @@ Install Rust, the Solana CLI and Anchor (`avm`). Then the Solana items in sectio
 
 Run both over everything with a user-facing UI before Phase 5 templates copy it: `@codkit/ui` (ConnectButton, wallet picker, TokenAmountInput, TxStatusToast, AddressPill, ChainSwitcher), the Vite and Next examples, and the demo dashboard (`apps/`).
 
-- [ ] **`modern-web-guidance`**: check dialogs/popovers (the wallet picker uses `<dialog>`), forms and inputs (TokenAmountInput), dark mode, accessibility and layout against current web-platform practice; replace outdated patterns.
-- [ ] **`unslop`**: remove the AI-generated look (spacing, colour, icons, copy, type, details) from the same surfaces, keeping the owner's picker rules (no scrollbar for up to ten wallets, "Get a wallet" only when fewer than three).
-- [ ] Re-run `pnpm --filter example-dapp-vite e2e:picker` and a visual check in Chrome after each pass; log in PROGRESS.md.
+- [x] **`modern-web-guidance`** (done 2026-11-25): check dialogs/popovers (the wallet picker uses `<dialog>`), forms and inputs (TokenAmountInput), dark mode, accessibility and layout against current web-platform practice; replace outdated patterns.
+- [x] **`unslop`** (done 2026-11-25): remove the AI-generated look (spacing, colour, icons, copy, type, details) from the same surfaces, keeping the owner's picker rules (no scrollbar for up to ten wallets, "Get a wallet" only when fewer than three).
+- [x] Re-run `pnpm --filter example-dapp-vite e2e:picker` and a visual check in Chrome after each pass; log in PROGRESS.md. Still open: look at the narrow-phone layout, and a real Safari for the dialog fallback.
 
 ### contracts
 

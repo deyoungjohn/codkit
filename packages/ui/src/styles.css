@@ -1,43 +1,82 @@
 /*
  * @codkit/ui default theme. Import once: `import "@codkit/ui/styles.css"`.
- * Every color and radius is a variable; override them on :root or any ancestor.
+ * Every color, radius and the font are variables; override them on :root or any ancestor.
+ * Spacing sits on a 4px grid. Dark mode follows the system unless the page sets data-theme.
  */
 :root {
+  color-scheme: light;
   --ck-font: inherit;
   --ck-bg: #ffffff;
-  --ck-fg: #0f1115;
-  --ck-muted: #646a73;
-  --ck-border: #e3e5e8;
-  --ck-surface: #f6f7f8;
+  --ck-fg: #171717;
+  --ck-muted: #6b6b70;
+  --ck-border: rgb(23 23 23 / 0.1);
+  --ck-surface: #f6f6f7;
+  --ck-raised: #ececee;
   --ck-accent: #3b5bdb;
   --ck-accent-fg: #ffffff;
-  --ck-success: #2f9e44;
-  --ck-danger: #e03131;
-  --ck-radius: 12px;
-  --ck-shadow: 0 12px 40px rgb(0 0 0 / 0.16);
+  --ck-success: #2b8a3e;
+  --ck-danger: #c92a2a;
+  --ck-radius: 10px;
+  --ck-radius-lg: 16px;
+  --ck-shadow: 0 8px 24px rgb(0 0 0 / 0.08), 0 1px 2px rgb(0 0 0 / 0.06);
+  --ck-ease: cubic-bezier(0.22, 1, 0.36, 1);
   /* wallet picker rows */
-  --ck-option-height: 42px;
-  --ck-option-gap: 6px;
+  --ck-option-height: 40px;
+  --ck-option-gap: 8px;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --ck-bg: #15171c;
-    --ck-fg: #eceef1;
-    --ck-muted: #9aa0a9;
-    --ck-border: #2a2e36;
-    --ck-surface: #1d2027;
+    color-scheme: dark;
+    --ck-bg: #19191b;
+    --ck-fg: #ededed;
+    --ck-muted: #9a9aa0;
+    --ck-border: rgb(237 237 237 / 0.1);
+    --ck-surface: #232325;
+    --ck-raised: #2c2c2f;
     --ck-accent: #748ffc;
-    --ck-accent-fg: #0f1115;
+    --ck-accent-fg: #101114;
+    --ck-success: #4cc38a;
+    --ck-danger: #f2787c;
+    --ck-shadow: 0 8px 24px rgb(0 0 0 / 0.4);
   }
 }
 :root[data-theme="dark"] {
-  --ck-bg: #15171c;
-  --ck-fg: #eceef1;
-  --ck-muted: #9aa0a9;
-  --ck-border: #2a2e36;
-  --ck-surface: #1d2027;
+  color-scheme: dark;
+  --ck-bg: #19191b;
+  --ck-fg: #ededed;
+  --ck-muted: #9a9aa0;
+  --ck-border: rgb(237 237 237 / 0.1);
+  --ck-surface: #232325;
+  --ck-raised: #2c2c2f;
   --ck-accent: #748ffc;
-  --ck-accent-fg: #0f1115;
+  --ck-accent-fg: #101114;
+  --ck-success: #4cc38a;
+  --ck-danger: #f2787c;
+  --ck-shadow: 0 8px 24px rgb(0 0 0 / 0.4);
+}
+
+.ck-svg {
+  flex: none;
+}
+/* Text for screen readers only */
+.ck-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------- text */
+.ck-muted {
+  color: var(--ck-muted);
+  font-size: 0.875rem;
+}
+.ck-error {
+  color: var(--ck-danger);
+  font-size: 0.875rem;
+  margin: 8px 0 0;
 }
 
 .ck-connect,
@@ -52,41 +91,84 @@
 .ck-connect {
   flex-wrap: wrap;
 }
+
+/* ---------------------------------------------------------------- buttons */
 .ck-button {
   font: inherit;
-  font-weight: 600;
-  padding: 10px 16px;
-  border: 0;
+  font-weight: 500;
+  min-height: 36px;
+  padding: 0 16px;
+  border: 1px solid transparent;
   border-radius: var(--ck-radius);
   background: var(--ck-accent);
   color: var(--ck-accent-fg);
   cursor: pointer;
+  transition:
+    background-color 150ms var(--ck-ease),
+    border-color 150ms var(--ck-ease),
+    transform 150ms var(--ck-ease);
+}
+.ck-button:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--ck-accent) 88%, var(--ck-fg));
+}
+.ck-button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.ck-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+/* Quiet companion to the primary action */
+.ck-button-secondary {
+  background: var(--ck-surface);
+  border-color: var(--ck-border);
+  color: var(--ck-fg);
+}
+.ck-button-secondary:hover:not(:disabled) {
+  background: var(--ck-raised);
+}
+.ck-ghost {
+  font: inherit;
+  display: inline-grid;
+  place-items: center;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0 8px;
+  background: none;
+  border: 0;
+  border-radius: 8px;
+  color: var(--ck-muted);
+  cursor: pointer;
+  transition:
+    color 150ms var(--ck-ease),
+    background-color 150ms var(--ck-ease);
+}
+.ck-ghost:hover:not(:disabled) {
+  color: var(--ck-fg);
+  background: var(--ck-surface);
+}
+.ck-ghost:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 .ck-button:focus-visible,
 .ck-ghost:focus-visible,
 .ck-option:focus-visible,
 .ck-pill-copy:focus-visible,
+.ck-pill-link:focus-visible,
 .ck-select:focus-visible,
-.ck-amount input:focus-visible {
+.ck-amount input:focus-visible,
+.ck-field input:focus-visible,
+.ck-toast-link:focus-visible {
   outline: 2px solid var(--ck-accent);
   outline-offset: 2px;
 }
-.ck-ghost {
-  font: inherit;
-  background: none;
-  border: 0;
-  color: var(--ck-muted);
-  cursor: pointer;
-  padding: 4px 6px;
-  border-radius: 8px;
-}
-.ck-ghost:hover {
-  color: var(--ck-fg);
-  background: var(--ck-surface);
-}
+
+/* ------------------------------------------------------------ address pill */
 .ck-pill {
   gap: 4px;
-  padding: 6px 10px;
+  min-height: 32px;
+  padding: 0 4px 0 12px;
   border: 1px solid var(--ck-border);
   border-radius: 999px;
   background: var(--ck-surface);
@@ -95,22 +177,47 @@
 }
 .ck-pill-copy {
   font: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
   background: none;
   border: 0;
+  border-radius: 999px;
   color: inherit;
   cursor: pointer;
   padding: 0;
 }
-.ck-pill-link {
+.ck-pill-copy .ck-svg {
   color: var(--ck-muted);
-  text-decoration: none;
+  transition: color 150ms var(--ck-ease);
+}
+.ck-pill-copy:hover .ck-svg {
+  color: var(--ck-fg);
+}
+.ck-pill-link {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: var(--ck-muted);
+  transition:
+    color 150ms var(--ck-ease),
+    background-color 150ms var(--ck-ease);
+}
+.ck-pill-link:hover {
+  color: var(--ck-fg);
+  background: var(--ck-raised);
 }
 .ck-icon {
   width: 20px;
   height: 20px;
-  border-radius: 6px;
+  border-radius: 4px;
   flex: none;
 }
+
+/* ------------------------------------------------------------------ dialog */
 .ck-dialog {
   width: min(400px, calc(100vw - 32px));
   max-height: calc(100vh - 32px);
@@ -119,23 +226,69 @@
   flex-direction: column;
   gap: 12px;
   overflow: hidden;
+  /* the page behind never scrolls while the picker is open */
+  overscroll-behavior: contain;
   border: 1px solid var(--ck-border);
-  border-radius: calc(var(--ck-radius) + 4px);
+  border-radius: var(--ck-radius-lg);
   background: var(--ck-bg);
   color: var(--ck-fg);
   box-shadow: var(--ck-shadow);
   font-family: var(--ck-font);
+  /* enter and leave: a fade and a small rise; the scale only for people who haven't asked for less motion */
+  opacity: 0;
+  transition-property: opacity, translate, display, overlay;
+  transition-duration: 200ms;
+  transition-timing-function: var(--ck-ease);
+  transition-behavior: allow-discrete;
 }
 .ck-dialog[open] {
   display: flex;
+  opacity: 1;
+  @starting-style {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ck-dialog {
+    translate: 0 8px;
+  }
+  .ck-dialog[open] {
+    translate: 0 0;
+    @starting-style {
+      translate: 0 8px;
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ck-dialog {
+    transition-duration: 100ms;
+  }
 }
 .ck-dialog::backdrop {
-  background: rgb(0 0 0 / 0.45);
+  background: rgb(0 0 0 / 0);
+  overflow: hidden;
+  overscroll-behavior: contain;
+  transition-property: background-color, display, overlay;
+  transition-duration: 200ms;
+  transition-timing-function: var(--ck-ease);
+  transition-behavior: allow-discrete;
+}
+.ck-dialog[open]::backdrop {
+  background: rgb(0 0 0 / 0.5);
+  @starting-style {
+    background: rgb(0 0 0 / 0);
+  }
 }
 .ck-dialog-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.ck-dialog-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
 }
 .ck-tabs {
   display: flex;
@@ -151,27 +304,34 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 7px 10px;
+  gap: 8px;
+  min-height: 32px;
+  padding: 0 12px;
   border: 0;
-  border-radius: calc(var(--ck-radius) - 4px);
+  border-radius: 6px;
   background: none;
   color: var(--ck-muted);
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
+  transition:
+    color 150ms var(--ck-ease),
+    background-color 150ms var(--ck-ease);
+}
+.ck-tab:hover:not([aria-selected="true"]) {
+  color: var(--ck-fg);
 }
 .ck-tab[aria-selected="true"] {
   background: var(--ck-bg);
   color: var(--ck-fg);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.1);
 }
 .ck-tab:focus-visible {
   outline: 2px solid var(--ck-accent);
   outline-offset: 1px;
 }
 .ck-dot {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--ck-success);
 }
@@ -181,7 +341,7 @@
   display: flex;
   flex-direction: column;
   flex: 0 1 auto;
-  gap: 10px;
+  gap: 12px;
   min-height: 0;
 }
 .ck-list {
@@ -206,20 +366,23 @@
 }
 .ck-current > div {
   display: grid;
-  gap: 6px;
+  gap: 8px;
   flex: 1;
   justify-items: start;
 }
 .ck-note {
   margin: 0;
-  padding: 10px 12px;
+  padding: 12px;
   border-radius: var(--ck-radius);
   background: var(--ck-surface);
   color: var(--ck-muted);
-  font-size: 0.9em;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  text-wrap: pretty;
 }
 .ck-panel > .ck-muted {
   margin: 0;
+  text-wrap: pretty;
 }
 .ck-option {
   font: inherit;
@@ -228,7 +391,7 @@
   height: var(--ck-option-height);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   padding: 0 12px;
   border: 1px solid var(--ck-border);
   border-radius: var(--ck-radius);
@@ -236,63 +399,82 @@
   color: var(--ck-fg);
   cursor: pointer;
   text-align: left;
+  transition:
+    background-color 150ms var(--ck-ease),
+    transform 150ms var(--ck-ease);
 }
 a.ck-option {
   text-decoration: none;
 }
-.ck-suggestion > span:nth-child(2) {
-  flex: 1;
-}
-.ck-letter {
-  display: inline-grid;
-  place-items: center;
-  background: var(--ck-border);
-  color: var(--ck-fg);
-  font-size: 11px;
-  font-weight: 700;
-}
-.ck-list-heading {
-  margin: 6px 0 0;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ck-muted);
-}
-.ck-list-heading:empty {
-  display: none;
-}
 .ck-option:hover:not(:disabled) {
-  border-color: var(--ck-accent);
+  background: var(--ck-raised);
+}
+.ck-option:active:not(:disabled) {
+  transform: scale(0.99);
 }
 .ck-option:disabled {
   opacity: 0.6;
   cursor: progress;
 }
-.ck-muted {
+.ck-suggestion > span:nth-child(2) {
+  flex: 1;
+}
+.ck-suggestion-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.ck-letter {
+  display: inline-grid;
+  place-items: center;
+  background: var(--ck-raised);
   color: var(--ck-muted);
-  font-size: 0.9em;
+  font-size: 0.6875rem;
+  font-weight: 500;
 }
-.ck-error {
-  color: var(--ck-danger);
-  font-size: 0.9em;
-  margin: 8px 0 0;
+.ck-list-heading {
+  margin: 4px 0 0;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ck-muted);
 }
+.ck-list-heading:empty {
+  display: none;
+}
+
+/* ----------------------------------------------------------------- inputs */
 .ck-select,
-.ck-amount input {
+.ck-amount input,
+.ck-field input {
   font: inherit;
-  padding: 9px 12px;
+  min-height: 36px;
+  padding: 0 12px;
   border: 1px solid var(--ck-border);
   border-radius: var(--ck-radius);
   background: var(--ck-bg);
   color: var(--ck-fg);
+  transition: border-color 150ms var(--ck-ease);
+}
+.ck-select:hover:not(:disabled),
+.ck-amount input:hover:not(:disabled),
+.ck-field input:hover:not(:disabled) {
+  border-color: color-mix(in oklab, var(--ck-border), var(--ck-fg) 25%);
 }
 .ck-amount {
   display: grid;
-  gap: 6px;
+  gap: 8px;
   font-family: var(--ck-font);
 }
-.ck-amount label {
-  font-size: 0.9em;
+.ck-amount label,
+.ck-field {
+  font-size: 0.875rem;
   color: var(--ck-muted);
+}
+/* A labelled text field for your own forms: <label class="ck-field">Recipient <input /></label> */
+.ck-field {
+  display: grid;
+  gap: 8px;
+  font-family: var(--ck-font);
 }
 .ck-amount input {
   flex: 1;
@@ -302,38 +484,103 @@ a.ck-option {
 .ck-amount input[aria-invalid="true"] {
   border-color: var(--ck-danger);
 }
+
+/* ------------------------------------------------------------------ toasts */
+/* The stack is a manual popover: in the top layer, never light-dismissed, shown while there are toasts. */
 .ck-toasts {
   position: fixed;
-  right: 16px;
-  bottom: 16px;
-  display: grid;
+  inset: auto 16px 16px auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  overflow: visible;
   gap: 8px;
-  z-index: 50;
   width: min(360px, calc(100vw - 32px));
+}
+.ck-toasts:popover-open {
+  display: grid;
+}
+@supports not selector(:popover-open) {
+  .ck-toasts {
+    display: grid;
+    z-index: 50;
+  }
 }
 .ck-toast {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 14px;
+  padding: 12px;
   border: 1px solid var(--ck-border);
-  border-left: 3px solid var(--ck-muted);
   border-radius: var(--ck-radius);
   background: var(--ck-bg);
   color: var(--ck-fg);
   box-shadow: var(--ck-shadow);
   font-family: var(--ck-font);
+  animation: ck-toast-in 200ms var(--ck-ease) both;
+}
+@keyframes ck-toast-in {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes ck-toast-in {
+    from {
+      opacity: 0;
+      translate: 0 8px;
+    }
+  }
 }
 .ck-toast > div {
   display: grid;
+  gap: 2px;
   flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
-.ck-toast a {
-  color: var(--ck-accent);
+.ck-toast-icon {
+  display: inline-grid;
+  place-items: center;
+  color: var(--ck-muted);
 }
-.ck-toast-confirmed {
-  border-left-color: var(--ck-success);
+.ck-toast-confirmed .ck-toast-icon {
+  color: var(--ck-success);
 }
-.ck-toast-failed {
-  border-left-color: var(--ck-danger);
+.ck-toast-failed .ck-toast-icon {
+  color: var(--ck-danger);
+}
+.ck-toast-link {
+  color: var(--ck-fg);
+  font-size: 0.875rem;
+  text-underline-offset: 3px;
+  border-radius: 4px;
+}
+.ck-spin {
+  transform-origin: 12px 12px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ck-spin {
+    animation: ck-spin 900ms linear infinite;
+  }
+}
+@keyframes ck-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@media (forced-colors: active) {
+  .ck-option,
+  .ck-pill,
+  .ck-toast,
+  .ck-tabs,
+  .ck-current {
+    border-color: CanvasText;
+  }
+  .ck-tab[aria-selected="true"] {
+    outline: 2px solid Highlight;
+  }
 }

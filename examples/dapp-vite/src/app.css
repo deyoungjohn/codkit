@@ -1,15 +1,27 @@
+/* The example's own layout. Colors, radii and inputs come from @codkit/ui's variables and classes. */
 :root {
-  font-family: system-ui, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
   color: var(--ck-fg);
-  background: var(--ck-bg);
+  background: var(--page);
+  --ck-font: inherit;
+  --page: #fafafa; /* the page sits one step below the cards */
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #141415;
+  }
 }
 body {
   margin: 0;
+  min-height: 100vh;
+  background: var(--page);
 }
 main {
   max-width: 960px;
   margin: 0 auto;
-  padding: 24px 16px;
+  padding: 32px 24px 64px;
 }
 header {
   display: flex;
@@ -17,55 +29,81 @@ header {
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
+  padding-bottom: 24px;
 }
 h1 {
-  font-size: 20px;
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+h1 span {
+  color: var(--ck-muted);
+  font-weight: 400;
 }
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
   gap: 16px;
-  margin-top: 24px;
+  margin-top: 8px;
 }
 .panel {
   display: grid;
-  gap: 12px;
+  gap: 16px;
   align-content: start;
-  padding: 20px;
+  padding: 24px;
   border: 1px solid var(--ck-border);
-  border-radius: 16px;
-  background: var(--ck-surface);
+  border-radius: var(--ck-radius-lg);
+  background: var(--ck-bg);
+}
+.panel > .ck-button {
+  justify-self: start;
 }
 .row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
+  min-height: 36px;
 }
 h2 {
   margin: 0;
-  font-size: 16px;
+  font-size: 1rem;
+  font-weight: 500;
 }
-.muted {
-  color: var(--ck-muted);
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin: 0;
+  color: var(--ck-muted);
+  font-size: 0.875rem;
+}
+.status::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ck-muted);
+  opacity: 0.5;
+}
+.status[data-connected="true"]::before {
+  background: var(--ck-success);
+  opacity: 1;
 }
 .mono {
-  font-family: ui-monospace, monospace;
-  font-size: 12px;
-  word-break: break-all;
   margin: 0;
-}
-.field {
-  display: grid;
-  gap: 6px;
-  font-size: 0.9em;
-  color: var(--ck-muted);
-}
-.field input {
-  font: inherit;
-  padding: 9px 12px;
+  padding: 12px;
+  border-radius: var(--ck-radius);
+  background: var(--ck-surface);
   border: 1px solid var(--ck-border);
-  border-radius: 12px;
-  background: var(--ck-bg);
-  color: var(--ck-fg);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.panel .ck-field input,
+.panel .ck-amount input,
+.panel .ck-select {
+  background: var(--ck-surface);
 }

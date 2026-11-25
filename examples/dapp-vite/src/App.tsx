@@ -8,7 +8,9 @@ export function App() {
   return (
     <main>
       <header>
-        <h1>codkit dapp</h1>
+        <h1>
+          codkit <span>dapp</span>
+        </h1>
         <ConnectButton />
       </header>
       <div className="grid">
@@ -58,12 +60,12 @@ function Panel({ ecosystem }: { ecosystem: WalletEcosystem }) {
         <h2>{ecosystem === "evm" ? "EVM" : "Solana"}</h2>
         <ChainSwitcher ecosystem={ecosystem} />
       </div>
-      <p className="muted" data-testid={`${ecosystem}-status`}>
+      <p className="status" data-connected={connected} data-testid={`${ecosystem}-status`}>
         {connected ? `${wallet.wallet?.name} · ${wallet.chain.name}` : "Not connected"}
       </p>
       <button
         type="button"
-        className="ck-button"
+        className="ck-button ck-button-secondary"
         disabled={!connected}
         onClick={() => act(async () => setSignature(await wallet.signMessage("Hello from codkit")))}
       >
@@ -74,9 +76,16 @@ function Panel({ ecosystem }: { ecosystem: WalletEcosystem }) {
           {signature}
         </p>
       )}
-      <label className="field">
+      <label className="ck-field">
         Recipient
-        <input value={to} onChange={(e) => setTo(e.target.value.trim())} placeholder={ecosystem === "evm" ? "0x…" : "Base58 address"} />
+        <input
+          value={to}
+          onChange={(e) => setTo(e.target.value.trim())}
+          placeholder={ecosystem === "evm" ? "0x…" : "Base58 address"}
+          autoComplete="off"
+          autoCapitalize="off"
+          spellCheck={false}
+        />
       </label>
       <TokenAmountInput value={amount} onChange={setAmount} decimals={decimals} symbol={wallet.chain.nativeCurrency.symbol} />
       <button type="button" className="ck-button" disabled={!connected || !to || !amount} onClick={send}>

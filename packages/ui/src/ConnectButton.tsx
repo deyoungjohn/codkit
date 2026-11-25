@@ -1,6 +1,7 @@
 import { useWallets, type Wallet, type WalletEcosystem } from "@codkit/wallet";
-import { type KeyboardEvent, useEffect, useId, useRef, useState } from "react";
+import { type KeyboardEvent, type MouseEvent, useEffect, useId, useRef, useState } from "react";
 import { AddressPill, cx } from "./AddressPill.js";
+import { ArrowUpRightIcon, XIcon } from "./icons.js";
 import { sameWallet, suggestedWallets, type WalletSuggestion } from "./wallets.js";
 
 /** Tab labels; a new ecosystem (Sui, NEAR …) only needs an adapter and a name here. */
@@ -39,6 +40,7 @@ export function ConnectButton({
 }: ConnectButtonProps) {
   const wallets = useWallets().filter((w) => !ecosystems || ecosystems.includes(w.ecosystem));
   const dialog = useRef<HTMLDialogElement>(null);
+  const id = useId();
   const connected = wallets.filter((w) => w.status === "connected" && w.address);
   const firstOpen = () => (wallets.find((w) => w.status !== "connected") ?? wallets[0])?.ecosystem;
   const [tab, setTab] = useState<WalletEcosystem | undefined>(firstOpen);
@@ -60,18 +62,28 @@ export function ConnectButton({
             onClick={() => w.disconnect().catch(() => {})}
             aria-label={`Disconnect ${LONG[w.ecosystem]}`}
           >
-            ✕
+            <XIcon />
           </button>
         </span>
       ))}
       <button type="button" className="ck-button" onClick={open}>
         {!connected.length ? label : connected.length < wallets.length ? "Add wallet" : "Wallets"}
       </button>
-      <dialog ref={dialog} className="ck-dialog" aria-label="Connect a wallet">
+      {/* closedby="any": a click on the backdrop closes it (Chrome, Edge, Firefox); `lightDismiss` covers Safari */}
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents: a pointer shortcut; Esc and the Close button already work from the keyboard */}
+      <dialog
+        ref={dialog}
+        className="ck-dialog"
+        aria-labelledby={`${id}-title`}
+        {...({ closedby: "any" } as object)}
+        onClick={lightDismiss}
+      >
         <div className="ck-dialog-head">
-          <strong>Connect a wallet</strong>
+          <h2 id={`${id}-title`} className="ck-dialog-title">
+            Connect a wallet
+          </h2>
           <button type="button" className="ck-ghost" onClick={() => dialog.current?.close()} aria-label="Close">
-            ✕
+            <XIcon />
           </button>
         </div>
         {wallets.length > 1 && <Tabs wallets={wallets} value={tab} onChange={setTab} />}
@@ -88,6 +100,14 @@ export function ConnectButton({
       </dialog>
     </div>
   );
+}
+
+/** Fallback for browsers without `closedby`: a click whose target is the dialog itself but lands outside its box hit the backdrop. */
+function lightDismiss(e: MouseEvent<HTMLDialogElement>) {
+  const dialog = e.currentTarget;
+  if ("closedBy" in dialog || e.target !== dialog) return;
+  const r = dialog.getBoundingClientRect();
+  if (e.clientY < r.top || e.clientY > r.bottom || e.clientX < r.left || e.clientX > r.right) dialog.close();
 }
 
 function Tabs({
@@ -230,7 +250,10 @@ function Panel({
                     {s.name[0]}
                   </span>
                   <span>{open ? `Open in ${s.name}` : s.name}</span>
-                  <span className="ck-muted">{open ? "↗" : "Install ↗"}</span>
+                  <span className="ck-muted ck-suggestion-cta">
+                    {!open && "Install"}
+                    <ArrowUpRightIcon />
+                  </span>
                 </a>
               </li>
             );
