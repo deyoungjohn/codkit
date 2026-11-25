@@ -1,6 +1,6 @@
 {
   "name": "@codkit/ui",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "Dapp UI for @codkit/wallet: ConnectButton, AddressPill, ChainSwitcher, TokenAmountInput, TxStatusToast. Import them or copy a file in.",
   "license": "MIT",
   "engines": {
