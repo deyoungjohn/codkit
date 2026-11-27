@@ -1,6 +1,6 @@
 # Remaining tasks
 
-> The dapp toolkit (config, wallet, ui, agent-tools) now comes first: see [CLAUDE.md](CLAUDE.md) and [docs/HANDOFF.md](docs/HANDOFF.md). All nine packages are on npm with trusted publishing (2026-11-19; `pnpm smoke:npm` passes). **Needs you:** the Phase 2 check with your own wallets: `pnpm --filter example-dapp-vite dev`, connect MetaMask (or any EVM wallet) and Phantom (or any Solana wallet), sign and send a small testnet transfer on each.
+> The dapp toolkit (config, wallet, ui, agent-tools, ai) now comes first: see [CLAUDE.md](CLAUDE.md) and [docs/HANDOFF.md](docs/HANDOFF.md). All nine packages are on npm with trusted publishing (2026-11-19; `pnpm smoke:npm` passes). **Needs you:** the Phase 2 check with your own wallets: `pnpm --filter example-dapp-vite dev`, connect MetaMask (or any EVM wallet) and Phantom (or any Solana wallet), sign and send a small testnet transfer on each.
 
 Status as of 2026-10-15. Modules 1 to 6 are built, tested and pushed. CI is green: Node and Foundry tests in one job, Move tests in the other. Everything below is what's left. It's split into tasks only you can do, and work I (or you) can do next.
 
@@ -53,6 +53,19 @@ pnpm --filter demo-shell dev                      # the dashboard switches to "L
 Install Rust, the Solana CLI and Anchor (`avm`). Then the Solana items in section 2 can be built and tested.
 
 ## 2. Engineering backlog (I can pick these up)
+
+### From the 2027 blueprint review (owner's picks, 2026-11-27)
+
+Boilerplate ships as npm packages (no starter repo; see CLAUDE.md). In the owner's order after `@codkit/ai`:
+
+- [x] **`@codkit/ai`**: every provider from env as AI SDK models, fallback on 429/timeouts/outages, structured output (built 2026-11-27; private until published by hand).
+- [ ] **1. Test-payment button**: a UI component that pays an x402 endpoint from the connected browser wallet, through the policy-checked client, with the result shown.
+- [ ] **2. `@codkit/wallet/privy`**: email/social login with embedded wallets behind the same `useWallet()`.
+- [ ] **3. GOAT / SendAI adapters**: only after the evidence checks (install size, Node 22 import, whether their signer can be wrapped by `@codkit/policy`).
+- [ ] **4. shadcn registry** for `@codkit/ui` (`npx shadcn add <url>`).
+- [ ] `DEMO_MODE` across `ai`, `pay` and `agent-tools`: fixtures (real testnet hashes), a banner component.
+- [ ] `@codkit/policy` Redis (Upstash) spend store: in-memory limits reset on serverless cold starts.
+- [ ] Optional USD caps: a `priceOf(asset)` hook with a Pyth adapter (needs an oracle; defer until a project needs it).
 
 ### UI quality pass: `unslop` and `modern-web-guidance`
 

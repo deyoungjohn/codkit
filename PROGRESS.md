@@ -14,13 +14,24 @@ Provenance: entries before 2026-10-29 were reconstructed from git history and th
 | Phase 2 (`@codkit/wallet`, `@codkit/ui`, Vite + Next examples)         | Done; owner has tested with real wallets          | wallet 0.1.2 · ui 0.1.3                                                              |
 | Phase 3 (contracts usable from other repos, deployments in config)     | Done; codegen intentionally not wrapped           |                                                                                      |
 | Phase 4 (`@codkit/agent-tools`)                                        | Done                                              | agent-tools 0.1.0 · mcp 0.3.0                                                        |
+| `@codkit/ai` (providers, fallback, structured output)                  | **Built, unpublished**                            |                                                                                      |
 | Phase 5 (`create-app` + templates)                                     | **Dropped**: replaced by an external consumer app |                                                                                      |
 
 All nine packages publish through GitHub Actions Trusted Publishing (set up 2026-11-19). Nothing has been deployed to a mainnet.
 
-**Waiting on the owner:** phone check of the "Open in …" deep links (MetaMask's encoding is the unverified one); a WalletConnect project ID if they want it on in the examples; the Trust Wallet link report (could not be reproduced). Backlog that isn't Phase 4/5 lives in [TODO.md](TODO.md).
+**Waiting on the owner:** publish `@codkit/ai` by hand (remove `private`, `pnpm publish`, `npm trust github`); phone check of the "Open in …" deep links (MetaMask's encoding is the unverified one); a WalletConnect project ID if they want it on in the examples; the Trust Wallet link report (could not be reproduced). Backlog that isn't Phase 4/5 lives in [TODO.md](TODO.md).
 
 ## Log
+
+### 2026-11-27 — `@codkit/ai`: every model provider, with fallback and structured output
+
+- **Why:** the 2027 blueprint review; the owner wants every provider supported (Anthropic included) and picked this first. Built on the Vercel AI SDK, which has the AI Gateway built in but no provider fallback (checked in `ai` 7.0.183's exports).
+- **What:** `modelsFromEnv()` turns keys into models for the gateway, Anthropic, OpenAI, Google, Groq (native SDK packages), OpenRouter, NIM, AgentRouter and any OpenAI-compatible URL; `LLM_PROVIDER`, `<NAME>_MODEL` and `LLM_MODEL` as in `@codkit/mcp`, whose names (`gemini`, `nim`) work as aliases. `withFallback()` / `modelFromEnv()` is one model that moves on after 408/409/425/429/5xx, exhausted retries, network failures or a per-attempt timeout (60s; streams only while connecting), never after a 4xx bug or a caller abort. `generateStructured()` also moves on when the answer doesn't fit the schema. Provider packages are regular dependencies (static imports, so Next.js bundling works); default model ids were read from each package's own model list. **Private** until the owner publishes it by hand.
+- **Verified:** 15 unit tests on the SDK's own `MockLanguageModelV4` (generate and stream paths). Mutation checks: falling back on every error, ignoring the caller's abort, not falling back on a schema misfit, and not treating 429 as transient each failed the right tests. **Live** (repo `.env` keys): Gemini Flash-Lite and Groq `gpt-oss-120b` did structured output plus a two-step tool call; `gemini-3.5-flash` hung on the free tier and the new timeout moved the chain on (that run first hung for 200s+, which is why the timeout exists); a live `generateStructured` fell back from `gemini-3.5-flash` to Flash-Lite and returned a valid object; `streamText` over `modelFromEnv()` streamed.
+- **Found:** Groq through the native `@ai-sdk/groq` handles multi-step tool calls, unlike the OpenAI-compatible path (the test app's `reasoning_content` failure). OpenRouter: the `.env`'s free slugs are partly retired; setting `supportsStructuredOutputs` made a free model hard-fail (which stops the chain), so it stays off and off-schema answers fall through instead.
+- **Not verified:** Anthropic, OpenAI and the AI Gateway live (no keys in `.env`); NIM and AgentRouter live this session.
+- **Backlog** (owner's order) added to TODO.md: the test-payment button, a Privy wallet adapter, GOAT/SendAI adapters after evidence checks, a shadcn registry; plus `DEMO_MODE`, a Redis spend store, optional USD caps.
+- The owner's untracked `docs/2027_web3_ai_hackathon_starter_blueprint.md` fails Biome's formatter; left untouched and unstaged.
 
 ### 2026-11-27 — Owner corrections: model providers, starter repo, oracle question
 

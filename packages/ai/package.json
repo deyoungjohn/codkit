@@ -1,0 +1,85 @@
+{
+  "name": "@codkit/ai",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Every model provider from env (Anthropic, OpenAI, Google, Groq, OpenRouter, NVIDIA NIM, AgentRouter, the Vercel AI Gateway, any OpenAI-compatible URL) as Vercel AI SDK models, with fallback to the next provider on rate limits and outages, and structured output.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "author": "Young John",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deyoungjohn/codkit.git",
+    "directory": "packages/ai"
+  },
+  "homepage": "https://github.com/deyoungjohn/codkit/tree/main/packages/ai#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "clean": "rm -rf dist .turbo",
+    "prepublishOnly": "pnpm run build",
+    "example:models": "tsx --env-file-if-exists=../../.env examples/models.ts",
+    "example:structured": "tsx --env-file-if-exists=../../.env examples/structured.ts"
+  },
+  "dependencies": {
+    "@ai-sdk/openai-compatible": "^3.0.96",
+    "@ai-sdk/provider": "^4.0.39"
+  },
+  "devDependencies": {
+    "@ai-sdk/anthropic": "^4.0.110",
+    "@ai-sdk/google": "^4.0.128",
+    "@ai-sdk/groq": "^4.0.88",
+    "@ai-sdk/openai": "^4.0.125",
+    "ai": "^7.0.183",
+    "zod": "^4.6.7"
+  },
+  "peerDependencies": {
+    "@ai-sdk/anthropic": "^4.0.0",
+    "@ai-sdk/google": "^4.0.0",
+    "@ai-sdk/groq": "^4.0.0",
+    "@ai-sdk/openai": "^4.0.0",
+    "ai": "^7.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@ai-sdk/anthropic": {
+      "optional": true
+    },
+    "@ai-sdk/openai": {
+      "optional": true
+    },
+    "@ai-sdk/google": {
+      "optional": true
+    },
+    "@ai-sdk/groq": {
+      "optional": true
+    }
+  }
+}

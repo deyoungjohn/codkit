@@ -6,7 +6,7 @@ Ship hackathon projects faster by owning the glue code that gets rewritten at ev
 
 Two tracks, in priority order:
 
-1. **dapp toolkit** (current priority; the owner uses it most): config, wallet, ui, agent-tools. Plan: [docs/HANDOFF.md](docs/HANDOFF.md).
+1. **dapp toolkit** (current priority; the owner uses it most): config, wallet, ui, agent-tools, ai. Plan: [docs/HANDOFF.md](docs/HANDOFF.md).
 2. **agent modules** (built, maintained): policy, pay, contracts, receipts, mcp, feed, demo-shell.
 
 ## Rules

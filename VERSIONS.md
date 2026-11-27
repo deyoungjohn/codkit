@@ -31,14 +31,16 @@ The versions codkit is built and tested against, checked on the npm registry and
 
 ## Agents and payments
 
-| Package                                            | Version | Notes                                                                |
-| -------------------------------------------------- | ------- | -------------------------------------------------------------------- |
-| `@x402/core`, `evm`, `svm`, `fetch`, `hono`, `mcp` | 2.31.0  | codkit pins `~2.28.0`; bump deliberately and rerun `e2e:x402-solana` |
-| `@modelcontextprotocol/sdk`                        | 1.32.2  |                                                                      |
-| `ai` (Vercel AI SDK)                               | 7.0.173 | Phase 4                                                              |
-| `@coinbase/agentkit`                               | 0.10.4  | Phase 4                                                              |
-| `@lifi/sdk`                                        | 4.13.0  | Phase 4                                                              |
-| `@jup-ag/api`                                      | 6.0.48  | Phase 4                                                              |
+| Package                                            | Version                              | Notes                                                                                                                                                                                           |
+| -------------------------------------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@x402/core`, `evm`, `svm`, `fetch`, `hono`, `mcp` | 2.31.0                               | codkit pins `~2.28.0`; bump deliberately and rerun `e2e:x402-solana`                                                                                                                            |
+| `@modelcontextprotocol/sdk`                        | 1.32.2                               |                                                                                                                                                                                                 |
+| `ai` (Vercel AI SDK)                               | 7.0.183                              | `@codkit/ai` (fallback models, structured output); has the AI Gateway built in (`createGateway`) and no provider fallback of its own (checked 2026-11-27)                                       |
+| `@ai-sdk/anthropic` / `openai` / `google` / `groq` | 4.0.110 / 4.0.125 / 4.0.128 / 4.0.88 | `@codkit/ai` dependencies. Default models read from each package's model list: `claude-sonnet-5-5`, `gpt-5.5`, `gemini-3.5-flash`, `openai/gpt-oss-120b`; gateway `anthropic/claude-sonnet-5.5` |
+| `@ai-sdk/openai-compatible` / `@ai-sdk/provider`   | 3.0.96 / 4.0.39                      | OpenRouter, NIM, AgentRouter, custom URLs; model spec `v4`                                                                                                                                      |
+| `@coinbase/agentkit`                               | 0.10.4                               | Phase 4                                                                                                                                                                                         |
+| `@lifi/sdk`                                        | 4.13.0                               | Phase 4                                                                                                                                                                                         |
+| `@jup-ag/api`                                      | 6.0.48                               | Phase 4                                                                                                                                                                                         |
 
 ## Frameworks
 
