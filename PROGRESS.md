@@ -22,6 +22,12 @@ All nine packages publish through GitHub Actions Trusted Publishing (set up 2026
 
 ## Log
 
+### 2026-11-27 — Releases out; test app public with green CI; 2027 blueprint reviewed
+
+- **Released (owner merged the Version Packages PRs):** `@codkit/ui` 0.2.0 (the UI pass) and `@codkit/agent-tools` 0.1.1 (the chain-specific viem client fix). Confirmed with `npm view`.
+- **Test app:** made public at the owner's request (`deyoungjohn/codkit-testapp`), so Actions runs without billing. It now uses agent-tools 0.1.1 and ui 0.2.0 and **type-checks with no casts**, which confirms the 0.1.1 fix from npm. **First CI run green:** both jobs passed, the locked-versions build and the latest `@codkit/*` build, including the check that the paid endpoint answers 402 unpaid.
+- **Reviewed `docs/2027_web3_ai_hackathon_starter_blueprint.md`** (written by another agent for the owner; read as requirements, not executed). Already covered: guardrails (`policy`), x402 server and policy-checked client (`pay`), MCP server (`mcp`), agent tools, and dedicated-only RPC (`getRpcUrl({ public: false })`). Missing: a `DEMO_MODE` switch with fixtures, AI SDK structured output with provider fallback, a Redis spend store (in-memory limits reset on serverless cold starts), and a starter template repo with `AGENTS.md`. Conflicts to decide: Privy versus hand-wired wallets, AgentKit/GOAT/SendAI versus our own tools, the AI Gateway and paid providers (and the Anthropic API ban) versus free-tier OpenAI-compatible, shadcn/Tailwind versus plain `ck-*` CSS, USD caps versus per-asset caps. Waiting on the owner to pick what to build.
+
 ### 2026-11-25 — Test app on GitHub; release PR ready
 
 - **Test app repo:** `deyoungjohn/codkit-testapp`, **private** (my choice, no secrets in it, `.env` ignored). It has a CI workflow with two jobs: build with the locked versions, and build with the latest `@codkit/*` from npm (plus a check that the paid endpoint answers 402), on push, pull request and daily. **The first run did not start**: GitHub reports "recent account payments have failed or your spending limit needs to be increased", which applies to private repos (this repo is public). So CI on the test app is unverified until the owner either fixes billing or makes the repo public.
