@@ -22,7 +22,15 @@ const port = await new Promise<number>((r) => {
     s.close(() => r(p));
   });
 });
-const next = spawn("pnpm", ["exec", "next", "start", "-p", String(port)], { cwd: root, stdio: "ignore" });
+// x402 from the browser: with E2E_PAYER_KEY (a funded Base Sepolia TEST key) the payment really settles, to the
+// payer itself; without it, a fresh unfunded key gets as far as the facilitator, which must refuse it.
+const payerKey = process.env.E2E_PAYER_KEY as `0x${string}` | undefined;
+const payer = privateKeyToAccount(payerKey ?? generatePrivateKey());
+const next = spawn("pnpm", ["exec", "next", "start", "-p", String(port)], {
+  cwd: root,
+  stdio: "ignore",
+  env: { ...process.env, PAY_TO: payer.address },
+});
 for (let i = 0; i < 100; i++) {
   const up = await new Promise<boolean>((r) => {
     const s = connect(port, "127.0.0.1", () => {
@@ -87,7 +95,36 @@ try {
   await early.getByRole("button", { name: "Connect wallet" }).click();
   await early.getByRole("button", { name: /Early One/ }).waitFor();
   if (earlyProblems.length) throw new Error(`wallets announced before hydration broke it:\n${earlyProblems.join("\n")}`);
-  console.log("• wallets announced before hydration (browser extensions) … ok\n\nPASS");
+  console.log("• wallets announced before hydration (browser extensions) … ok");
+
+  const pay = await browser.newPage();
+  await installWallets(
+    pay,
+    { account: payer, chain: baseSepolia, rpcUrl: "https://sepolia.base.org" },
+    { signer: await generateKeyPairSigner() },
+  );
+  await pay.goto(url);
+  await pay.getByRole("button", { name: "Connect wallet" }).click();
+  await pay.getByRole("button", { name: /Codkit Test EVM/ }).click();
+  await pay.getByTestId("status").getByText("evm: connected on Base Sepolia").waitFor();
+  await pay.getByRole("button", { name: "Test x402 payment" }).click();
+  if (payerKey) {
+    await pay
+      .locator(".ck-pay-status")
+      .getByText(/Paid 0\.001 USDC/)
+      .waitFor({ timeout: 90_000 });
+    const href = await pay.locator(".ck-pay-status a").getAttribute("href");
+    console.log(`• x402 from the browser: the wallet signed, the facilitator settled 0.001 USDC … ok\n    ${href}`);
+  } else {
+    const alert = pay.locator(".ck-pay-failed");
+    await alert.waitFor({ timeout: 60_000 });
+    const text = (await alert.textContent()) ?? "";
+    if (/Refused before signing/.test(text)) throw new Error(`the policy refused a 0.001 USDC payment: ${text}`);
+    console.log(
+      `• x402 from the browser: the wallet signed, the facilitator refused the unfunded payer … ok (${text.trim().slice(0, 90)})`,
+    );
+  }
+  console.log("\nPASS");
 } catch (e) {
   failed = true;
   console.log(`FAILED — ${e instanceof Error ? e.message : String(e)}`);

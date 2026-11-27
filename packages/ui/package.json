@@ -34,6 +34,16 @@
         "default": "./dist/index.cjs"
       }
     },
+    "./pay": {
+      "import": {
+        "types": "./dist/pay.d.ts",
+        "default": "./dist/pay.js"
+      },
+      "require": {
+        "types": "./dist/pay.d.cts",
+        "default": "./dist/pay.cjs"
+      }
+    },
     "./styles.css": "./dist/styles.css",
     "./package.json": "./package.json"
   },
@@ -53,16 +63,32 @@
     "@codkit/config": "workspace:^"
   },
   "peerDependencies": {
+    "@codkit/pay": "workspace:^",
+    "@codkit/policy": "workspace:^",
     "@codkit/wallet": "workspace:^",
     "react": ">=18"
   },
   "devDependencies": {
+    "@codkit/pay": "workspace:^",
+    "@codkit/policy": "workspace:^",
     "@codkit/wallet": "workspace:^",
     "@testing-library/react": "^16.3.3",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "@x402/core": "~2.28.0",
+    "@x402/hono": "~2.28.0",
     "happy-dom": "^20.14.6",
+    "hono": "^4.10.0",
     "react": "^19.3.0",
-    "react-dom": "^19.3.0"
+    "react-dom": "^19.3.0",
+    "viem": "^2.58.7"
+  },
+  "peerDependenciesMeta": {
+    "@codkit/pay": {
+      "optional": true
+    },
+    "@codkit/policy": {
+      "optional": true
+    }
   }
 }

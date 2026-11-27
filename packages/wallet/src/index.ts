@@ -2,6 +2,8 @@ export { isWalletError, toWalletError, WalletError, type WalletErrorCode } from 
 export { useWallet, useWallets, WalletProvider, type WalletProviderProps } from "./react.js";
 export type {
   EvmTransaction,
+  EvmTypedData,
+  EvmWalletActions,
   SolanaInstructionLike,
   SolanaTransaction,
   Wallet,

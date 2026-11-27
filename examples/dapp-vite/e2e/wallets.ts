@@ -55,6 +55,29 @@ export async function installWallets(page: Page, evm: EvmBackend, sol: SolanaBac
         return null;
       case "personal_sign":
         return evm.account.signMessage!({ message: { raw: params[0] as `0x${string}` } });
+      case "eth_signTypedData_v4": {
+        // JSON-RPC sends numbers as strings; viem wants bigints for the integer fields
+        const td = JSON.parse(params[1] as string) as {
+          domain: Record<string, unknown>;
+          types: Record<string, { name: string; type: string }[]>;
+          primaryType: string;
+          message: Record<string, unknown>;
+        };
+        const { EIP712Domain: _, ...types } = td.types;
+        const ints = (fields: { name: string; type: string }[] = [], o: Record<string, unknown>) =>
+          Object.fromEntries(
+            Object.entries(o).map(([k, v]) => [
+              k,
+              /^u?int\d*$/.test(fields.find((f) => f.name === k)?.type ?? "") ? BigInt(v as string) : v,
+            ]),
+          );
+        return evm.account.signTypedData!({
+          domain: td.domain,
+          types,
+          primaryType: td.primaryType,
+          message: ints(types[td.primaryType], td.message),
+        } as never);
+      }
       case "eth_sendTransaction": {
         const tx = params[0] as { to: `0x${string}`; value?: `0x${string}`; data?: `0x${string}` };
         return client.sendTransaction({ to: tx.to, ...(tx.value && { value: BigInt(tx.value) }), ...(tx.data && { data: tx.data }) });

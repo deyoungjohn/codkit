@@ -1,5 +1,5 @@
 export { type FallbackEvent, type FallbackOptions, isTransient, withFallback } from "./fallback.js";
-export { modelsFromEnv, type NamedModel, PROVIDERS, type ProviderName, type ProviderPreset } from "./providers.js";
+export { modelsFromEnv, type NamedModel, OPENROUTER_STRUCTURED, PROVIDERS, type ProviderName, type ProviderPreset } from "./providers.js";
 export { generateStructured, type StructuredOptions, type StructuredResult } from "./structured.js";
 
 import type { LanguageModelV4 } from "@ai-sdk/provider";

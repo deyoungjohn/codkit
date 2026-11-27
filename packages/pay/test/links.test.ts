@@ -55,3 +55,12 @@ describe("payment links", () => {
     expect(() => usdcTransferTx({ chain: DEVNET, to: SOL_TO, amount: 1n })).toThrow(/EVM-only/);
   });
 });
+
+describe("USDC table", () => {
+  // Checked on-chain 2026-11-27: every EVM entry has contract code and 6 decimals; the Solana mints are SPL mints
+  // with 6 decimals. The mainnet mint was once mistyped here (an address with no account), so it's pinned.
+  it("has Circle's Solana mainnet USDC mint", () => {
+    expect(usdcAddress("solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp")).toBe("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+    expect(usdcAddress("solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1")).toBe("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU");
+  });
+});

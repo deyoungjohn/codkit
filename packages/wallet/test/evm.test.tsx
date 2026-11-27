@@ -1,6 +1,6 @@
 import { act, renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { createPublicClient, http, parseEther, verifyMessage } from "viem";
+import { createPublicClient, http, parseEther, verifyMessage, verifyTypedData } from "viem";
 import { mock } from "wagmi/connectors";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { evmAdapter } from "../src/evm.js";
@@ -36,6 +36,39 @@ describe("evmAdapter wallet list", () => {
     expect(evmAdapter({ chains: ["anvil"], env: {} }).getSnapshot().wallets).toEqual([
       { id: "injected", name: "Injected", ecosystem: "evm" },
     ]);
+  });
+});
+
+describe("evmAdapter typed data", () => {
+  it("signs EIP-712 data (an x402 authorization) that verifies for the connected address, through useWallet too", async () => {
+    const a = adapter();
+    const off = a.mount();
+    await a.connect("mock");
+    const data = {
+      domain: { name: "USDC", version: "2", chainId: 31337, verifyingContract: "0x036CbD53842c5426634e7929541eC2318f3dCF7e" as const },
+      types: {
+        TransferWithAuthorization: [
+          { name: "from", type: "address" },
+          { name: "to", type: "address" },
+          { name: "value", type: "uint256" },
+          { name: "validAfter", type: "uint256" },
+          { name: "validBefore", type: "uint256" },
+          { name: "nonce", type: "bytes32" },
+        ],
+      },
+      primaryType: "TransferWithAuthorization" as const,
+      message: { from: ALICE, to: BOB, value: 1000n, validAfter: 0n, validBefore: 2n ** 40n, nonce: `0x${"11".repeat(32)}` as const },
+    };
+    const signature = await a.signTypedData(data);
+    expect(await verifyTypedData({ address: ALICE, ...data, signature })).toBe(true);
+
+    const { result } = renderHook(() => useWallet("evm"), {
+      wrapper: ({ children }: { children: ReactNode }) => <WalletProvider adapters={[a]}>{children}</WalletProvider>,
+    });
+    const again = await act(() => result.current.signTypedData(data));
+    expect(await verifyTypedData({ address: ALICE, ...data, signature: again })).toBe(true);
+    await a.disconnect();
+    off();
   });
 });
 

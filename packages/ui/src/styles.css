@@ -584,3 +584,34 @@ a.ck-option {
     outline: 2px solid Highlight;
   }
 }
+
+/* -------------------------------------------------------------- pay button */
+.ck-pay {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  font-family: var(--ck-font);
+}
+.ck-pay-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  min-height: 20px;
+  color: var(--ck-muted);
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+.ck-pay-status a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ck-fg);
+  text-underline-offset: 3px;
+}
+.ck-pay-paid .ck-svg {
+  color: var(--ck-success);
+}
+.ck-pay-failed {
+  color: var(--ck-danger);
+}

@@ -17,6 +17,7 @@ import {
   getConnectors,
   sendTransaction,
   signMessage,
+  signTypedData,
   switchChain,
   waitForTransactionReceipt,
   watchConnection,
@@ -25,7 +26,7 @@ import {
 import { injected, walletConnect } from "wagmi/connectors";
 import { WalletError } from "./errors.js";
 import { createStore, toWalletError } from "./store.js";
-import type { WalletAdapter, WalletInfo, WalletSnapshot } from "./types.js";
+import type { EvmWalletActions, WalletAdapter, WalletInfo, WalletSnapshot } from "./types.js";
 
 export interface EvmAdapterOptions {
   /** EVM chains, default first: `["base-sepolia", "sepolia"]`. */
@@ -44,11 +45,12 @@ export interface EvmAdapterOptions {
   queryClient?: QueryClient;
 }
 
-export type EvmAdapter = WalletAdapter<"evm"> & {
-  /** The wagmi config, so the app can use wagmi hooks and actions directly. */
-  wagmiConfig: Config;
-  queryClient: QueryClient;
-};
+export type EvmAdapter = WalletAdapter<"evm"> &
+  EvmWalletActions & {
+    /** The wagmi config, so the app can use wagmi hooks and actions directly. */
+    wagmiConfig: Config;
+    queryClient: QueryClient;
+  };
 
 export function evmAdapter(opts: EvmAdapterOptions): EvmAdapter {
   const chainConfigs = opts.chains.map(getChain);
@@ -212,6 +214,15 @@ export function evmAdapter(opts: EvmAdapterOptions): EvmAdapter {
         if (connector) store.set({ lastDisconnect: { wallet: info(connector), revoked } });
       }),
     signMessage: (message) => run("sign the message", () => sign(message)),
+    signTypedData: (data) =>
+      run("sign the message", async () => {
+        const want = Number(data.domain.chainId);
+        if (want && want !== read().chain.chainId && byChainId.has(want)) {
+          await switchChain(wagmiConfig, { chainId: want });
+          refresh();
+        }
+        return signTypedData(wagmiConfig, data as Parameters<typeof signTypedData>[1]);
+      }),
     sendTransaction: (tx) =>
       run("send the transaction", () =>
         sendTransaction(wagmiConfig, {

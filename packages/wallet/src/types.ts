@@ -86,4 +86,22 @@ export interface WalletAdapter<E extends WalletEcosystem = WalletEcosystem> exte
   Provider?: ComponentType<{ children: ReactNode }>;
 }
 
-export type Wallet<E extends WalletEcosystem = WalletEcosystem> = WalletSnapshot & { ecosystem: E } & WalletActions<E>;
+/** EIP-712 typed data, as `eth_signTypedData_v4` takes it (an x402 payment authorization, a permit, a login …). */
+export interface EvmTypedData {
+  domain: Record<string, unknown>;
+  types: Record<string, unknown>;
+  primaryType: string;
+  message: Record<string, unknown>;
+}
+
+/** What only EVM wallets can do. */
+export interface EvmWalletActions {
+  /**
+   * EIP-712 sign. If the domain names another chain this adapter knows, the wallet switches to it first
+   * (MetaMask and others refuse a domain `chainId` that isn't the active chain).
+   */
+  signTypedData(data: EvmTypedData): Promise<`0x${string}`>;
+}
+
+export type Wallet<E extends WalletEcosystem = WalletEcosystem> = WalletSnapshot & { ecosystem: E } & WalletActions<E> &
+  ([E] extends ["evm"] ? EvmWalletActions : unknown);

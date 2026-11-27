@@ -73,6 +73,11 @@ describe("modelsFromEnv", () => {
     expect(m.map((x) => `${x.provider}:${x.modelId}`)).toEqual(["google:gemini-3.5-flash-lite", "nvidia:openai/gpt-oss-120b"]);
   });
 
+  it("OpenRouter defaults to Nemotron 3.5 Super VL first", () => {
+    const m = modelsFromEnv({ OPENROUTER_API_KEY: "k" });
+    expect(m.map((x) => x.modelId)).toEqual(["nvidia/nemotron-3.5-super-vl:free", "google/gemma-4-31b-it:free"]);
+  });
+
   it("custom points at any OpenAI-compatible URL", () => {
     const [m] = modelsFromEnv({ LLM_PROVIDER: "custom", LLM_BASE_URL: "http://localhost:11434/v1", LLM_MODEL: "llama3.3" });
     expect(m).toMatchObject({ provider: "custom", modelId: "llama3.3" });

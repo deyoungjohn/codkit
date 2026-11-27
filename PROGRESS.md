@@ -23,6 +23,15 @@ All nine packages publish through GitHub Actions Trusted Publishing (set up 2026
 
 ## Log
 
+### 2026-11-27 — Test-payment button (`@codkit/ui/pay`), typed-data signing, Nemotron fallback, a wrong USDC mint
+
+- **`@codkit/ui/pay`** (owner's pick 1): `<PayButton url>` and `usePaidFetch()` pay x402 endpoints from the connected EVM wallet through `@codkit/pay`'s policy-checked client; default cap 0.01 USDC a request and 10× that per page load, USDC only; shows the settlement with an explorer link or the facilitator's reason. Needs the new **`signTypedData`** on EVM wallets in `@codkit/wallet` (switches to the domain's chain first, since wallets refuse another chain's `chainId`). The Next example gets a paywalled `/api/paid/price` (`@codkit/pay/hono`, public x402.org facilitator) and the button. Changesets: wallet minor, ui minor.
+- **Verified:** wallet: typed-data signatures verify for the connected address on a real Anvil, directly and through `useWallet` (24 tests). ui: 4 new tests against a real `paywall()` with a facilitator that recovers the EIP-3009 signer from the signature (pays and shows the tx link; refuses above the cap with **no signature asked for**; stops at the page total; disabled without a wallet), 27 total. **Real browser, real facilitator** (Next example e2e, production build): an unfunded key's payment is refused with "Payment not accepted: invalid_exact_evm_insufficient_balance"; with the agent test key (`E2E_PAYER_KEY`) **0.001 USDC settled on Base Sepolia** (`0x71b0a5a1…0902`, paid to itself). The Vite wallet e2e still passes after teaching the test wallet `eth_signTypedData_v4`.
+- **Bug found and fixed in `@codkit/pay`:** the `USDC` table's Solana **mainnet** mint was a mistyped address with no account on-chain (since `ab5c2f5`, 2026-10-29), so mainnet Solana payment links pointed at a token that doesn't exist. Now Circle's `EPjFWdd5…Dt1v`, pinned by a test. Every other entry was checked on-chain (EVM: code and 6 decimals on all ten chains; Amoy's `symbol()` call didn't answer). Changeset: pay patch.
+- **`@codkit/ai`:** OpenRouter's **Nemotron 3.5 Super VL** (free) is now the first OpenRouter fallback (owner's request). Live: tools work; structured output works only with JSON-schema output switched on, so that flag is set per model for known-good ones (`OPENROUTER_STRUCTURED`) and stays off for the rest.
+- **Also fixed:** the Next example and `@codkit/ui` dev deps now use the workspace's `hono` 4.13.13 (a second copy broke the paywall's types).
+- **Not verified:** the button with a real wallet extension in the owner's Chrome; Solana x402 from the browser (not built).
+
 ### 2026-11-27 — `@codkit/ai`: every model provider, with fallback and structured output
 
 - **Why:** the 2027 blueprint review; the owner wants every provider supported (Anthropic included) and picked this first. Built on the Vercel AI SDK, which has the AI Gateway built in but no provider fallback (checked in `ai` 7.0.183's exports).

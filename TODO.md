@@ -59,7 +59,7 @@ Install Rust, the Solana CLI and Anchor (`avm`). Then the Solana items in sectio
 Boilerplate ships as npm packages (no starter repo; see CLAUDE.md). In the owner's order after `@codkit/ai`:
 
 - [x] **`@codkit/ai`**: every provider from env as AI SDK models, fallback on 429/timeouts/outages, structured output (built 2026-11-27; private until published by hand).
-- [ ] **1. Test-payment button**: a UI component that pays an x402 endpoint from the connected browser wallet, through the policy-checked client, with the result shown.
+- [x] **1. Test-payment button**: `@codkit/ui/pay` (`<PayButton>`, `usePaidFetch`), EVM; settled a real Base Sepolia payment from a browser (2026-11-27). Solana x402 from the browser is still open.
 - [ ] **2. `@codkit/wallet/privy`**: email/social login with embedded wallets behind the same `useWallet()`.
 - [ ] **3. GOAT / SendAI adapters**: only after the evidence checks (install size, Node 22 import, whether their signer can be wrapped by `@codkit/policy`).
 - [ ] **4. shadcn registry** for `@codkit/ui` (`npx shadcn add <url>`).

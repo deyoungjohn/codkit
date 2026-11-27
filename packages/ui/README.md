@@ -45,3 +45,18 @@ Also exported: `parseAmount`, `formatAmount`, `shortAddress`.
 ## Styling
 
 `styles.css` uses plain classes (`ck-*`) and CSS variables (`--ck-accent`, `--ck-radius`, `--ck-bg` …) with light and dark themes (`prefers-color-scheme`, or `data-theme` on `<html>`). Skip it and style the `ck-*` classes yourself, or pass `className`. No Tailwind required. Helpers for your own screens: `ck-button-secondary` (the quiet companion to a primary button), `ck-field` (a labelled text input), and `--ck-raised` / `--ck-radius-lg` for one step up in surface and radius.
+
+## Paid requests (x402): `@codkit/ui/pay`
+
+`<PayButton>` requests a paid endpoint, pays its x402 price from the connected EVM wallet, and shows the settlement with an explorer link. The wallet signs a USDC transfer authorization (EIP-3009); the server's facilitator settles it and pays the gas. Every payment goes through a `@codkit/policy` engine before the wallet is asked to sign: by default at most 0.01 USDC a request and 10× that per page load, USDC only.
+
+```tsx
+import { PayButton, usePaidFetch } from "@codkit/ui/pay"; // needs @codkit/pay and @codkit/policy installed
+
+<PayButton url="/api/paid/price" label="Test x402 payment" onResponse={async (res) => setData(await res.json())} />;
+
+// or your own UI: a fetch that pays
+const { fetch: paidFetch, ready } = usePaidFetch({ maxPerPayment: "0.05" });
+```
+
+Pass `engine` for your own limits (other assets, human approval, a kill switch). EVM only for now. The server side is `paywall()` from `@codkit/pay/hono` or `/express`. Checked end to end in a real browser: the Next example's e2e paid its own `/api/paid/price` through the public Base Sepolia facilitator.

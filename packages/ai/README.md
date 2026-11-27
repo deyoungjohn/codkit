@@ -65,7 +65,7 @@ With tools from codkit (`@codkit/agent-tools`, `policy`, `pay`), pass `toAiSdkTo
 - `generateStructured` retries each model once (`maxRetries: 1`) before moving on.
 - Groq through the native provider handles multi-step tool calls. Through a plain OpenAI-compatible client, its reasoning models reject the replayed `reasoning_content`.
 
-Live check on 2026-11-27 (`pnpm --filter @codkit/ai example:models`): Gemini Flash-Lite and Groq `gpt-oss-120b` did structured output and a two-step tool call. `gemini-3.5-flash` timed out on the free tier and the chain moved on. Several OpenRouter free slugs had been retired.
+Live check on 2026-11-27 (`pnpm --filter @codkit/ai example:models`): Gemini Flash-Lite and Groq `gpt-oss-120b` did structured output and a two-step tool call. `gemini-3.5-flash` timed out on the free tier and the chain moved on. Several OpenRouter free slugs had been retired. OpenRouter's Nemotron 3.5 Super VL (free) did both once JSON-schema output was switched on for it (`OPENROUTER_STRUCTURED`); without that, its answers didn't fit the schema.
 
 ## Examples
 

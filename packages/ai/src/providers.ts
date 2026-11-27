@@ -20,6 +20,9 @@ const compatible =
   (apiKey: string, modelId: string) =>
     createOpenAICompatible({ name, baseURL, apiKey, ...extra })(modelId) as LanguageModelV4;
 
+/** OpenRouter models checked to return valid JSON-schema output when asked for it. */
+export const OPENROUTER_STRUCTURED: RegExp[] = [/^nvidia\/nemotron-3\.5-super-vl/];
+
 /**
  * Every provider codkit knows, in auto-detect order: when `LLM_PROVIDER` is unset, each one whose key is set is
  * used, in this order. Defaults were read from each provider package's own model list (2026-11-27); free
@@ -53,10 +56,15 @@ export const PROVIDERS = {
   },
   openrouter: {
     keyEnv: ["OPENROUTER_API_KEY"],
-    model: "nvidia/nemotron-3-ultra-550b-a55b:free,google/gemma-4-31b-it:free",
-    // No `supportsStructuredOutputs`: many free models reject JSON-schema formats outright (a hard error that
-    // stops the chain); without it a model that ignores the schema fails validation and the chain moves on.
-    create: compatible("openrouter", "https://openrouter.ai/api/v1", { headers: { "X-Title": "codkit" } }),
+    // Nemotron 3.5 Super VL: tools, JSON-schema output, 1M context, image/video input (checked live 2026-11-27)
+    model: "nvidia/nemotron-3.5-super-vl:free,google/gemma-4-31b-it:free",
+    create: (apiKey, modelId) =>
+      compatible("openrouter", "https://openrouter.ai/api/v1", {
+        headers: { "X-Title": "codkit" },
+        // Only for models known to honour JSON-schema formats: many free ones reject them outright (a hard error
+        // that stops the chain), while without the flag an answer that ignores the schema just falls through.
+        supportsStructuredOutputs: OPENROUTER_STRUCTURED.some((re) => re.test(modelId)),
+      })(apiKey, modelId),
   },
   nvidia: {
     keyEnv: ["NVIDIA_API_KEY"],

@@ -17,7 +17,7 @@ export const USDC: Readonly<Record<string, string>> = {
   "eip155:421614": "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d",
   "eip155:137": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
   "eip155:80002": "0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582",
-  "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp": "EPjFWdvwXcSi2HvXqrJ6Q1PBdB3Ksdmvt1RZTZhzQpVM",
+  "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
   "solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
 };
 

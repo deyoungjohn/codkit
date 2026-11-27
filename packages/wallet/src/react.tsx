@@ -1,6 +1,6 @@
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useSyncExternalStore } from "react";
 import type { WalletSnapshot } from "./types.js";
-import type { Wallet, WalletAdapter, WalletEcosystem } from "./types.js";
+import type { EvmWalletActions, Wallet, WalletAdapter, WalletEcosystem } from "./types.js";
 
 type Adapters = Partial<{ [E in WalletEcosystem]: WalletAdapter<E> }>;
 
@@ -49,6 +49,7 @@ const toWallet = (a: WalletAdapter, snap: WalletSnapshot): Wallet =>
     sendTransaction: a.sendTransaction,
     switchChain: a.switchChain,
     waitForTransaction: a.waitForTransaction,
+    ...("signTypedData" in a && { signTypedData: (a as WalletAdapter & EvmWalletActions).signTypedData }),
   }) as Wallet;
 
 /**
