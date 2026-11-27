@@ -22,6 +22,13 @@ All nine packages publish through GitHub Actions Trusted Publishing (set up 2026
 
 ## Log
 
+### 2026-11-27 — Owner corrections: model providers, starter repo, oracle question
+
+- **No Anthropic ban.** CLAUDE.md said "Do NOT use the Anthropic API". The owner never decided that; it entered with `d519b4d` (2026-10-15), when the agent loop moved to free-tier OpenAI-compatible providers. Corrected: support as many providers as possible (Anthropic, OpenAI, Google, Groq, NIM, OpenRouter, AgentRouter, AI Gateway, any OpenAI-compatible URL); free tiers stay the default for tests and examples.
+- **No starter template repo.** Pre-existing commits can get a project auto-disqualified by review agents. Boilerplate ships as npm packages; at an event the owner creates a private lab repo, clones the project repo into it, installs the packages and has agents port the code. Recorded in CLAUDE.md.
+- **Public RPC fallback stays as is** (owner).
+- **USD caps:** the owner asked whether this needs an oracle. Yes, for anything that isn't a stablecoin; answered in the session, nothing built.
+
 ### 2026-11-27 — Releases out; test app public with green CI; 2027 blueprint reviewed
 
 - **Released (owner merged the Version Packages PRs):** `@codkit/ui` 0.2.0 (the UI pass) and `@codkit/agent-tools` 0.1.1 (the chain-specific viem client fix). Confirmed with `npm view`.

@@ -30,7 +30,7 @@ Chains first: **EVM + Solana**; Sui follows as an adapter. Templates: **Next.js 
 - Phase 2 ✅ (published 2026-11-19): `@codkit/wallet` (`useWallet()` → `{ ecosystem, address, connect, disconnect, signMessage, sendTransaction, switchChain }`) and `@codkit/ui` (ConnectButton, TokenAmountInput, TxStatusToast, AddressPill, ChainSwitcher; shadcn-style, copy-in or import).
 - Phase 3 ✅ (2026-11-19): contracts consumable from other repos: `forge install` + remapping into `packages/contracts/evm/src`, a cargo git dependency, a Move git dependency with `subdir`; deploy JSON readable by `@codkit/config`. Codegen: no codkit wrapper (owner's decision, 2026-11-20); the Phase 5 templates wire the official generators (`@wagmi/cli` for Foundry, Codama for Anchor, `@mysten/codegen` for Move) behind `pnpm codegen`.
 - Phase 4 ✅ (published 2026-11-24, [decision 0002](docs/decisions/0002-agent-tools.md)): `@codkit/agent-tools` (get_balance, transfer, quote_swap, swap on EVM + Solana; Uniswap v3 / LI.FI / Jupiter providers, no AgentKit; AI SDK export is `@codkit/mcp/ai-sdk`; dry-run and per-call caps, reusing `@codkit/policy`). Payments are already `@codkit/pay`.
-- Phase 5 dropped (owner's decision, 2026-11-25): no `create-app` scaffolder. Instead a real consumer app outside this workspace (`~/Projects/codkit-testapp`, installs `@codkit/*` from npm) proves the packages work the way a hackathon team uses them. Codegen stays the official generators (`@wagmi/cli`, Codama, `@mysten/codegen`), wired by each project.
+- Phase 5 dropped (owner's decision, 2026-11-25): no `create-app` scaffolder, and no starter template repo either (2026-11-27): pre-existing commits can get a project auto-disqualified by review agents. Boilerplate ships as npm packages instead; at an event the owner creates a private lab repo, clones the project repo into it, installs the packages, and has agents port the code. Instead a real consumer app outside this workspace (`~/Projects/codkit-testapp`, installs `@codkit/*` from npm) proves the packages work the way a hackathon team uses them. Codegen stays the official generators (`@wagmi/cli`, Codama, `@mysten/codegen`), wired by each project.
 
 ## Agent modules (built)
 
@@ -49,5 +49,5 @@ policy (guardrails: caps, allow/deny, approval, simulate, kill switch) · pay (x
 - pnpm + Turborepo, TypeScript strict (5.9), tsup, Biome, Zod, Vitest, Changesets, GitHub Actions (Trusted Publishing to npm under `@codkit`).
 - Chains: viem/wagmi (EVM), @solana/kit + @solana/react + Anchor (Solana), @mysten/sui (Sui). Contracts: Foundry, Anchor, Sui Move.
 - Frontend: Next.js and Vite, Tailwind. Backend: Node (Hono/Express).
-- AI: provider-neutral OpenAI-compatible Chat Completions (Groq, Gemini, NVIDIA NIM, OpenRouter, AgentRouter free tiers), MCP TypeScript SDK. Do NOT use the Anthropic API.
+- AI: support as many model providers as possible (Anthropic, OpenAI, Google, Groq, NVIDIA NIM, OpenRouter, AgentRouter, the Vercel AI Gateway, any OpenAI-compatible URL), because projects have different needs. Free tiers are the default for tests and examples, not a limit. MCP TypeScript SDK.
 - Licence: MIT.
