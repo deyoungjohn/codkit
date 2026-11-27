@@ -1,6 +1,6 @@
 {
   "name": "@codkit/wallet",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "One useWallet() for EVM and Solana dapps: hand-wired wagmi + Wallet Standard adapters, one swappable file per ecosystem.",
   "license": "MIT",
   "engines": {
